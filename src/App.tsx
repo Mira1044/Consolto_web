@@ -1,41 +1,21 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import Features from './components/Features';
-import HowItWorks from './components/HowItWorks';
-import Benefits from './components/Benefits';
-import Testimonials from './components/Testimonials';
-import CTA from './components/CTA';
-import Footer from './components/Footer';
-import Experts from './components/Experts';
-import Booking from './components/Booking';
-import ProtectedRoute from './components/ProtectedRoute';
-import ContactPage from './components/ContactPage';
+import { MainLayout } from '@/shared/components/layout';
+import { HomePage } from '@/pages/home';
+import { ExpertsPage } from '@/pages/experts';
+import { BookingPage } from '@/pages/booking';
+import { ContactPage } from '@/pages/contact';
+import { ProtectedRoute } from '@/routes/guards';
 
-function App() {
+function App(): JSX.Element {
   return (
-    <div className="min-h-screen">
-      <Navbar />
+    <MainLayout>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <>
-              <Hero />
-              <Features />
-              <HowItWorks />
-              <Benefits />
-              <Testimonials />
-              <CTA />
-              <Footer />
-            </>
-          }
-        />
+        <Route path="/" element={<HomePage />} />
         <Route
           path="/experts"
           element={
             <ProtectedRoute>
-              <Experts />
+              <ExpertsPage />
             </ProtectedRoute>
           }
         />
@@ -43,14 +23,14 @@ function App() {
           path="/booking"
           element={
             <ProtectedRoute>
-              <Booking />
+              <BookingPage />
             </ProtectedRoute>
           }
         />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </div>
+    </MainLayout>
   );
 }
 
