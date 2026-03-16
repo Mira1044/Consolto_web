@@ -73,10 +73,11 @@ export default function Hero() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: 50, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative hidden md:block"
+            whileHover={{ rotateX: -6, rotateY: 6, scale: 1.02 }}
+            className="relative hidden md:block [perspective:1200px]"
           >
             {floatingCards.map((card, index) => (
               <motion.div

@@ -28,8 +28,10 @@ export default function CTA() {
           </p>
 
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.07 }}
             whileTap={{ scale: 0.95 }}
+            animate={{ scale: [1, 1.03, 1] }}
+            transition={{ duration: 2.5, repeat: Infinity, repeatType: 'loop' }}
             className="bg-white text-blue-600 px-10 py-5 rounded-full font-bold text-lg shadow-2xl hover:shadow-3xl transition-all inline-flex items-center gap-3 group"
           >
             Get Started Now

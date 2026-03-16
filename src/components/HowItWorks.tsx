@@ -55,7 +55,9 @@ export default function HowItWorks() {
                 className="relative"
               >
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.05, y: -6 }}
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, delay: index * 0.3 }}
                   className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border border-blue-100 relative z-10"
                 >
                   <div className="flex flex-col items-center text-center">

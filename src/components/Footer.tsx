@@ -4,10 +4,10 @@ import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'luc
 export default function Footer() {
   const quickLinks = ['Features', 'How It Works', 'Pricing', 'About Us', 'Blog', 'Careers'];
   const socialLinks = [
-    { icon: Facebook, href: '#' },
-    { icon: Twitter, href: '#' },
-    { icon: Instagram, href: '#' },
-    { icon: Linkedin, href: '#' },
+    { icon: Facebook, href: 'https://www.facebook.com/bconsolto/', label: 'Facebook' },
+    { icon: Twitter, href: 'https://x.com/Consolto_777', label: 'Twitter' },
+    { icon: Instagram, href: 'https://www.instagram.com/consolto_official/', label: 'Instagram' },
+    { icon: Linkedin, href: '#', label: 'LinkedIn' },
   ];
 
   return (
@@ -31,6 +31,9 @@ export default function Footer() {
                 <motion.a
                   key={index}
                   href={social.href}
+                  target={social.href.startsWith('http') ? '_blank' : undefined}
+                  rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  aria-label={social.label}
                   whileHover={{ scale: 1.1, y: -2 }}
                   className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
                 >
@@ -71,11 +74,11 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <Mail className="text-blue-400 mt-1 flex-shrink-0" size={20} />
-                <span>support@consolto.com</span>
+                <span>contact@consolto.in</span>
               </li>
               <li className="flex items-start gap-3">
                 <Phone className="text-blue-400 mt-1 flex-shrink-0" size={20} />
-                <span>+1 (555) 123-4567</span>
+                <span>+91 9689873927</span>
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="text-blue-400 mt-1 flex-shrink-0" size={20} />
