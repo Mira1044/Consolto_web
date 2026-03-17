@@ -61,14 +61,6 @@ export const Hero = () => {
               Connect with verified professionals across various fields instantly.
             </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4"
-            >
-              
-            </motion.div>
           </motion.div>
 
           <motion.div
@@ -76,34 +68,36 @@ export const Hero = () => {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             whileHover={{ rotateX: -6, rotateY: 6, scale: 1.02 }}
-            className="relative hidden md:block [perspective:1200px]"
+            className="relative hidden md:flex items-center justify-center [perspective:1200px]"
           >
-            {floatingCards.map((card, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: card.delay + 0.5, duration: 0.5 }}
-                className="absolute"
-                style={{ right: `${card.x}px`, top: `${card.y}px` }}
-              >
+            <div className="relative w-56 h-56">
+              {floatingCards.map((card, index) => (
                 <motion.div
-                  animate={{
-                    y: [0, -20, 0],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    delay: card.delay,
-                  }}
-                  className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-blue-100"
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: card.delay + 0.5, duration: 0.5 }}
+                  className="absolute"
+                  style={{ left: `${card.x}px`, top: `${card.y}px` }}
                 >
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mb-3"></div>
-                  <div className="h-3 bg-gray-200 rounded w-24 mb-2"></div>
-                  <div className="h-2 bg-gray-100 rounded w-16"></div>
+                  <motion.div
+                    animate={{
+                      y: [0, -20, 0],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                      delay: card.delay,
+                    }}
+                    className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-blue-100"
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mb-3"></div>
+                    <div className="h-3 bg-gray-200 rounded w-24 mb-2"></div>
+                    <div className="h-2 bg-gray-100 rounded w-16"></div>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            ))}
+              ))}
+            </div>
           </motion.div>
         </div>
       </div>

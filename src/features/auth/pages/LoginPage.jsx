@@ -67,13 +67,13 @@ export const LoginPage = () => {
       </div>
 
       <div className="flex h-screen w-full">
-        {/* Left: full hero / marketing (60%) */}
-        <div className="hidden lg:flex flex-[3]">
+        {/* Left: full hero / marketing (70%) */}
+        <div className="hidden lg:flex basis-[70%]">
           <Hero />
         </div>
 
-        {/* Right: auth panel (40%) */}
-        <div className="flex flex-[2] items-center justify-center px-6 lg:px-12">
+        {/* Right: auth panel (30%) */}
+        <div className="flex basis-[30%] items-center justify-center px-6 lg:px-12">
           <div className="w-full max-w-md">
             {renderRight()}
           </div>

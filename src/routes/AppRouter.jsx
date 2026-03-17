@@ -10,10 +10,8 @@ import { useDocumentTitle } from './hooks';
  * AuthLayout - Simple layout for authentication pages
  */
 const AuthLayout = ({ children }) => (
-  <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-background">
-    <div className="container mx-auto px-4 py-8">
-      {children}
-    </div>
+  <div className="from-primary/10 via-background to-background min-h-screen bg-gradient-to-br">
+    {children}
   </div>
 );
 
@@ -29,13 +27,7 @@ export const AppRouter = () => {
     <Suspense fallback={<Loader fullScreen size="lg" text="Loading..." />}>
       <Routes>
         {routeConfig.map((route) => {
-          const {
-            path,
-            element: Component,
-            requiresAuth,
-            requiresGuest,
-            layout = 'main',
-          } = route;
+          const { path, element: Component, requiresAuth, requiresGuest, layout = 'main' } = route;
 
           // Determine which guard to use
           let WrappedComponent = <Component />;

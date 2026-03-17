@@ -41,33 +41,27 @@ export const SignupPage = () => {
       return <ForgotPasswordPage onBackToLogin={() => setMode('login')} />;
     }
 
-    return (
-      <SignupLayout
-        {...signup}
-        onGoToLogin={() => setMode('login')}
-        onBackToHome={goHome}
-      />
-    );
+    return <SignupLayout {...signup} onGoToLogin={() => setMode('login')} onBackToHome={goHome} />;
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="flex h-screen w-full">
         {/* Left: full hero / marketing (60%) */}
-        <div className="hidden lg:flex flex-[3]">
+        <div className="hidden flex-[3] lg:flex">
           <Hero />
         </div>
 
         {/* Right: auth panel (40%) */}
         <div className="flex flex-[2] items-center justify-center px-6 lg:px-12">
           <div className="w-full max-w-md">
-            <div className="mb-6 inline-flex rounded-full bg-white/60 p-1 shadow-sm max-w-xs self-end">
+            <div className="mb-6 inline-flex max-w-xs self-end rounded-full bg-white/60 p-1 shadow-sm">
               <button
                 type="button"
                 onClick={() => setMode('login')}
-                className={`flex-1 px-4 py-2 text-sm font-medium rounded-full transition ${
+                className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition ${
                   mode === 'login'
-                    ? 'bg-primary text-white shadow'
+                    ? 'bg-primary shadow text-white'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -76,9 +70,9 @@ export const SignupPage = () => {
               <button
                 type="button"
                 onClick={() => setMode('signup')}
-                className={`flex-1 px-4 py-2 text-sm font-medium rounded-full transition ${
+                className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition ${
                   mode === 'signup'
-                    ? 'bg-primary text-white shadow'
+                    ? 'bg-primary shadow text-white'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -86,7 +80,7 @@ export const SignupPage = () => {
               </button>
             </div>
 
-            <div className="rounded-3xl bg-white shadow-xl shadow-black/5 p-6 sm:p-8">
+            <div className="rounded-3xl bg-white p-6 shadow-xl shadow-black/5 sm:p-8">
               {renderRight()}
             </div>
           </div>
