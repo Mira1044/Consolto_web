@@ -1,2 +1,3 @@
-// Routes configuration
-// Export route definitions and router component here
+export { AppRouter } from './AppRouter';
+export * from './config';
+export * from './guards';

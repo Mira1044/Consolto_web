@@ -1,36 +1,33 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
-import { LoginForm } from '@/auth/components';
-import { SignupForm } from '@/auth/components';
+import { ROUTES } from '@/routes/config';
 
 const navLinks = [
-  { label: 'Home', path: '/', hash: '#home' },
-  { label: 'Features', path: '/', hash: '#features' },
-  { label: 'How It Works', path: '/', hash: '#how-it-works' },
-  { label: 'Testimonials', path: '/', hash: '#testimonials' },
-  { label: 'Contact', path: '/contact' },
+  { label: 'Home', path: ROUTES.HOME, hash: '#home' },
+  { label: 'Features', path: ROUTES.HOME, hash: '#features' },
+  { label: 'How It Works', path: ROUTES.HOME, hash: '#how-it-works' },
+  { label: 'Testimonials', path: ROUTES.HOME, hash: '#testimonials' },
+  { label: 'Contact', path: ROUTES.CONTACT },
 ];
 
 export const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isLoggedIn, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
 
-  const openLogin = () => {
-    setShowSignupModal(false);
-    setShowLoginModal(true);
+  const handleLogin = () => {
     setIsMobileMenuOpen(false);
+    navigate(ROUTES.LOGIN);
   };
-  const openSignup = () => {
-    setShowLoginModal(false);
-    setShowSignupModal(true);
+
+  const handleSignup = () => {
     setIsMobileMenuOpen(false);
+    navigate(ROUTES.SIGNUP);
   };
 
   useEffect(() => {
@@ -42,7 +39,7 @@ export const Navbar = () => {
   }, []);
 
   const navHref = (item) => {
-    if ('hash' in item) return location.pathname === '/' ? item.hash : `${item.path}${item.hash}`;
+    if ('hash' in item) return location.pathname === ROUTES.HOME ? item.hash : `${item.path}${item.hash}`;
     return item.path;
   };
 
@@ -108,7 +105,7 @@ export const Navbar = () => {
             ))}
             {isLoggedIn ? (
               <>
-                <Link to="/experts">
+                <Link to={ROUTES.EXPERTS}>
                   <motion.span
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -134,7 +131,7 @@ export const Navbar = () => {
               <>
                 <motion.button
                   type="button"
-                  onClick={openLogin}
+                  onClick={handleLogin}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="text-gray-700 hover:text-blue-600 font-semibold px-5 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 transition-all"
@@ -143,7 +140,7 @@ export const Navbar = () => {
                 </motion.button>
                 <motion.button
                   type="button"
-                  onClick={openSignup}
+                  onClick={handleSignup}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
@@ -186,7 +183,7 @@ export const Navbar = () => {
             {isLoggedIn ? (
               <div className="flex flex-col gap-2 pt-2">
                 <Link
-                  to="/experts"
+                  to={ROUTES.EXPERTS}
                   className="w-full text-center text-gray-700 font-semibold px-6 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 hover:text-blue-600 transition-all block"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -207,14 +204,14 @@ export const Navbar = () => {
               <div className="flex flex-col gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={openLogin}
+                  onClick={handleLogin}
                   className="w-full text-center text-gray-700 font-semibold px-6 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 hover:text-blue-600 transition-all"
                 >
                   Log in
                 </button>
                 <button
                   type="button"
-                  onClick={openSignup}
+                  onClick={handleSignup}
                   className="w-full text-center bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2.5 rounded-full font-semibold"
                 >
                   Sign up
@@ -224,8 +221,6 @@ export const Navbar = () => {
           </div>
         </motion.div>
       )}
-      <LoginForm isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
-      <SignupForm isOpen={showSignupModal} onClose={() => setShowSignupModal(false)} />
     </motion.nav>
   );
 };

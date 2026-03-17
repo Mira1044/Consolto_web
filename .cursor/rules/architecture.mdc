@@ -3,3 +3,25 @@ alwaysApply: true
 ---
 # Project Architecture
 
+This is a React 18 application using JavaScript (JSX), Vite, Tailwind CSS, and Zod.
+
+## Structure
+
+- src/features/<name>/ - Self-contained feature modules with layers: models, validators, utils, services, hooks, components, pages, index.js
+- src/pages/ - App-level pages only (Home, NotFound). Feature pages live inside their feature.
+- src/shared/ - Shared UI components, API client, error handling, theme tokens, constants, formatters
+- src/routes/ - Centralized routing with guards, lazy loading, and route constants
+- src/context/ - React context providers (AuthContext)
+- src/config/ - Application configuration
+
+## Rules
+
+1. Features are self-contained. Never import from one feature into another.
+2. Components never call APIs directly. Use: service -> hook -> component.
+3. Pages are thin wrappers. They wire routing to hooks and pass data to layouts.
+4. All data shapes use Zod schemas in the models layer.
+5. Validation goes through validator functions, not inline.
+6. Import from feature barrel exports, not internal paths.
+7. No TypeScript. JavaScript with JSX only.
+8. Shared code lives in src/shared/, never duplicated in features.
+9. Do not generate documentation files unless explicitly requested.

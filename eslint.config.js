@@ -3,16 +3,12 @@ import globals from 'globals';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
-import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
-  { ignores: ['dist', 'node_modules', 'build', '*.config.js', '*.config.ts'] },
+export default [
+  { ignores: ['dist', 'node_modules', 'build', '*.config.js'] },
   {
-    extends: [
-      js.configs.recommended,
-      ...tseslint.configs.recommended,
-    ],
-    files: ['**/*.{ts,tsx}'],
+    extends: [js.configs.recommended],
+    files: ['**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -20,6 +16,7 @@ export default tseslint.config(
         ecmaFeatures: {
           jsx: true,
         },
+        sourceType: 'module',
       },
     },
     plugins: {
@@ -41,9 +38,9 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
-      'react/prop-types': 'off', // Using TypeScript for prop validation
-      'react/react-in-jsx-scope': 'off', // Not needed in React 17+
-      'react/jsx-uses-react': 'off', // Not needed in React 17+
+      'react/prop-types': 'off',
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'off',
       'react/jsx-uses-vars': 'error',
       'react/jsx-key': 'error',
       'react/jsx-no-duplicate-props': 'error',
@@ -67,37 +64,7 @@ export default tseslint.config(
         reservedFirst: true,
       }],
 
-      // TypeScript rules (non-type-aware)
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/no-unused-vars': ['error', {
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-      }],
-      '@typescript-eslint/explicit-function-return-type': ['warn', {
-        allowExpressions: true,
-        allowTypedFunctionExpressions: true,
-      }],
-      '@typescript-eslint/no-non-null-assertion': 'warn',
-      '@typescript-eslint/consistent-type-imports': ['error', {
-        prefer: 'type-imports',
-        fixStyle: 'inline-type-imports',
-      }],
-      '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
-
-      // Disable base rules that conflict with TypeScript ESLint
-      'no-unused-vars': 'off', // Use @typescript-eslint/no-unused-vars instead
-      'no-undef': 'off', // TypeScript handles this
-      'no-duplicate-imports': 'off', // Use @typescript-eslint/no-duplicate-imports
-      'indent': 'off', // Prettier handles this
-      'quotes': 'off', // Prettier handles this
-      'semi': 'off', // Prettier handles this
-      'comma-dangle': 'off', // Prettier handles this
-      'object-curly-spacing': 'off', // Prettier handles this
-      'comma-spacing': 'off', // Prettier handles this
-      'key-spacing': 'off', // Prettier handles this
-      'space-before-function-paren': 'off', // Prettier handles this
-
-      // General JavaScript/TypeScript rules
+      // General JavaScript rules
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-debugger': 'error',
       'no-alert': 'warn',
@@ -106,6 +73,10 @@ export default tseslint.config(
       'prefer-arrow-callback': 'error',
       'arrow-body-style': ['error', 'as-needed'],
       'no-unused-expressions': 'error',
+      'no-unused-vars': ['error', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      }],
       'no-useless-return': 'error',
       'prefer-template': 'error',
       'object-shorthand': 'error',
@@ -139,26 +110,15 @@ export default tseslint.config(
         ignoreTemplateLiterals: true,
         ignoreRegExpLiterals: true,
       }],
+      'no-duplicate-imports': 'error',
+      'indent': 'off', // Prettier handles this
+      'quotes': 'off', // Prettier handles this
+      'semi': 'off', // Prettier handles this
+      'comma-dangle': 'off', // Prettier handles this
+      'object-curly-spacing': 'off', // Prettier handles this
+      'comma-spacing': 'off', // Prettier handles this
+      'key-spacing': 'off', // Prettier handles this
+      'space-before-function-paren': 'off', // Prettier handles this
     },
   },
-  // Type-aware rules configuration
-  ...tseslint.configs.recommendedTypeChecked,
-  {
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-    rules: {
-      // Type-aware TypeScript rules
-      '@typescript-eslint/prefer-nullish-coalescing': 'error',
-      '@typescript-eslint/prefer-optional-chain': 'error',
-      '@typescript-eslint/no-unnecessary-condition': 'warn',
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/await-thenable': 'error',
-      '@typescript-eslint/no-misused-promises': 'error',
-    },
-  }
-);
+];

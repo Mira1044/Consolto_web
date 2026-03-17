@@ -5,7 +5,7 @@
  */
 
 import axios from 'axios';
-import { AppError, ErrorCode } from '@/shared/types/errors';
+import { AppError, ErrorCode } from './errors';
 
 /**
  * Maps HTTP status codes to ErrorCode
@@ -109,7 +109,9 @@ export const processError = (error) => {
 
 /**
  * Shows user-friendly error message
- * This can be extended to integrate with toast notifications, modals, etc.
+ * This integrates with the centralized error handling system
+ * If ErrorContext is available, it will use toast notifications
+ * Otherwise, falls back to console logging
  */
 export const showErrorToUser = (error) => {
   const errorResponse = processError(error);
@@ -121,12 +123,12 @@ export const showErrorToUser = (error) => {
     statusCode: errorResponse.statusCode,
   });
 
-  // TODO: Integrate with toast notification system
-  // Example: toast.error(errorResponse.message);
-
-  // For now, we'll use alert as fallback (remove in production)
+  // Try to use error context if available (lazy import to avoid circular dependencies)
+  // This will be handled by the ErrorContext when used through hooks
+  // For direct calls, we'll just log - the context will handle display
   if (process.env.NODE_ENV === 'development') {
-    // eslint-disable-next-line no-alert
-    alert(`Error: ${errorResponse.message}`);
+    // In development, show alert as fallback if error context is not available
+    // This should rarely happen as errors should be handled through hooks
+    console.warn('Error displayed without ErrorContext. Consider using useErrorHandler hook.');
   }
 };

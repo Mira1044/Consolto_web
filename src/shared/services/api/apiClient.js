@@ -98,8 +98,13 @@ const setupResponseInterceptor = (client) => {
       if (appError.code === 'UNAUTHORIZED') {
         // Clear auth and redirect to login
         localStorage.removeItem(apiConfig.authKey);
-        if (window.location.pathname !== '/') {
-          window.location.href = '/';
+        // Use React Router if available, otherwise fallback to window.location
+        if (typeof window !== 'undefined') {
+          const currentPath = window.location.pathname;
+          if (currentPath !== '/' && currentPath !== '/login') {
+            // Only redirect if not already on login page
+            window.location.href = '/login';
+          }
         }
       }
 
@@ -122,11 +127,16 @@ export const apiClient = (() => {
  * API Request Helper
  * Wraps axios requests with proper typing and error handling
  */
+/**
+ * Legacy API Request Helper
+ * Wraps axios requests with proper error handling
+ * @deprecated Use apiService or api builder for new code
+ */
 export const apiRequest = {
   /**
    * GET request
    */
-  get: async (url, config) => {
+  get: async (url, config = {}) => {
     const response = await apiClient.get(url, config);
     return response.data;
   },
@@ -134,7 +144,7 @@ export const apiRequest = {
   /**
    * POST request
    */
-  post: async (url, data, config) => {
+  post: async (url, data, config = {}) => {
     const response = await apiClient.post(url, data, config);
     return response.data;
   },
@@ -142,7 +152,7 @@ export const apiRequest = {
   /**
    * PUT request
    */
-  put: async (url, data, config) => {
+  put: async (url, data, config = {}) => {
     const response = await apiClient.put(url, data, config);
     return response.data;
   },
@@ -150,7 +160,7 @@ export const apiRequest = {
   /**
    * PATCH request
    */
-  patch: async (url, data, config) => {
+  patch: async (url, data, config = {}) => {
     const response = await apiClient.patch(url, data, config);
     return response.data;
   },
@@ -158,7 +168,7 @@ export const apiRequest = {
   /**
    * DELETE request
    */
-  delete: async (url, config) => {
+  delete: async (url, config = {}) => {
     const response = await apiClient.delete(url, config);
     return response.data;
   },

@@ -1,123 +1,240 @@
-## Consolto Web App
+# Consolto Web
 
-A modern, scalable React + TypeScript single-page application with Tailwind CSS, strict linting/formatting, and a modular architecture designed for long-term maintainability.
+A modern React application built with a feature-based, layered architecture. The project enforces strict separation of concerns, SOLID principles, and consistent patterns across all modules.
 
-### Tech Stack
+## Tech Stack
 
-- **Framework**: React 18 (SPA)
-- **Language**: TypeScript (strict mode)
-- **Bundler**: Vite
-- **Routing**: React Router DOM v7
-- **Styling**: Tailwind CSS + Prettier Tailwind plugin
-- **Animations**: Framer Motion
-- **Icons**: lucide-react
-- **Backend Integration**: Node.js Express API (via axios)
+- React 18 with JavaScript (JSX)
+- Vite (build tool)
+- React Router DOM (routing)
+- Tailwind CSS (styling)
+- Framer Motion (animations)
+- Zod (schema validation)
+- Axios (HTTP client)
+- Lucide React (icons)
+- ESLint and Prettier (code quality)
 
+## Project Structure
 
-### High-Level Architecture
-
-- **`src/main.tsx`**: Application entry; wires up `StrictMode`, `BrowserRouter`, and `AuthProvider`.
-- **`src/App.tsx`**: Top-level shell with router and layout (Navbar + route views).
-- **`src/context/AuthContext.tsx`**: Centralized auth state (email-based session) with `useAuth()` hook.
-- **`src/components/`**: Current UI for landing, experts, booking, auth forms, etc. (to be gradually reorganized into `pages/`, `shared/`, and `features/`).
-- **`src/shared/`**: Shared, reusable building blocks (UI, hooks, utils, services, types, constants).
-- **`src/features/`**: Feature-based modules; `_template` provides the reference structure.
-- **`src/auth/`**: Dedicated auth module (components, hooks, services, types, utils).
-- **`src/routes/`**: Route configuration and guards (currently a placeholder to be wired up).
-- **`src/pages/`**: Page-level components (currently empty; target location for `Home`, `Experts`, `Booking`, `Contact`, etc.).
-- **`src/store/`**: Reserved for future global state (Redux/Zustand/etc.).
-- **`src/assets/`**: Static assets (fonts, icons, images, global styles).
-
-
-### Folder Structure (Planned Target)
-
-```text
+```
 src/
-  App.tsx
-  main.tsx
-  index.css
-  assets/
-  auth/
-  components/          # legacy; to be refactored into pages/shared/features
-  config/
-  context/
-  features/
-    _template/         # reference feature module
-  pages/
-  routes/
-  shared/
-  store/
+  main.jsx                   Application entry point
+  App.jsx                    Root component (router + global toast)
+  index.css                  Global styles and Tailwind directives
+
+  config/                    Application-level configuration
+    api.js                   API base URL, timeouts, headers
+    index.js                 Config barrel export
+
+  context/                   React context providers
+    AuthContext.jsx           Authentication state provider
+
+  features/                  Self-contained feature modules
+    auth/
+    booking/
+    contact/
+    experts/
+
+  pages/                     App-level pages (not tied to a feature)
+    home/                    Landing page with section components
+    NotFoundPage.jsx         404 fallback page
+
+  routes/                    Routing system
+    AppRouter.jsx            Central router with guards and lazy loading
+    config/
+      constants.js           Route path constants (ROUTES, ROUTE_NAMES)
+      routes.js              Route definitions with metadata
+    guards/
+      ProtectedRoute.jsx     Requires authentication
+      PublicRoute.jsx        Guest-only access
+    hooks/
+      useDocumentTitle.js    Updates document title per route
+
+  shared/                    Shared code used across features
+    components/
+      layout/                MainLayout, Navbar, Footer
+      ui/                    Button, Input, Textarea, FormField, Loader
+    constants/               Hardcoded data (experts, categories, time slots)
+    services/
+      api/                   API client, request builder, error handler
+      error/                 ErrorBoundary, ErrorContext, ErrorToast, hooks
+    theme/                   Design tokens, fonts, animations, layout, Tailwind config
+    utils/
+      formatters/            Date and price formatting utilities
 ```
 
-- **`shared/`** (global reusables)
-  - `components/` (`ui/`, `layout/`, `forms/`)
-  - `hooks/`
-  - `utils/` (`validators/`, `formatters/`, `helpers/`)
-  - `services/` (`api/`, `storage/`)
-  - `types/`, `constants/`, `lib/`
-- **`features/`** (self-contained feature modules)
-  - Each feature: `components/`, `hooks/`, `types/`, `utils/`, `services/`, `index.ts`, `README.md`.
-- **`pages/`** (route-level containers)
-  - `home/`, `experts/`, `booking/`, `contact/`, etc.
-- **`routes/`**
-  - `config/` (route config + constants)
-  - `guards/` (e.g. `ProtectedRoute`)
+## Feature Architecture
 
+Every feature follows the same layered structure. No exceptions.
 
-### State Management & Auth
+```
+features/<name>/
+  models/           Zod schemas and factory functions
+  validators/       Validation functions using safeParse
+  utils/            Pure utility functions (no side effects)
+  services/         API calls (isolated from UI and hooks)
+  hooks/            Business logic and state management
+  components/       Presentational components (receive data via props)
+  pages/            Thin page wrappers (wire routing to hooks and layouts)
+  index.js          Barrel export for the entire feature
+```
 
-- **AuthContext** (`src/context/AuthContext.tsx`):
-  - Stores a simple `User` (currently `{ email }`) in `localStorage` under `consolto_user`.
-  - Exposes `isLoggedIn`, `user`, `login(email)`, `logout()`.
-  - Accessed via `useAuth()`; throws if used outside `AuthProvider`.
-- **State placement guidelines**:
-  - Prefer **local component state** for view-only concerns.
-  - Use **context** for cross-cutting concerns (auth, theme, app-level preferences).
-  - Use **feature hooks** under `src/features/**/hooks` for domain-specific logic.
-  - Reserve `src/store/` for larger global state if needed later.
+### Layer Responsibilities
 
+**models** define the shape of data using Zod schemas. Each model file exports schemas and factory functions that return default values.
 
-### Styling & Tailwind Rules
+```javascript
+// features/booking/models/bookingModel.js
+export const bookingSchema = z.object({
+  expertId: z.number().int().positive(),
+  duration: z.union([z.literal(15), z.literal(30)]),
+  selectedSlot: z.string().min(1, 'Time slot is required'),
+  reason: z.string().min(10, 'Please provide a bit more detail'),
+});
 
-- Use **Tailwind utility classes** for layout and styling; add custom CSS via `@layer` in `index.css` when necessary.
-- Let **Prettier + `prettier-plugin-tailwindcss`** handle Tailwind class ordering.
-- Use responsive prefixes (`sm:`, `md:`, `lg:`, `xl:`) and state variants (`hover:`, `focus:`) consistently.
-- Keep class names readable; avoid extremely long single-line class strings when possible (split logical sections across lines if needed).
+export const createDefaultBooking = (expert) => ({
+  expertId: expert?.id ?? 0,
+  duration: 15,
+  selectedSlot: '11:30 AM',
+  reason: '',
+});
+```
 
+**validators** use models to validate data. They return a consistent result shape.
 
-### Tooling & Quality Gates
+```javascript
+// features/booking/validators/bookingValidator.js
+export const validateBooking = (booking) => {
+  const result = bookingSchema.safeParse(booking);
+  if (result.success) return { success: true };
+  return { success: false, errors: result.error.flatten().fieldErrors };
+};
+```
 
-- **TypeScript**: strict mode with `noUnusedLocals`, `noUnusedParameters`, `noFallthroughCasesInSwitch`.
-- **ESLint** (`eslint.config.js`):
-  - Based on `@eslint/js` + `typescript-eslint` + React + hooks + type-aware rules.
-  - Core formatting rules are disabled in favor of Prettier.
-- **Prettier** (`.prettierrc`): `semi: true`, `singleQuote: true`, `trailingComma: "all"`, `printWidth: 100`, Tailwind plugin enabled.
-- **EditorConfig**: LF, UTF-8, 2-space indentation, trim trailing whitespace, final newline.
-- **VS Code**: format-on-save + ESLint fix-on-save, Tailwind IntelliSense configured.
+**utils** contain pure functions with no side effects. They do not import React or call APIs.
 
-**Commands:**
-- `npm run dev` – start dev server.
-- `npm run build` – production build.
-- `npm run typecheck` – TypeScript project check.
-- `npm run lint` / `npm run lint:fix` – ESLint.
-- `npm run format` / `npm run format:check` – Prettier.
-- `npm run check` – `typecheck + lint + format:check`.
+**services** handle API communication. They validate data before sending and return consistent responses. No UI awareness.
 
-### Environment Configuration
+```javascript
+// features/booking/services/bookingService.js
+export const bookingService = {
+  async createBooking(booking) {
+    // Replace with: return api.post('/bookings').body(booking).getData();
+    return Promise.resolve({ ...booking, id: Date.now() });
+  },
+};
+```
 
-- **`.env`**: Local environment variables (not committed to git)
-- **`.env.example`**: Template file showing required environment variables
+**hooks** contain all business logic. They call services, manage state, compute derived values, and expose a clean API to pages.
 
-**Required Environment Variables:**
-- `VITE_API_BASE_URL`: Backend API base URL (default: `http://localhost:3000/api`)
+```javascript
+// features/booking/hooks/useBooking.js
+export const useBooking = (expert, initialDuration, navigate) => {
+  // state, effects, memoized values, callbacks
+  return { confirmed, duration, price, canConfirm, confirm, summary };
+};
+```
 
-**Setup:**
-1. Copy `.env.example` to `.env` (if not already present)
-2. Update `VITE_API_BASE_URL` to match your Node.js Express backend URL
-3. For production, set `VITE_API_BASE_URL` to your production API URL
+**components** are presentational. They receive all data through props and render UI. They do not call hooks that fetch data or manage business state.
 
-**Example `.env` file:**
-```env
-VITE_API_BASE_URL=http://localhost:3000/api
-NODE_ENV=development
+**pages** are thin wrappers. They connect routing (useNavigate, useLocation, useParams) to feature hooks and pass the result into layout components.
+
+```javascript
+// features/booking/pages/BookingPage.jsx
+export const BookingPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const expert = location.state?.expert;
+  const booking = useBooking(expert, 15, navigate);
+  return <BookingLayout expert={expert} state={booking} actions={booking} />;
+};
+```
+
+**index.js** is the barrel export. External code imports from the feature root, never from internal paths.
+
+```javascript
+import { useBooking, BookingPage } from '@/features/booking';
+```
+
+## Adding a New Feature
+
+Follow these steps strictly.
+
+1. Create the feature folder under `src/features/<name>/`.
+2. Create all required subfolders: `models`, `validators`, `utils`, `services`, `hooks`, `components`, `pages`.
+3. Define the data schema in `models/<name>Model.js` using Zod.
+4. Create validation functions in `validators/<name>Validator.js`.
+5. Add any pure utility functions in `utils/<name>Utils.js`.
+6. Create the service in `services/<name>Service.js` with API methods.
+7. Build the business logic hook in `hooks/use<Name>.js`.
+8. Build presentational components in `components/`.
+9. Create the page wrapper in `pages/<Name>Page.jsx`.
+10. Create `index.js` at the feature root. Export everything that external code needs.
+11. Add the route in `src/routes/config/constants.js` and `src/routes/config/routes.js`.
+
+## Routing
+
+Routes are defined in `src/routes/config/routes.js`. Each route specifies:
+
+- `path` from `ROUTES` constants
+- `element` as a lazy-loaded component
+- `requiresAuth` and `requiresGuest` flags for guard behavior
+- `layout` type (`main` or `auth`)
+- `title` for the document title
+
+Feature pages are imported from their feature barrel export:
+
+```javascript
+const BookingPage = lazy(() =>
+  import('@/features/booking').then(m => ({ default: m.BookingPage }))
+);
+```
+
+App-level pages (Home, NotFound) are imported from `src/pages/`.
+
+## Shared Layer
+
+Code in `src/shared/` is used by multiple features. It includes:
+
+- **UI components** (Button, Input, Textarea, FormField, Loader) in `shared/components/ui/`
+- **Layout components** (MainLayout, Navbar, Footer) in `shared/components/layout/`
+- **API client** with request builder pattern in `shared/services/api/`
+- **Error handling** (ErrorBoundary, ErrorContext, ErrorToast) in `shared/services/error/`
+- **Design tokens** (colors, typography, spacing, shadows) in `shared/theme/tokens.js`
+- **Animation presets** in `shared/theme/animations.js`
+- **Constants** (hardcoded data for experts, categories, time slots) in `shared/constants/`
+- **Formatters** (date, price) in `shared/utils/formatters/`
+
+## Design System
+
+All design tokens are centralized in `src/shared/theme/`. The Tailwind configuration at the project root imports these tokens. Use Tailwind classes throughout the application. Do not use inline style objects for values that exist in the token system.
+
+The theme includes: colors, typography, spacing, border radius, shadows, breakpoints, z-index scale, transitions, and animation presets.
+
+## Rules
+
+1. Features must be self-contained. A feature never imports from another feature directly.
+2. All cross-feature communication goes through routing (navigation state), context providers, or shared services.
+3. Components never call APIs directly. API calls go through services, which are called by hooks.
+4. Pages contain no business logic. They connect routing to hooks and pass data to layouts.
+5. All data shapes are defined as Zod schemas in the models layer.
+6. Validation is always done through validator functions, not inline in components or hooks.
+7. Use `useMemo` and `useCallback` for derived values and stable references.
+8. Import from feature barrel exports (`@/features/<name>`), not from internal file paths.
+9. Shared utilities, components, and services live under `src/shared/`, never duplicated in features.
+10. No TypeScript. The project uses JavaScript with JSX.
+11. Every new file must follow the naming convention of its layer: `<name>Model.js`, `<name>Validator.js`, `<name>Utils.js`, `<name>Service.js`, `use<Name>.js`, `<Name>Layout.jsx`, `<Name>Page.jsx`.
+12. Do not generate documentation files unless explicitly requested.
+
+## Commands
+
+```
+npm run dev           Start development server
+npm run build         Production build
+npm run preview       Preview production build
+npm run lint          Run ESLint
+npm run lint:fix      Run ESLint with auto-fix
+npm run format        Format code with Prettier
+npm run format:check  Check formatting without writing
+npm run check         Run lint and format check together
 ```
