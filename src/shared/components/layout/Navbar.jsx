@@ -51,39 +51,9 @@ export const Navbar = () => {
         isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}
     >
-      {/* SVG filter: transparent background + solid dark blue icon for a clear, sharp logo */}
-      <svg className="absolute w-0 h-0" aria-hidden="true">
-        <defs>
-          <filter
-            id="logo-clear-dark"
-            x="-10%"
-            y="-10%"
-            width="120%"
-            height="120%"
-            colorInterpolationFilters="sRGB"
-          >
-            <feColorMatrix
-              type="matrix"
-              in="SourceGraphic"
-              result="colored"
-              values="0 0 0 0 0.09  0 0 0 0 0.22  0 0 0 0 0.45  0.5 0.5 0.5 0 -0.12"
-            />
-          </filter>
-        </defs>
-      </svg>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
           <Link to="/" className="flex items-center gap-2.5">
-            <span
-              className="inline-block h-8 w-8 md:h-9 md:w-9 flex-shrink-0"
-              style={{ filter: 'url(#logo-clear-dark)' }}
-            >
-              <img
-                src="/consolto-logo.png"
-                alt="Consolto"
-                className="h-full w-full object-contain block select-none"
-              />
-            </span>
             <motion.span
               whileHover={{ scale: 1.05 }}
               className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent"

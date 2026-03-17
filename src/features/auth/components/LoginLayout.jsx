@@ -1,6 +1,4 @@
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ROUTES } from '@/routes/config';
 import { FormField, Input, Button } from '@/shared/components/ui';
 
 /**
@@ -8,9 +6,18 @@ import { FormField, Input, Button } from '@/shared/components/ui';
  * Pure presentational component for the login page.
  * Receives all data and handlers via props — no business logic inside.
  */
-export const LoginLayout = ({ fields, errors, isLoading, setField, handleSubmit }) => {
+export const LoginLayout = ({
+  fields,
+  errors,
+  isLoading,
+  setField,
+  handleSubmit,
+  onForgotPassword,
+  onGoToSignup,
+  onBackToHome,
+}) => {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -26,7 +33,6 @@ export const LoginLayout = ({ fields, errors, isLoading, setField, handleSubmit 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="rounded-2xl bg-white p-8 shadow-xl"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             <FormField
@@ -38,7 +44,7 @@ export const LoginLayout = ({ fields, errors, isLoading, setField, handleSubmit 
               required
               value={fields.email}
               onChange={setField('email')}
-              placeholder="you@example.com"
+              placeholder="Email"
               inputComponent={Input}
               error={!!errors.email}
               errorMessage={errors.email?.[0]}
@@ -49,12 +55,15 @@ export const LoginLayout = ({ fields, errors, isLoading, setField, handleSubmit 
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <Link
-                  to={ROUTES.HOME}
-                  className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
-                >
-                  Forgot password?
-                </Link>
+                {onForgotPassword ? (
+                  <button
+                    type="button"
+                    onClick={onForgotPassword}
+                    className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                ) : null}
               </div>
               <Input
                 id="password"
@@ -79,24 +88,20 @@ export const LoginLayout = ({ fields, errors, isLoading, setField, handleSubmit 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don&apos;t have an account?{' '}
-              <Link
-                to={ROUTES.SIGNUP}
-                className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
-              >
-                Sign up
-              </Link>
+              {onGoToSignup ? (
+                <button
+                  type="button"
+                  onClick={onGoToSignup}
+                  className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
+                >
+                  Sign up
+                </button>
+              ) : null}
             </p>
           </div>
         </motion.div>
 
-        <div className="text-center">
-          <Link
-            to={ROUTES.HOME}
-            className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
-          >
-            ← Back to home
-          </Link>
-        </div>
+        
       </motion.div>
     </div>
   );

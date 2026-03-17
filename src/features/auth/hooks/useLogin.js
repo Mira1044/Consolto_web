@@ -21,11 +21,18 @@ export const useLogin = ({ onSuccess } = {}) => {
    */
   const setField = useCallback(
     (key) => (e) => {
-      setFields((prev) => ({ ...prev, [key]: e.target.value }));
-      setErrors((prev) => {
-        if (!prev[key]) return prev;
-        const next = { ...prev };
-        delete next[key];
+      const value = e.target.value;
+      setFields((prev) => {
+        const next = { ...prev, [key]: value };
+
+        // Real-time validation on change
+        const validation = validateLogin(next);
+        if (validation.success) {
+          setErrors({});
+        } else {
+          setErrors(validation.errors || {});
+        }
+
         return next;
       });
     },
@@ -34,6 +41,8 @@ export const useLogin = ({ onSuccess } = {}) => {
 
   /**
    * Submit the login form through the service layer.
+   * On success, store the full auth user (including token) in context
+   * so that the web app mirrors the mobile auth flow.
    */
   const handleSubmit = useCallback(
     async (e) => {
@@ -50,9 +59,10 @@ export const useLogin = ({ onSuccess } = {}) => {
       setIsLoading(true);
 
       try {
-        const response = await authService.login(fields);
-        login(response.email);
-        onSuccess?.(response);
+        const authUser = await authService.login(fields);
+        login(authUser);
+        window.alert('Signed in successfully');
+        onSuccess?.(authUser);
       } catch (err) {
         if (err.fieldErrors) {
           setErrors(err.fieldErrors);

@@ -8,7 +8,7 @@ import { ROUTES } from './constants';
 
 // Lazy load pages for code splitting
 // Feature pages are loaded from their respective feature modules
-const HomePage = lazy(() => import('@/pages/home').then(module => ({ default: module.HomePage })));
+const HomePage = lazy(() => import('@/features/auth').then(module => ({ default: module.LoginPage })));
 const ContactPage = lazy(() => import('@/features/contact').then(module => ({ default: module.ContactPage })));
 const ExpertsPage = lazy(() => import('@/features/experts').then(module => ({ default: module.ExpertsPage })));
 const BookingPage = lazy(() => import('@/features/booking').then(module => ({ default: module.BookingPage })));
@@ -35,11 +35,11 @@ export const routeConfig = [
     path: ROUTES.HOME,
     element: HomePage,
     requiresAuth: false,
-    requiresGuest: false,
-    layout: 'main',
-    title: 'Home - Consolto',
+    requiresGuest: true,
+    layout: 'auth',
+    title: 'Sign In - Consolto',
     meta: {
-      description: 'Welcome to Consolto',
+      description: 'Sign in to your Consolto account',
     },
   },
   {

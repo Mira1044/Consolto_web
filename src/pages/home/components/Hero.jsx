@@ -11,16 +11,28 @@ export const Hero = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-20"
+      className="relative h-full flex items-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-12"
     >
+      {/* Top-left Consolto logo on hero */}
+      <div className="absolute left-6 top-4 z-20 flex items-center gap-1.5">
+        <img
+          src="/consolto-logo.png"
+          alt="Consolto logo"
+          className="h-5 w-auto object-contain"
+        />
+        <span className="text-base font-semibold tracking-tight text-blue-600">
+          consolto
+        </span>
+      </div>
+
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
         <div className="absolute top-40 right-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
         <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+        <div className="grid md:grid-cols-2 gap-8 items-center">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -55,23 +67,7 @@ export const Hero = () => {
               transition={{ delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-4 rounded-full font-semibold text-lg shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-2 group"
-              >
-                Start Consultation
-                <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
-              >
-                <Play size={20} />
-                Learn More
-              </motion.button>
+              
             </motion.div>
           </motion.div>
 

@@ -1,6 +1,4 @@
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ROUTES } from '@/routes/config';
 import { FormField, Input, Button } from '@/shared/components/ui';
 
 /**
@@ -15,9 +13,11 @@ export const SignupLayout = ({
   passwordsMatch,
   setField,
   handleSubmit,
+  onGoToLogin,
+  onBackToHome,
 }) => {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-screen items-center justify-center px-0 py-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -33,7 +33,6 @@ export const SignupLayout = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="rounded-2xl bg-white p-8 shadow-xl"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             <FormField
@@ -45,7 +44,7 @@ export const SignupLayout = ({
               required
               value={fields.name}
               onChange={setField('name')}
-              placeholder="John Doe"
+              placeholder="Full name"
               inputComponent={Input}
               error={!!errors.name}
               errorMessage={errors.name?.[0]}
@@ -60,7 +59,7 @@ export const SignupLayout = ({
               required
               value={fields.email}
               onChange={setField('email')}
-              placeholder="you@example.com"
+              placeholder="Email"
               inputComponent={Input}
               error={!!errors.email}
               errorMessage={errors.email?.[0]}
@@ -76,7 +75,7 @@ export const SignupLayout = ({
               minLength={6}
               value={fields.password}
               onChange={setField('password')}
-              placeholder="••••••••"
+              placeholder="Password"
               inputComponent={Input}
               error={!!errors.password}
               errorMessage={errors.password?.[0]}
@@ -92,7 +91,7 @@ export const SignupLayout = ({
               minLength={6}
               value={fields.confirmPassword}
               onChange={setField('confirmPassword')}
-              placeholder="••••••••"
+              placeholder="Confirm password"
               inputComponent={Input}
               error={!!errors.confirmPassword || (fields.confirmPassword && !passwordsMatch)}
               errorMessage={
@@ -115,24 +114,20 @@ export const SignupLayout = ({
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
-              <Link
-                to={ROUTES.LOGIN}
-                className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
-              >
-                Sign in
-              </Link>
+              {onGoToLogin ? (
+                <button
+                  type="button"
+                  onClick={onGoToLogin}
+                  className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
+                >
+                  Sign in
+                </button>
+              ) : null}
             </p>
           </div>
         </motion.div>
 
-        <div className="text-center">
-          <Link
-            to={ROUTES.HOME}
-            className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
-          >
-            ← Back to home
-          </Link>
-        </div>
+        
       </motion.div>
     </div>
   );

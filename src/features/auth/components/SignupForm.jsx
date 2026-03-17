@@ -56,7 +56,7 @@ export const SignupForm = ({ isOpen, onClose }) => {
                 value={fields.name}
                 onChange={setField('name')}
                 required
-                placeholder="Your name"
+                placeholder="Full name"
                 inputComponent={Input}
                 error={!!errors.name}
                 errorMessage={errors.name?.[0]}
@@ -68,7 +68,7 @@ export const SignupForm = ({ isOpen, onClose }) => {
                 value={fields.email}
                 onChange={setField('email')}
                 required
-                placeholder="you@example.com"
+                placeholder="Email"
                 inputComponent={Input}
                 error={!!errors.email}
                 errorMessage={errors.email?.[0]}
@@ -81,7 +81,7 @@ export const SignupForm = ({ isOpen, onClose }) => {
                 onChange={setField('password')}
                 required
                 minLength={6}
-                placeholder="••••••••"
+                placeholder="Password"
                 inputComponent={Input}
                 error={!!errors.password}
                 errorMessage={errors.password?.[0]}
@@ -94,7 +94,7 @@ export const SignupForm = ({ isOpen, onClose }) => {
                 onChange={setField('confirmPassword')}
                 required
                 minLength={6}
-                placeholder="••••••••"
+                placeholder="Confirm password"
                 inputComponent={Input}
                 error={!!errors.confirmPassword || (fields.confirmPassword && !passwordsMatch)}
                 errorMessage={

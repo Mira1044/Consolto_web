@@ -1,19 +1,21 @@
 /**
  * Auth service
- * Placeholder for future API integration for authentication.
  *
- * This layer isolates any HTTP details from hooks/components,
- * making it easy to swap mock data with real API calls later.
+ * Mirrors the real backend auth flow used in the mobile `consolto_app`,
+ * but keeps the existing web folder structure.
+ *
+ * This layer isolates HTTP details from hooks/components.
  */
 
-// import { api } from '@/shared/services/api';
-
+import { apiRequest } from '@/shared/services/api';
 import { validateLogin, validateSignup } from '../validators/authValidator';
 
 export const authService = {
   /**
-   * Log in with email and password.
-   * In the future, this would POST to the backend.
+   * Log in with email and password against the real API.
+   *
+   * Returns a normalized auth user object that includes the backend user
+   * fields plus the `token`, ready to be stored by `AuthContext`.
    */
   async login(credentials) {
     const validation = validateLogin(credentials);
@@ -23,24 +25,27 @@ export const authService = {
       throw err;
     }
 
-    // Example real call (commented until backend exists):
-    // return api.post('/auth/login').body(validation.value).getData();
-
-    // Simulate async network delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          email: validation.value.email,
-          id: Date.now(),
-          token: 'mock-jwt-token',
-        });
-      }, 500);
+    // Backend is expected to behave like the mobile app:
+    // POST /auth/login -> { data: { token, user } }
+    // Our axios layer unwraps `data`, so we receive { token, user } here.
+    const data = await apiRequest.post('/auth/login', validation.value, {
+      skipAuth: true,
     });
+
+    const { token, user } = data || {};
+    if (!token || !user) {
+      throw new Error('Invalid login response from server');
+    }
+
+    // Normalize to a single object that includes the token.
+    return { ...user, token };
   },
 
   /**
-   * Sign up with name, email, password.
-   * In the future, this would POST to the backend.
+   * Sign up with name, email, password against the real API.
+   *
+   * Returns whatever the backend returns, but if a `{ token, user }`
+   * shape is present, callers can log the user in immediately.
    */
   async signup(data) {
     const validation = validateSignup(data);
@@ -50,19 +55,13 @@ export const authService = {
       throw err;
     }
 
-    // Example real call (commented until backend exists):
-    // return api.post('/auth/signup').body(validation.value).getData();
-
-    // Simulate async network delay
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          email: validation.value.email,
-          name: validation.value.name,
-          id: Date.now(),
-          token: 'mock-jwt-token',
-        });
-      }, 500);
+    // Backend is expected to behave similarly to mobile register:
+    // POST /auth/register -> { data: ... }
+    // Our axios layer unwraps `data`, so we receive it directly.
+    const result = await apiRequest.post('/auth/register', validation.value, {
+      skipAuth: true,
     });
+
+    return result;
   },
 };

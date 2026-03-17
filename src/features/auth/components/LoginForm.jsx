@@ -56,7 +56,7 @@ export const LoginForm = ({ isOpen, onClose }) => {
                 value={fields.email}
                 onChange={setField('email')}
                 required
-                placeholder="you@example.com"
+              placeholder="Email"
                 inputComponent={Input}
                 error={!!errors.email}
                 errorMessage={errors.email?.[0]}
@@ -69,7 +69,7 @@ export const LoginForm = ({ isOpen, onClose }) => {
                   value={fields.password}
                   onChange={setField('password')}
                   required
-                  placeholder="••••••••"
+              placeholder="Password"
                   inputComponent={Input}
                   error={!!errors.password}
                   errorMessage={errors.password?.[0]}

@@ -22,19 +22,48 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  const login = useCallback((email) => {
-    setUser({ email });
+  /**
+   * Log the user in.
+   *
+   * Supports both the old signature `login(email)` used by the initial
+   * mock implementation and the new mobile-like flow where we pass a
+   * full auth object that includes a token.
+   */
+  const login = useCallback((payload) => {
+    // Backwards compatibility: login('user@example.com')
+    if (typeof payload === 'string') {
+      setUser({ email: payload });
+      return;
+    }
+
+    if (!payload || typeof payload !== 'object') {
+      return;
+    }
+
+    // New flow: payload is either the normalized auth user
+    // { ...userFields, token } or a backend-like { user, token }.
+    const { user: nestedUser, token, ...rest } = payload;
+
+    if (nestedUser) {
+      setUser({ ...nestedUser, token });
+    } else {
+      setUser({ ...rest, token });
+    }
   }, []);
 
   const logout = useCallback(() => {
     setUser(null);
   }, []);
 
+  const isLoggedIn = !!user;
+  const token = user?.token ?? null;
+
   return (
     <AuthContext.Provider
       value={{
-        isLoggedIn: !!user,
+        isLoggedIn,
         user,
+        token,
         login,
         logout,
       }}

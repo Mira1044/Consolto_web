@@ -30,11 +30,18 @@ export const useSignup = ({ onSuccess } = {}) => {
    */
   const setField = useCallback(
     (key) => (e) => {
-      setFields((prev) => ({ ...prev, [key]: e.target.value }));
-      setErrors((prev) => {
-        if (!prev[key]) return prev;
-        const next = { ...prev };
-        delete next[key];
+      const value = e.target.value;
+      setFields((prev) => {
+        const next = { ...prev, [key]: value };
+
+        // Real-time validation on change
+        const validation = validateSignup(next);
+        if (validation.success) {
+          setErrors({});
+        } else {
+          setErrors(validation.errors || {});
+        }
+
         return next;
       });
     },
@@ -43,6 +50,9 @@ export const useSignup = ({ onSuccess } = {}) => {
 
   /**
    * Submit the signup form through the service layer.
+   * If the backend returns a token + user (like mobile),
+   * log the user in immediately; otherwise fall back to the
+   * previous email-only behaviour.
    */
   const handleSubmit = useCallback(
     async (e) => {
@@ -60,7 +70,23 @@ export const useSignup = ({ onSuccess } = {}) => {
 
       try {
         const response = await authService.signup(fields);
-        login(response.email);
+
+        if (response && typeof response === 'object') {
+          const { token, user, email, ...rest } = response;
+
+          if (token && user) {
+            // Mobile-like: { token, user }
+            login({ ...user, token });
+          } else if (token) {
+            // Fallback: embed token into response itself
+            login({ ...rest, email, token });
+          } else if (email) {
+            // Legacy behaviour
+            login(email);
+          }
+        }
+
+        window.alert('Account created successfully');
         onSuccess?.(response);
       } catch (err) {
         if (err.fieldErrors) {
