@@ -12,6 +12,7 @@ const HomePage = lazy(() => import('@/features/auth').then(module => ({ default:
 const ContactPage = lazy(() => import('@/features/contact').then(module => ({ default: module.ContactPage })));
 const ExpertsPage = lazy(() => import('@/features/experts').then(module => ({ default: module.ExpertsPage })));
 const BookingPage = lazy(() => import('@/features/booking').then(module => ({ default: module.BookingPage })));
+const BookingsPage = lazy(() => import('@/features/booking').then((module) => ({ default: module.BookingsPage })));
 const LoginPage = lazy(() => import('@/features/auth').then(module => ({ default: module.LoginPage })));
 const SignupPage = lazy(() => import('@/features/auth').then(module => ({ default: module.SignupPage })));
 // App-level pages stay in src/pages/

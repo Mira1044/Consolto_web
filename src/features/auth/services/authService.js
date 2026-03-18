@@ -35,6 +35,8 @@ export const authService = {
 
     const data = await apiRequest.post('/auth/login', validation.value, {
       skipAuth: true,
+      // Let the login form show validation inline instead of global toast
+      skipErrorHandler: true,
     });
 
     const { token, user } = data || {};

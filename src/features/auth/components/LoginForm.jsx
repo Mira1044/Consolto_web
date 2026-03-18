@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { Eye, EyeOff, X } from 'lucide-react';
+import { useState } from 'react';
 import { FormField, Input, Button } from '@/shared/components/ui';
 import { useLogin } from '../hooks/useLogin';
 
@@ -11,6 +12,7 @@ import { useLogin } from '../hooks/useLogin';
  */
 export const LoginForm = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const { fields, errors, isLoading, setField, handleSubmit } = useLogin({
     onSuccess: () => {
@@ -62,21 +64,31 @@ export const LoginForm = ({ isOpen, onClose }) => {
                 errorMessage={errors.email?.[0]}
               />
               <div>
-                <FormField
-                  label="Password"
-                  id="login-password"
-                  type="password"
-                  value={fields.password}
-                  onChange={setField('password')}
-                  required
-              placeholder="Password"
-                  inputComponent={Input}
-                  error={!!errors.password}
-                  errorMessage={errors.password?.[0]}
-                />
-                <a href="#" className="mt-2 block text-sm text-blue-600 hover:underline">
-                  Forgot password?
-                </a>
+                <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-2">
+                  Password <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <Input
+                    id="login-password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={fields.password}
+                    onChange={setField('password')}
+                    required
+                    placeholder="Password"
+                    className="pr-12"
+                    error={!!errors.password}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {errors.password?.[0] ? <p className="mt-1 text-sm text-red-500">{errors.password[0]}</p> : null}
               </div>
               <Button type="submit" disabled={isLoading} isLoading={isLoading} fullWidth size="lg">
                 {isLoading ? 'Logging in...' : 'Log in'}

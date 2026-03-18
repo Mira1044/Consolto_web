@@ -39,20 +39,20 @@ export const ExpertsLayout = ({
                 <p className="text-white font-semibold text-xl">{user?.email ?? 'User'}</p>
               </div>
             </div>
-            <button
+            {/* <button
               aria-label="Notifications"
               className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors"
               type="button"
             >
               <Bell className="text-white" size={24} />
-            </button>
+            </button> */}
           </div>
           <div className="mt-8 max-w-2xl">
             <div className="bg-white rounded-xl flex items-center gap-4 px-5 py-4 shadow-sm">
               <Search className="text-gray-400 flex-shrink-0" size={22} />
               <input
                 className="flex-1 text-base text-gray-700 outline-none placeholder-gray-400 bg-transparent min-w-0"
-                placeholder="Search experts or categories..."
+                placeholder="Search experts..."
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}

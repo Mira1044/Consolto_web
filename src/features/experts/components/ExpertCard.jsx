@@ -86,14 +86,14 @@ export const ExpertCard = ({ expert, onBook }) => {
             </label>
           ))}
         </div>
-        {/* <button
+        <button
           className="bg-blue-600 hover:bg-blue-700 text-white text-base font-medium px-5 py-3 rounded-full transition-all flex items-center gap-2 shadow-sm"
           type="button"
           onClick={() => onBook(expert, selected)}
         >
           Book Now
           <ChevronRight size={18} />
-        </button> */}
+        </button>
       </div>
     </div>
   );

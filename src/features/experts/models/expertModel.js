@@ -6,7 +6,7 @@ import { z } from 'zod';
  */
 
 export const expertSchema = z.object({
-  id: z.number().int().positive(),
+  id: z.union([z.string().min(1), z.number().int().positive()]),
   name: z.string().min(2, 'Name must be at least 2 characters'),
   tags: z.array(z.string()).min(1, 'At least one tag is required'),
   rating: z.number().min(0).max(5).nullable(),

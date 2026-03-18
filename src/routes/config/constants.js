@@ -14,6 +14,8 @@ export const ROUTES = {
   // Protected routes
   EXPERTS: '/experts',
   BOOKING: '/booking',
+  BOOKINGS: '/bookings',
+  SESSION: '/session',
 
   // Fallback
   NOT_FOUND: '/404',

@@ -5,12 +5,11 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/routes/config';
 
-const navLinks = [
+const baseNavLinks = [
   { label: 'Home', path: ROUTES.HOME, hash: '#home' },
   // { label: 'Features', path: ROUTES.HOME, hash: '#features' },
   // { label: 'How It Works', path: ROUTES.HOME, hash: '#how-it-works' },
-  // { label: 'Testimonials', path: ROUTES.HOME, hash: {}
-  { label: 'Bookings', path: ROUTES.BOOKINGS },
+  // { label: 'Testimonials', path: ROUTES.HOME, hash: '#testimonials' },
   { label: 'Contact', path: ROUTES.CONTACT },
 ];
 
@@ -44,6 +43,10 @@ export const Navbar = () => {
     return item.path;
   };
 
+  const navLinks = isLoggedIn
+    ? [baseNavLinks[0], { label: 'Bookings', path: ROUTES.BOOKINGS }, ...baseNavLinks.slice(1)]
+    : baseNavLinks;
+
   return (
     <motion.nav
       initial={{ y: -100 }}
@@ -53,7 +56,7 @@ export const Navbar = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16 md:h-20">
+        <div className="flex justify-between items-center h-16 md:h-20 gap-3">
           <Link to="/" className="flex items-center gap-2.5">
             <motion.span
               whileHover={{ scale: 1.05 }}
@@ -63,16 +66,27 @@ export const Navbar = () => {
             </motion.span>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center gap-6 lg:gap-8">
             {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={navHref(link)}
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors relative group"
-              >
-                {link.label}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300" />
-              </a>
+              'hash' in link ? (
+                <a
+                  key={link.label}
+                  href={navHref(link)}
+                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors relative group whitespace-nowrap"
+                >
+                  {link.label}
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300" />
+                </a>
+              ) : (
+                <Link
+                  key={link.label}
+                  to={link.path}
+                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors relative group whitespace-nowrap"
+                >
+                  {link.label}
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300" />
+                </Link>
+              )
             ))}
             {isLoggedIn ? (
               <>
@@ -80,7 +94,7 @@ export const Navbar = () => {
                   <motion.span
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="text-gray-700 hover:text-blue-600 font-semibold px-5 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 transition-all inline-block"
+                    className="text-gray-700 hover:text-blue-600 font-semibold px-4 lg:px-5 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 transition-all inline-block whitespace-nowrap"
                   >
                     Experts
                   </motion.span>
@@ -93,7 +107,7 @@ export const Navbar = () => {
                   }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-5 lg:px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
                 >
                   Log out
                 </motion.button>
@@ -105,7 +119,7 @@ export const Navbar = () => {
                   onClick={handleLogin}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="text-gray-700 hover:text-blue-600 font-semibold px-5 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 transition-all"
+                  className="text-gray-700 hover:text-blue-600 font-semibold px-4 lg:px-5 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 transition-all whitespace-nowrap"
                 >
                   Log in
                 </motion.button>
@@ -114,7 +128,7 @@ export const Navbar = () => {
                   onClick={handleSignup}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-5 lg:px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
                 >
                   Sign up
                 </motion.button>
@@ -140,16 +154,27 @@ export const Navbar = () => {
           exit={{ opacity: 0, height: 0 }}
           className="md:hidden bg-white/95 backdrop-blur-md border-t"
         >
-          <div className="px-4 py-4 space-y-3">
+          <div className="px-4 py-4 space-y-2">
             {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={navHref(link)}
-                className="block text-gray-700 hover:text-blue-600 font-medium py-2"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {link.label}
-              </a>
+              'hash' in link ? (
+                <a
+                  key={link.label}
+                  href={navHref(link)}
+                  className="block text-gray-700 hover:text-blue-600 font-medium py-2.5 rounded-lg px-2 hover:bg-blue-50/60 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.label}
+                  to={link.path}
+                  className="block text-gray-700 hover:text-blue-600 font-medium py-2.5 rounded-lg px-2 hover:bg-blue-50/60 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              )
             ))}
             {isLoggedIn ? (
               <div className="flex flex-col gap-2 pt-2">

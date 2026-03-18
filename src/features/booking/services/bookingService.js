@@ -6,7 +6,7 @@
  * making it easy to swap mock data with real API calls later.
  */
 
-// import { api } from '@/shared/services/api';
+import { apiRequest } from '@/shared/services/api';
 
 export const bookingService = {
   /**
@@ -23,5 +23,39 @@ export const bookingService = {
       id: Date.now(),
       createdAt: new Date().toISOString(),
     });
+  },
+
+  /**
+   * Get logged-in user's appointments
+   * GET /appointment/user
+   *
+   * Backend envelope:
+   *  { success, statusCode, message, data: { data: Appointment[], pagination: {...} } }
+   *
+   * After interceptor unwrap, this method receives:
+   *  { data: Appointment[], pagination: {...} }
+   */
+  async getUserAppointments(params = {}) {
+    const payload = await apiRequest.get('/appointment/user', { params });
+    const list = Array.isArray(payload?.data) ? payload.data : [];
+    const pagination = payload?.pagination ?? null;
+    return { appointments: list, pagination };
+  },
+
+  /**
+   * Get logged-in consultant's appointments
+   * GET /appointment/consultant
+   *
+   * Backend envelope:
+   *  { success, statusCode, message, data: { data: Appointment[], pagination: {...} } }
+   *
+   * After interceptor unwrap, this method receives:
+   *  { data: Appointment[], pagination: {...} }
+   */
+  async getConsultantAppointments(params = {}) {
+    const payload = await apiRequest.get('/appointment/consultant', { params });
+    const list = Array.isArray(payload?.data) ? payload.data : [];
+    const pagination = payload?.pagination ?? null;
+    return { appointments: list, pagination };
   },
 };
