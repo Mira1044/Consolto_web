@@ -47,8 +47,7 @@ export const AppRouter = () => {
           }
 
           // Determine which layout to use
-          const LayoutComponent =
-            layout === 'auth' ? AuthLayout : layout === 'main-no-footer' ? MainLayoutNoFooter : MainLayout;
+          const LayoutComponent = layout === 'auth' ? AuthLayout : MainLayout;
 
           return (
             <Route

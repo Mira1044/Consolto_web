@@ -12,12 +12,15 @@ const HomePage = lazy(() => import('@/features/auth').then(module => ({ default:
 const ContactPage = lazy(() => import('@/features/contact').then(module => ({ default: module.ContactPage })));
 const ExpertsPage = lazy(() => import('@/features/experts').then(module => ({ default: module.ExpertsPage })));
 const BookingPage = lazy(() => import('@/features/booking').then(module => ({ default: module.BookingPage })));
-const BookingsPage = lazy(() => import('@/features/booking').then(module => ({ default: module.BookingsPage })));
 const LoginPage = lazy(() => import('@/features/auth').then(module => ({ default: module.LoginPage })));
 const SignupPage = lazy(() => import('@/features/auth').then(module => ({ default: module.SignupPage })));
 // App-level pages stay in src/pages/
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(module => ({ default: module.NotFoundPage })));
-
+const NotFoundPage = lazy(() =>
+  import('@/pages/NotFoundPage').then((module) => ({ default: module.NotFoundPage })),
+);
+const SessionPage = lazy(() =>
+  import('@/features/communication').then((module) => ({ default: module.SessionPage })),
+);
 /**
  * Route definition structure:
  * {
@@ -126,32 +129,43 @@ export const routeConfig = [
       description: 'The page you are looking for does not exist',
     },
   },
+  {
+    path: ROUTES.SESSION,
+    element: SessionPage,
+    requiresAuth: true,
+    requiresGuest: false,
+    layout: 'none',
+    title: 'Session - Consolto',
+    meta: {
+      description: 'Video call and chat session',
+    },
+  },
 ];
 
 /**
  * Get route config by path
  */
 export const getRouteByPath = (path) => {
-  return routeConfig.find(route => route.path === path);
+  return routeConfig.find((route) => route.path === path);
 };
 
 /**
  * Get all public routes
  */
 export const getPublicRoutes = () => {
-  return routeConfig.filter(route => !route.requiresAuth && !route.requiresGuest);
+  return routeConfig.filter((route) => !route.requiresAuth && !route.requiresGuest);
 };
 
 /**
  * Get all protected routes
  */
 export const getProtectedRoutes = () => {
-  return routeConfig.filter(route => route.requiresAuth);
+  return routeConfig.filter((route) => route.requiresAuth);
 };
 
 /**
  * Get all auth routes
  */
 export const getAuthRoutes = () => {
-  return routeConfig.filter(route => route.requiresGuest);
+  return routeConfig.filter((route) => route.requiresGuest);
 };
