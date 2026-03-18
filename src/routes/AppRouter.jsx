@@ -46,7 +46,12 @@ export const AppRouter = () => {
             );
           }
 
-          // Determine which layout to use
+          if (layout === 'none') {
+            return (
+              <Route key={path} path={path} element={WrappedComponent} />
+            );
+          }
+
           const LayoutComponent = layout === 'auth' ? AuthLayout : MainLayout;
 
           return (
