@@ -15,8 +15,13 @@ export const Hero = () => {
     >
       {/* Top-left Consolto logo on hero */}
       <div className="z-20 gap-1.5 absolute left-6 top-4 flex items-center">
-        <img src="/consolto-logo.png" alt="Consolto logo" className="h-5 w-auto object-contain" />
-        <span className="text-base font-semibold tracking-tight text-blue-600">consolto</span>
+        <img
+          src="/assets/Consolto-01.png"
+          alt="Consolto"
+          className="h-12 w-auto select-none object-contain"
+          draggable="false"
+        />
+        <span className="text-lg font-semibold tracking-tight text-blue-600">consolto</span>
       </div>
 
       <div className="absolute inset-0 overflow-hidden">
