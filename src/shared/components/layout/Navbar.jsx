@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/routes/config';
+import { Button } from '@/shared/components/ui';
 
 const baseNavLinks = [
   { label: 'Home', path: ROUTES.HOME, hash: '#home' },
@@ -46,6 +47,8 @@ export const Navbar = () => {
   const navLinks = isLoggedIn
     ? [baseNavLinks[0], { label: 'Bookings', path: ROUTES.BOOKINGS }, ...baseNavLinks.slice(1)]
     : baseNavLinks;
+
+  const MotionButton = motion(Button);
 
   return (
     <motion.nav
@@ -90,16 +93,18 @@ export const Navbar = () => {
             ))}
             {isLoggedIn ? (
               <>
-                <Link to={ROUTES.EXPERTS}>
-                  <motion.span
+                {/* <Link to={ROUTES.EXPERTS}>
+                  <MotionButton
+                    variant="ghost"
+                    size="sm"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="text-gray-700 hover:text-blue-600 font-semibold px-4 lg:px-5 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 transition-all inline-block whitespace-nowrap"
+                    className="rounded-full border border-gray-300 hover:border-blue-500 px-4 lg:px-5 py-2.5 text-gray-700 hover:text-blue-600 shadow-none bg-transparent"
                   >
                     Experts
-                  </motion.span>
-                </Link>
-                <motion.button
+                  </MotionButton>
+                </Link> */}
+                <MotionButton
                   type="button"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
@@ -107,31 +112,35 @@ export const Navbar = () => {
                   }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-5 lg:px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+                  size="sm"
+                  className="rounded-full px-5 lg:px-6 py-2.5 whitespace-nowrap"
                 >
                   Log out
-                </motion.button>
+                </MotionButton>
               </>
             ) : (
               <>
-                <motion.button
+                <MotionButton
                   type="button"
                   onClick={handleLogin}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="text-gray-700 hover:text-blue-600 font-semibold px-4 lg:px-5 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 transition-all whitespace-nowrap"
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full border border-gray-300 hover:border-blue-500 px-4 lg:px-5 py-2.5 text-gray-700 hover:text-blue-600 shadow-none bg-transparent whitespace-nowrap"
                 >
                   Log in
-                </motion.button>
-                <motion.button
+                </MotionButton>
+                <MotionButton
                   type="button"
                   onClick={handleSignup}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-5 lg:px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all whitespace-nowrap"
+                  size="sm"
+                  className="rounded-full px-5 lg:px-6 py-2.5 whitespace-nowrap"
                 >
                   Sign up
-                </motion.button>
+                </MotionButton>
               </>
             )}
           </div>
@@ -180,38 +189,51 @@ export const Navbar = () => {
               <div className="flex flex-col gap-2 pt-2">
                 <Link
                   to={ROUTES.EXPERTS}
-                  className="w-full text-center text-gray-700 font-semibold px-6 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 hover:text-blue-600 transition-all block"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Experts
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    fullWidth
+                    className="rounded-full border border-gray-300 hover:border-blue-500 px-6 py-2.5 text-gray-700 hover:text-blue-600 shadow-none bg-transparent"
+                  >
+                    Experts
+                  </Button>
                 </Link>
-                <button
+                <Button
                   type="button"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     logout();
                   }}
-                  className="w-full text-center bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2.5 rounded-full font-semibold"
+                  fullWidth
+                  size="sm"
+                  className="rounded-full px-6 py-2.5"
                 >
                   Log out
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="flex flex-col gap-2 pt-2">
-                <button
+                <Button
                   type="button"
                   onClick={handleLogin}
-                  className="w-full text-center text-gray-700 font-semibold px-6 py-2.5 rounded-full border border-gray-300 hover:border-blue-500 hover:text-blue-600 transition-all"
+                  variant="ghost"
+                  size="sm"
+                  fullWidth
+                  className="rounded-full border border-gray-300 hover:border-blue-500 px-6 py-2.5 text-gray-700 hover:text-blue-600 shadow-none bg-transparent"
                 >
                   Log in
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={handleSignup}
-                  className="w-full text-center bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-2.5 rounded-full font-semibold"
+                  fullWidth
+                  size="sm"
+                  className="rounded-full px-6 py-2.5"
                 >
                   Sign up
-                </button>
+                </Button>
               </div>
             )}
           </div>
