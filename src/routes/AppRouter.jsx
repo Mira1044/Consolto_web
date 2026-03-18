@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { routeConfig, ROUTES } from './config';
 import { ProtectedRoute, PublicRoute } from './guards';
-import { MainLayout } from '@/shared/components/layout';
+import { MainLayout, MainLayoutNoFooter } from '@/shared/components/layout';
 import { Loader } from '@/shared/components/ui';
 import { useDocumentTitle } from './hooks';
 
@@ -47,7 +47,8 @@ export const AppRouter = () => {
           }
 
           // Determine which layout to use
-          const LayoutComponent = layout === 'auth' ? AuthLayout : MainLayout;
+          const LayoutComponent =
+            layout === 'auth' ? AuthLayout : layout === 'main-no-footer' ? MainLayoutNoFooter : MainLayout;
 
           return (
             <Route

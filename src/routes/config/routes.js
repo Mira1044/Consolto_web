@@ -12,6 +12,7 @@ const HomePage = lazy(() => import('@/features/auth').then(module => ({ default:
 const ContactPage = lazy(() => import('@/features/contact').then(module => ({ default: module.ContactPage })));
 const ExpertsPage = lazy(() => import('@/features/experts').then(module => ({ default: module.ExpertsPage })));
 const BookingPage = lazy(() => import('@/features/booking').then(module => ({ default: module.BookingPage })));
+const BookingsPage = lazy(() => import('@/features/booking').then(module => ({ default: module.BookingsPage })));
 const LoginPage = lazy(() => import('@/features/auth').then(module => ({ default: module.LoginPage })));
 const SignupPage = lazy(() => import('@/features/auth').then(module => ({ default: module.SignupPage })));
 // App-level pages stay in src/pages/
@@ -99,6 +100,17 @@ export const routeConfig = [
     title: 'Booking - Consolto',
     meta: {
       description: 'Book a consultation',
+    },
+  },
+  {
+    path: ROUTES.BOOKINGS,
+    element: BookingsPage,
+    requiresAuth: true,
+    requiresGuest: false,
+    layout: 'main-no-footer',
+    title: 'Bookings - Consolto',
+    meta: {
+      description: 'View and manage your bookings',
     },
   },
 

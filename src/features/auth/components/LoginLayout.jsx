@@ -55,7 +55,7 @@ export const LoginLayout = ({
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                {onForgotPassword ? (
+                {/* {onForgotPassword ? (
                   <button
                     type="button"
                     onClick={onForgotPassword}
@@ -63,7 +63,7 @@ export const LoginLayout = ({
                   >
                     Forgot password?
                   </button>
-                ) : null}
+                ) : null} */}
               </div>
               <Input
                 id="password"
@@ -85,7 +85,7 @@ export const LoginLayout = ({
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
+          {/* <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don&apos;t have an account?{' '}
               {onGoToSignup ? (
@@ -98,7 +98,7 @@ export const LoginLayout = ({
                 </button>
               ) : null}
             </p>
-          </div>
+          </div> */}
         </motion.div>
 
         

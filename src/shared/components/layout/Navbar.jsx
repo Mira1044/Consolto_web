@@ -7,9 +7,10 @@ import { ROUTES } from '@/routes/config';
 
 const navLinks = [
   { label: 'Home', path: ROUTES.HOME, hash: '#home' },
-  { label: 'Features', path: ROUTES.HOME, hash: '#features' },
-  { label: 'How It Works', path: ROUTES.HOME, hash: '#how-it-works' },
-  { label: 'Testimonials', path: ROUTES.HOME, hash: '#testimonials' },
+  // { label: 'Features', path: ROUTES.HOME, hash: '#features' },
+  // { label: 'How It Works', path: ROUTES.HOME, hash: '#how-it-works' },
+  // { label: 'Testimonials', path: ROUTES.HOME, hash: {}
+  { label: 'Bookings', path: ROUTES.BOOKINGS },
   { label: 'Contact', path: ROUTES.CONTACT },
 ];
 

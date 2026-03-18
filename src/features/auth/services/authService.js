@@ -1,10 +1,14 @@
 /**
  * Auth service
  *
- * Mirrors the real backend auth flow used in the mobile `consolto_app`,
- * but keeps the existing web folder structure.
- *
+ * Handles authentication against the backend API.
  * This layer isolates HTTP details from hooks/components.
+ *
+ * Backend response envelope:
+ *   { success, statusCode, message, data: { ... } }
+ *
+ * The axios response interceptor unwraps the `data` property automatically,
+ * so service methods receive the inner payload directly.
  */
 
 import { apiRequest } from '@/shared/services/api';
@@ -12,10 +16,14 @@ import { validateLogin, validateSignup } from '../validators/authValidator';
 
 export const authService = {
   /**
-   * Log in with email and password against the real API.
+   * POST /auth/login
    *
-   * Returns a normalized auth user object that includes the backend user
-   * fields plus the `token`, ready to be stored by `AuthContext`.
+   * Request:  { email, password }
+   * Response (after interceptor unwrap):
+   *   { user: { id, email, userName, role, isVerified }, token }
+   *
+   * Returns a flat auth object { id, email, userName, role, isVerified, token }
+   * ready to be stored by AuthContext.
    */
   async login(credentials) {
     const validation = validateLogin(credentials);
@@ -25,9 +33,6 @@ export const authService = {
       throw err;
     }
 
-    // Backend is expected to behave like the mobile app:
-    // POST /auth/login -> { data: { token, user } }
-    // Our axios layer unwraps `data`, so we receive { token, user } here.
     const data = await apiRequest.post('/auth/login', validation.value, {
       skipAuth: true,
     });
@@ -37,15 +42,14 @@ export const authService = {
       throw new Error('Invalid login response from server');
     }
 
-    // Normalize to a single object that includes the token.
     return { ...user, token };
   },
 
   /**
-   * Sign up with name, email, password against the real API.
+   * POST /auth/register
    *
-   * Returns whatever the backend returns, but if a `{ token, user }`
-   * shape is present, callers can log the user in immediately.
+   * Request:  { name, email, password, confirmPassword }
+   * Response (after interceptor unwrap): backend-defined payload
    */
   async signup(data) {
     const validation = validateSignup(data);
@@ -55,9 +59,6 @@ export const authService = {
       throw err;
     }
 
-    // Backend is expected to behave similarly to mobile register:
-    // POST /auth/register -> { data: ... }
-    // Our axios layer unwraps `data`, so we receive it directly.
     const result = await apiRequest.post('/auth/register', validation.value, {
       skipAuth: true,
     });

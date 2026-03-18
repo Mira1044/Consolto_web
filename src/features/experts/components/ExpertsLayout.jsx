@@ -25,7 +25,7 @@ export const ExpertsLayout = ({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-28 pb-20">
+    <div className="min-h-screen bg-gray-50 pt-10 pb-20">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header - web */}
         <div className="bg-gradient-to-br from-indigo-600 via-blue-600 to-purple-600 rounded-2xl p-8 mb-10">
@@ -71,7 +71,7 @@ export const ExpertsLayout = ({
         </div>
 
         {/* Categories - web: single row */}
-        <div className="mb-10">
+        {/* <div className="mb-10">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-2xl font-bold text-gray-900">Categories</h2>
             <button
@@ -118,7 +118,7 @@ export const ExpertsLayout = ({
               <X size={18} /> Clear filter: {activeCategory}
             </button>
           )}
-        </div>
+        </div> */}
 
         {/* Experts grid - web: 3 columns */}
         <div>
