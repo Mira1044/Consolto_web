@@ -1,7 +1,8 @@
-import { Search, Bell, User, X } from 'lucide-react';
+import { Search, Bell, User, X, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 import { ExpertCard } from './ExpertCard';
-import { Loader } from '@/shared/components/ui';
+import { Button, Loader } from '@/shared/components/ui';
 
 /**
  * ExpertsLayout
@@ -128,11 +129,34 @@ export const ExpertsLayout = ({
               No experts found for &quot;{search || (activeCategory ?? '...')}&quot;
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
-              {filteredExperts.map((expert) => (
-                <ExpertCard key={expert.id} expert={expert} onBook={onBook} />
-              ))}
-            </div>
+            <>
+              <div className="relative">
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                  {filteredExperts.map((expert) => (
+                    <ExpertCard key={expert.id} expert={expert} onBook={onBook} />
+                  ))}
+                </div>
+
+                <motion.div
+                  whileTap={{ scale: 0.96 }}
+                  className="hidden md:block absolute -right-16 top-1/2 -translate-y-1/2 z-10"
+                >
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    aria-label="New booking"
+                    onClick={() => {
+                      const first = filteredExperts?.[0];
+                      if (first) onBook?.(first, 15);
+                    }}
+                    className="rounded-full w-12 h-12 p-0 flex items-center justify-center bg-blue-600 text-white shadow-md focus:ring-blue-500 !transition-none hover:!bg-blue-600 hover:!text-white hover:!shadow-md"
+                  >
+                    <Plus size={20} />
+                  </Button>
+                </motion.div>
+              </div>
+            </>
           )}
         </div>
       </div>

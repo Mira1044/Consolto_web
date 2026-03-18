@@ -55,7 +55,7 @@ export const LoginPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative">
       {/* Top-left Consolto logo + text */}
-      <div className="absolute left-6 top-4 z-10 flex items-center gap-3">
+      <div className="absolute left-4 sm:left-6 top-4 z-10 flex items-center gap-3">
         <div className="h-9 w-9 rounded-full border-2 border-blue-500 bg-white flex items-center justify-center shadow-sm">
           <div className="h-5 w-5 rounded-full border border-blue-500 flex items-center justify-center">
             <span className="text-[10px] text-blue-500 font-semibold">...</span>
@@ -66,14 +66,14 @@ export const LoginPage = () => {
         </span>
       </div>
 
-      <div className="flex h-screen w-full">
+      <div className="flex min-h-screen w-full flex-col lg:flex-row">
         {/* Left: full hero / marketing (70%) */}
         <div className="hidden lg:flex basis-[70%]">
           <Hero />
         </div>
 
         {/* Right: auth panel (30%) */}
-        <div className="flex basis-[30%] items-center justify-center px-6 lg:px-12">
+        <div className="flex w-full lg:basis-[30%] items-center justify-center px-4 sm:px-6 lg:px-12 py-16 lg:py-0">
           <div className="w-full max-w-md">
             {renderRight()}
           </div>

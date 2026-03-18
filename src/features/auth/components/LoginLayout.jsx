@@ -20,7 +20,7 @@ export const LoginLayout = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
-    <div className="min-h-[calc(100vh-4rem)] md:min-h-[calc(100vh-5rem)] w-full flex items-center justify-center px-4 py-10 sm:py-14">
+    <div className="w-full flex items-center justify-center px-0 py-0">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
