@@ -11,28 +11,22 @@ export const Hero = () => {
   return (
     <section
       id="home"
-      className="relative h-full flex items-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-12"
+      className="relative flex h-full items-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50 pt-12"
     >
       {/* Top-left Consolto logo on hero */}
-      <div className="absolute left-6 top-4 z-20 flex items-center gap-1.5">
-        <img
-          src="/consolto-logo.png"
-          alt="Consolto logo"
-          className="h-5 w-auto object-contain"
-        />
-        <span className="text-base font-semibold tracking-tight text-blue-600">
-          consolto
-        </span>
+      <div className="z-20 gap-1.5 absolute left-6 top-4 flex items-center">
+        <img src="/consolto-logo.png" alt="Consolto logo" className="h-5 w-auto object-contain" />
+        <span className="text-base font-semibold tracking-tight text-blue-600">consolto</span>
       </div>
 
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+        <div className="w-72 h-72 absolute left-10 top-20 animate-blob rounded-full bg-blue-200 opacity-30 mix-blend-multiply blur-xl filter"></div>
+        <div className="w-72 h-72 animation-delay-2000 absolute right-10 top-40 animate-blob rounded-full bg-blue-300 opacity-30 mix-blend-multiply blur-xl filter"></div>
+        <div className="w-72 h-72 animation-delay-4000 absolute -bottom-8 left-1/2 animate-blob rounded-full bg-blue-400 opacity-30 mix-blend-multiply blur-xl filter"></div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-        <div className="grid md:grid-cols-2 gap-8 items-center">
+      <div className="z-10 relative mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-8 md:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -42,7 +36,7 @@ export const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6"
+              className="mb-6 text-5xl font-bold leading-tight text-gray-900 md:text-6xl lg:text-7xl"
             >
               Connect with{' '}
               <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
@@ -55,12 +49,11 @@ export const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-lg md:text-xl text-gray-600 mb-8 leading-relaxed"
+              className="mb-8 text-lg leading-relaxed text-gray-600 md:text-xl"
             >
               Get professional consultation and expert guidance from the comfort of your home.
               Connect with verified professionals across various fields instantly.
             </motion.p>
-
           </motion.div>
 
           <motion.div
@@ -68,9 +61,9 @@ export const Hero = () => {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             whileHover={{ rotateX: -6, rotateY: 6, scale: 1.02 }}
-            className="relative hidden md:flex items-center justify-center [perspective:1200px]"
+            className="relative hidden items-center justify-center [perspective:1200px] md:flex"
           >
-            <div className="relative w-56 h-56">
+            <div className="relative h-56 w-56">
               {floatingCards.map((card, index) => (
                 <motion.div
                   key={index}
@@ -89,11 +82,11 @@ export const Hero = () => {
                       repeat: Infinity,
                       delay: card.delay,
                     }}
-                    className="bg-white/80 backdrop-blur-md p-6 rounded-2xl shadow-xl border border-blue-100"
+                    className="rounded-2xl border border-blue-100 bg-white/80 p-6 shadow-xl backdrop-blur-md"
                   >
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl mb-3"></div>
-                    <div className="h-3 bg-gray-200 rounded w-24 mb-2"></div>
-                    <div className="h-2 bg-gray-100 rounded w-16"></div>
+                    <div className="mb-3 h-16 w-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600"></div>
+                    <div className="rounded mb-2 h-3 w-24 bg-gray-200"></div>
+                    <div className="rounded h-2 w-16 bg-gray-100"></div>
                   </motion.div>
                 </motion.div>
               ))}
