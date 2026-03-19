@@ -16,55 +16,53 @@ export const useLogin = ({ onSuccess } = {}) => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const { login } = useAuth();
   const { handleApiError, showSuccess } = useErrorHandler();
+
+  const setSingleInvalidCredentialError = useCallback((field = 'email') => {
+    setErrors({ [field]: ['Invalid credentials'] });
+  }, []);
+
   const setInlineFromApiMessage = useCallback((message) => {
-    const msg = String(message || 'Invalid credentials');
-    const lower = msg.toLowerCase();
-    if (lower.includes('password')) {
-      setErrors({ password: [msg] });
+    const msg = String(message || '').toLowerCase();
+    if (msg.includes('password')) {
+      setSingleInvalidCredentialError('password');
       return true;
     }
-    if (lower.includes('email')) {
-      setErrors({ email: [msg] });
+    if (msg.includes('email')) {
+      setSingleInvalidCredentialError('email');
+      return true;
+    }
+    if (msg.includes('credential') || msg.includes('invalid')) {
+      setSingleInvalidCredentialError('email');
       return true;
     }
     return false;
-  }, []);
+  }, [setSingleInvalidCredentialError]);
+
+  const setPriorityValidationError = useCallback(
+    (validation) => {
+      // Show one field at a time: email first, then password.
+      if (validation?.errors?.email?.length) {
+        setSingleInvalidCredentialError('email');
+        return;
+      }
+      if (validation?.errors?.password?.length) {
+        setSingleInvalidCredentialError('password');
+      }
+    },
+    [setSingleInvalidCredentialError],
+  );
 
   /**
-   * Update a single field value and clear its error.
+   * Update a single field value.
+   * Validation is intentionally not run here.
+   * Errors are shown only when user clicks Sign in.
    */
   const setField = useCallback(
     (key) => (e) => {
       const value = e.target.value;
-      setFields((prev) => {
-        const next = { ...prev, [key]: value };
-
-        // Real-time validation on change:
-        // show only the currently edited field's error until submit.
-        const validation = validateLogin(next);
-        if (validation.success) {
-          setErrors((prevErrors) => {
-            if (!prevErrors?.[key]) return prevErrors;
-            const { [key]: _removed, ...rest } = prevErrors;
-            return rest;
-          });
-        } else {
-          const fieldError = validation.errors?.[key];
-          setErrors((prevErrors) => {
-            if (hasSubmitted) return validation.errors || {};
-            if (!fieldError?.length) {
-              if (!prevErrors?.[key]) return prevErrors;
-              const { [key]: _removed, ...rest } = prevErrors;
-              return rest;
-            }
-            return { [key]: fieldError };
-          });
-        }
-
-        return next;
-      });
+      setFields((prev) => ({ ...prev, [key]: value }));
     },
-    [hasSubmitted],
+    [],
   );
 
   /**
@@ -80,21 +78,22 @@ export const useLogin = ({ onSuccess } = {}) => {
       // Client-side validation
       const validation = validateLogin(fields);
       if (!validation.success) {
-        setErrors(validation.errors);
+        setPriorityValidationError(validation);
         return;
       }
 
-      setErrors({});
       setIsLoading(true);
 
       try {
         const authUser = await authService.login(fields);
         login(authUser);
+        setErrors({});
         showSuccess('Login successful');
         onSuccess?.(authUser);
       } catch (err) {
         if (err.fieldErrors) {
-          setErrors(err.fieldErrors);
+          if (err.fieldErrors.email?.length) setSingleInvalidCredentialError('email');
+          else setSingleInvalidCredentialError('password');
         } else {
           // For login we don't want a toast for validation errors.
           const appError = handleApiError(err, {
@@ -112,7 +111,7 @@ export const useLogin = ({ onSuccess } = {}) => {
         setIsLoading(false);
       }
     },
-    [fields, login, onSuccess, handleApiError, setInlineFromApiMessage],
+    [fields, login, onSuccess, handleApiError, setInlineFromApiMessage, setPriorityValidationError, setSingleInvalidCredentialError],
   );
 
   return {

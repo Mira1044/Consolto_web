@@ -37,8 +37,19 @@ export const bookingService = {
    */
   async getUserAppointments(params = {}) {
     const payload = await apiRequest.get('/appointment/user', { params });
-    const list = Array.isArray(payload?.data) ? payload.data : [];
-    const pagination = payload?.pagination ?? null;
+
+    // Support both shapes:
+    // 1) { data: Appointment[], pagination }
+    // 2) { data: { data: Appointment[], pagination } }
+    const container = payload?.data && Array.isArray(payload.data)
+      ? payload
+      : payload?.data && Array.isArray(payload.data.data)
+        ? payload.data
+        : payload;
+
+    const list = Array.isArray(container?.data) ? container.data : [];
+    const pagination = container?.pagination ?? null;
+
     return { appointments: list, pagination };
   },
 
@@ -54,8 +65,50 @@ export const bookingService = {
    */
   async getConsultantAppointments(params = {}) {
     const payload = await apiRequest.get('/appointment/consultant', { params });
-    const list = Array.isArray(payload?.data) ? payload.data : [];
-    const pagination = payload?.pagination ?? null;
+
+    const container = payload?.data && Array.isArray(payload.data)
+      ? payload
+      : payload?.data && Array.isArray(payload.data.data)
+        ? payload.data
+        : payload;
+
+    const list = Array.isArray(container?.data) ? container.data : [];
+    const pagination = container?.pagination ?? null;
+
     return { appointments: list, pagination };
+  },
+
+  /**
+   * Cancel an appointment.
+   * Mirrors mobile:
+   *  POST /appointment/cancel/consultant
+   *  POST /appointment/cancel/user
+   */
+  async cancelAppointment({ appointmentId, roleTab, reasonToCancel }) {
+    const endpoint = roleTab === 'consultant' ? '/appointment/cancel/consultant' : '/appointment/cancel/user';
+    return apiRequest.post(endpoint, {
+      appointmentId,
+      reason_to_cancel: reasonToCancel,
+    });
+  },
+
+  /**
+   * Reschedule an appointment.
+   * Mirrors mobile:
+   *  PUT /appointment/reschedule/consultant
+   *  PUT /appointment/reschedule/user
+   */
+  async rescheduleAppointment({ appointmentId, roleTab, newAvailabilityId, booking_date }) {
+    const endpoint = roleTab === 'consultant' ? '/appointment/reschedule/consultant' : '/appointment/reschedule/user';
+
+    const body = {
+      appointmentId,
+      newAvailabilityId,
+    };
+
+    // Only send booking_date for WEEKLY/DAILY slots (SPECIFIC doesn't need it).
+    if (booking_date) body.booking_date = booking_date;
+
+    return apiRequest.put(endpoint, body);
   },
 };

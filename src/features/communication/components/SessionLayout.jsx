@@ -24,9 +24,13 @@ import { EndSessionModal } from './EndSessionModal';
  */
 export const SessionLayout = () => {
   const navigate = useNavigate();
-  const { appointmentId } = useParams();
   const location = useLocation();
   const sessionParams = location.state || {};
+  const { appointmentId: appointmentIdFromUrl } = useParams();
+
+  // The app navigates with `location.state` (not always `/:appointmentId` in the URL),
+  // so we fall back to the state value when the param is missing.
+  const appointmentId = appointmentIdFromUrl || sessionParams.appointmentId;
 
   const {
     appointmentStartTime = '',

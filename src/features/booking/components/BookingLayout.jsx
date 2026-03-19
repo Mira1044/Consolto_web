@@ -1,6 +1,7 @@
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { formatINR } from '@/shared/utils/formatters/priceFormatter';
 import { toInputDateValue } from '@/shared/utils/formatters/dateFormatter';
+import { Button, Input } from '@/shared/components/ui';
 
 /**
  * BookingLayout
@@ -17,6 +18,7 @@ export const BookingLayout = ({
     duration,
     selectedDate,
     selectedSlot,
+    frequency,
     reason,
     message,
     price,
@@ -29,6 +31,7 @@ export const BookingLayout = ({
     setDuration,
     setSelectedDate,
     setSelectedSlot,
+    setFrequency,
     setReason,
     setMessage,
     confirm,
@@ -36,48 +39,53 @@ export const BookingLayout = ({
 
   if (confirmed) {
     return (
-      <div className="min-h-screen bg-slate-50 pt-28 pb-24 flex items-center justify-center px-6">
-        <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg border border-slate-100 p-12 text-center">
+      <div className="min-h-screen bg-slate-50 pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-20 lg:pb-24 flex items-center justify-center px-4 sm:px-6">
+        <div className="w-full max-w-xl bg-white rounded-2xl shadow-lg border border-slate-100 p-6 sm:p-8 lg:p-12 text-center">
           <div className="w-24 h-24 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-8">
             <CheckCircle2 className="text-emerald-500" size={48} strokeWidth={1.5} />
           </div>
-          <h2 className="text-3xl font-semibold text-slate-900 mb-3">Booking confirmed!</h2>
-          <p className="text-slate-600 text-lg mb-1">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-slate-900 mb-3">Booking confirmed!</h2>
+          <p className="text-slate-600 text-base sm:text-lg mb-1">
             Your <span className="font-medium text-slate-700">{duration} min</span> session with
           </p>
-          <p className="text-slate-800 font-semibold text-xl mb-2">{expert.name}</p>
+          <p className="text-slate-800 font-semibold text-lg sm:text-xl mb-2">{expert.name}</p>
           <p className="text-slate-500 mb-3">
             {summary.dateLabel} at {summary.timeLabel}
           </p>
-          <p className="text-blue-600 font-semibold text-xl mb-10">
+          <p className="text-blue-600 font-semibold text-lg sm:text-xl mb-8 sm:mb-10">
             ₹{formatINR(price)} paid
           </p>
-          <button
+          <Button
             type="button"
             onClick={navigateBack}
-            className="rounded-xl bg-blue-600 hover:bg-blue-700 transition-colors px-10 py-4 text-lg font-semibold text-white"
+            size="lg"
+            className="rounded-xl px-10 py-4 text-lg !transition-none hover:!shadow-lg"
           >
             Back to Experts
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-28 pb-24">
-      <div className="max-w-5xl mx-auto px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-20 lg:pb-24">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back + title - desktop */}
         <div className="mb-10">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
             onClick={navigateBack}
-            className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors text-base font-medium mb-4"
+            className="mb-4 px-0 py-0 h-auto rounded-none shadow-none bg-transparent !transition-none hover:!bg-transparent hover:!text-slate-600"
           >
-            <ArrowLeft size={22} strokeWidth={2} />
-            Back to Experts
-          </button>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Book Appointment</h1>
+            <span className="inline-flex items-center gap-2 text-base font-medium">
+              <ArrowLeft size={22} strokeWidth={2} />
+              Back to Experts
+            </span>
+          </Button>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Book Appointment</h1>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
@@ -112,14 +120,14 @@ export const BookingLayout = ({
             {/* Date picker - calendar opens on click */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <p className="text-base font-semibold text-slate-800 mb-4">Select date</p>
-              <input
+              <Input
                 type="date"
                 value={toInputDateValue(selectedDate)}
                 min={toInputDateValue(new Date())}
                 onChange={(e) => {
                   if (e.target.value) setSelectedDate(new Date(e.target.value + 'T00:00:00'));
                 }}
-                className="w-full max-w-xs border border-slate-200 rounded-xl px-4 py-3.5 text-base text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+                className="max-w-xs cursor-pointer"
               />
               <p className="text-sm text-slate-500 mt-2">
                 Click the field above to open the calendar and pick a date.
@@ -129,26 +137,30 @@ export const BookingLayout = ({
             {/* Duration */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <p className="text-base font-semibold text-slate-800 mb-4">Select duration</p>
-              <div className="flex gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {[15, 30].map((d) => {
                   const p = d === 15 ? expert.price15 : expert.price30;
                   const active = duration === d;
                   return (
-                    <button
+                    <Button
                       key={d}
                       type="button"
                       onClick={() => setDuration(d)}
-                      className={`rounded-xl border-2 px-8 py-5 text-center transition-all min-w-[140px] ${
+                      variant="ghost"
+                      size="sm"
+                      className={`w-full rounded-xl border-2 px-5 sm:px-8 py-4 sm:py-5 text-center !transition-none ${
                         active
-                          ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100'
-                          : 'border-slate-200 hover:border-blue-300 text-slate-700'
+                          ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100 hover:!bg-blue-600 hover:!border-blue-600'
+                          : 'bg-white border-slate-200 text-slate-700 hover:!bg-white hover:!border-slate-200 hover:!text-slate-700'
                       }`}
                     >
-                      <p className="text-base font-semibold">{d} minutes</p>
-                      <p className={`text-base mt-1 ${active ? 'text-blue-100' : 'text-slate-400'}`}>
-                        ₹{formatINR(p)}
-                      </p>
-                    </button>
+                      <div>
+                        <p className="text-base font-semibold">{d} minutes</p>
+                        <p className={`text-base mt-1 ${active ? 'text-blue-100' : 'text-slate-400'}`}>
+                          ₹{formatINR(p)}
+                        </p>
+                      </div>
+                    </Button>
                   );
                 })}
               </div>
@@ -159,28 +171,55 @@ export const BookingLayout = ({
               <p className="text-base font-semibold text-slate-800 mb-4">
                 Available time slots ({duration} minutes)
               </p>
-              <div className="flex flex-wrap gap-3">
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3">
                 {timeSlots.map((slot) => {
                   const active = selectedSlot === slot.time;
                   return (
-                    <button
+                    <Button
                       key={slot.time}
                       type="button"
                       onClick={() => setSelectedSlot(slot.time)}
-                      className={`rounded-xl border-2 px-5 py-3.5 text-center transition-all min-w-[110px] ${
+                      variant="ghost"
+                      size="sm"
+                      className={`w-full sm:w-auto sm:min-w-[110px] rounded-xl border-2 px-4 sm:px-5 py-3 text-center !transition-none ${
                         active
-                          ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100'
-                          : 'border-slate-200 hover:border-blue-300 text-slate-700'
+                          ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100 hover:!bg-blue-600 hover:!border-blue-600'
+                          : 'bg-white border-slate-200 text-slate-700 hover:!bg-white hover:!border-slate-200 hover:!text-slate-700'
                       }`}
                     >
                       <p className="text-base font-semibold">{slot.time}</p>
-                      <p className={`text-sm mt-0.5 ${active ? 'text-blue-100' : 'text-slate-400'}`}>
-                        {slot.label}
-                      </p>
-                    </button>
+                    </Button>
                   );
                 })}
               </div>
+
+              {/* Frequency (shown after time selection) */}
+              {/* {selectedSlot ? (
+                <div className="mt-5 pt-5 border-t border-slate-100">
+                  <p className="text-sm font-semibold text-slate-700 mb-3">Frequency</p>
+                  <div className="inline-flex w-full sm:w-auto rounded-xl border border-slate-200 bg-slate-50 p-1">
+                    {['Daily', 'Weekly', 'Monthly'].map((f) => {
+                      const active = frequency === f;
+                      return (
+                        <Button
+                          key={f}
+                          type="button"
+                          onClick={() => setFrequency(f)}
+                          variant="ghost"
+                          size="sm"
+                          className={`flex-1 sm:flex-none rounded-lg px-4 sm:px-5 py-2.5 text-sm font-semibold !transition-none ${
+                            active
+                              ? '!bg-slate-900 text-white hover:!bg-slate-900 hover:!text-white'
+                              : '!bg-transparent text-slate-600 hover:!bg-transparent hover:!text-slate-600'
+                          }`}
+                        >
+                          {f}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null} */}
             </div>
 
             {/* Reason for visit */}
@@ -222,43 +261,54 @@ export const BookingLayout = ({
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Booking summary</h3>
                 <div className="space-y-3 text-slate-600">
-                  <p className="flex justify-between">
-                    <span>Expert</span>
-                    <span className="font-medium text-slate-800">{summary.expertName}</span>
-                  </p>
-                  <p className="flex justify-between">
+                  <div className="grid grid-cols-[76px_1fr] items-start gap-2">
+                    <span className="text-slate-600">Expert</span>
+                    <span className="font-medium text-slate-800 text-right break-words leading-snug min-w-0">
+                      {summary.expertName}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-[76px_1fr] items-center gap-2">
                     <span>Duration</span>
-                    <span className="font-medium text-slate-800">{summary.duration} min</span>
-                  </p>
-                  <p className="flex justify-between">
+                    <span className="font-medium text-slate-800 text-right">{summary.duration} min</span>
+                  </div>
+
+                  <div className="grid grid-cols-[76px_1fr] items-center gap-2">
                     <span>Date</span>
-                    <span className="font-medium text-slate-800">{summary.dateLabel}</span>
-                  </p>
-                  <p className="flex justify-between">
+                    <span className="font-medium text-slate-800 text-right">{summary.dateLabel}</span>
+                  </div>
+
+                  <div className="grid grid-cols-[76px_1fr] items-center gap-2">
                     <span>Time</span>
-                    <span className="font-medium text-slate-800">{summary.timeLabel}</span>
-                  </p>
+                    <span className="font-medium text-slate-800 text-right">{summary.timeLabel}</span>
+                  </div>
+
+                  <div className="grid grid-cols-[76px_1fr] items-center gap-2">
+                    <span>Frequency</span>
+                    <span className="font-medium text-slate-800 text-right">{summary.frequencyLabel}</span>
+                  </div>
+
                   <div className="border-t border-slate-100 pt-4 mt-4">
-                    <p className="flex justify-between text-lg">
+                    <div className="grid grid-cols-[76px_1fr] items-center gap-2 text-lg">
                       <span className="font-semibold text-slate-800">Total</span>
-                      <span className="font-bold text-blue-600">₹{summary.priceLabel}</span>
-                    </p>
+                      <span className="font-bold text-blue-600 text-right">₹{summary.priceLabel}</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
                 disabled={!canConfirm}
                 onClick={confirm}
-                className={`w-full rounded-2xl py-5 text-lg font-semibold transition-all ${
-                  canConfirm
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                size="lg"
+                fullWidth
+                className={`rounded-2xl py-5 text-lg !transition-none hover:!shadow-lg ${
+                  canConfirm ? 'shadow-lg shadow-blue-200' : 'bg-slate-200 text-slate-400 hover:!bg-slate-200'
                 }`}
               >
                 Confirm &amp; Pay ₹{formatINR(price)}
-              </button>
+              </Button>
 
               <p className="text-sm text-slate-400 text-center">
                 Fill in the reason for visit to enable payment

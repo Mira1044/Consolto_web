@@ -11,7 +11,8 @@ export const useBooking = (expert, initialDuration = 15, navigate) => {
   const [confirmed, setConfirmed] = useState(false);
   const [duration, setDuration] = useState(initialDuration === 30 ? 30 : 15);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
-  const [selectedSlot, setSelectedSlot] = useState('11:30 AM');
+  const [selectedSlot, setSelectedSlot] = useState('');
+  const [frequency, setFrequency] = useState(null); // 'Daily' | 'Weekly' | 'Monthly' | null
   const [reason, setReason] = useState('');
   const [message, setMessage] = useState('');
 
@@ -27,8 +28,8 @@ export const useBooking = (expert, initialDuration = 15, navigate) => {
   );
 
   const canConfirm = useMemo(
-    () => !!selectedSlot && reason.trim().length > 0,
-    [selectedSlot, reason],
+    () => !!selectedSlot && !!frequency && reason.trim().length > 0,
+    [selectedSlot, frequency, reason],
   );
 
   const confirm = useCallback(() => {
@@ -42,9 +43,10 @@ export const useBooking = (expert, initialDuration = 15, navigate) => {
       duration,
       dateLabel: formatDateShort(selectedDate),
       timeLabel: selectedSlot,
+      frequencyLabel: frequency || '—',
       priceLabel: formatINR(price),
     }),
-    [expert, duration, selectedDate, selectedSlot, price],
+    [expert, duration, selectedDate, selectedSlot, frequency, price],
   );
 
   return {
@@ -53,12 +55,17 @@ export const useBooking = (expert, initialDuration = 15, navigate) => {
     duration,
     selectedDate,
     selectedSlot,
+    frequency,
     reason,
     message,
     // setters
     setDuration,
     setSelectedDate,
-    setSelectedSlot,
+    setSelectedSlot: (slot) => {
+      setSelectedSlot(slot);
+      if (slot) setFrequency((prev) => prev || 'Daily');
+    },
+    setFrequency,
     setReason,
     setMessage,
     setConfirmed,

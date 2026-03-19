@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../hooks/useLogin';
 import { useSignup } from '../hooks/useSignup';
 import { LoginLayout } from '../components/LoginLayout';
@@ -15,12 +15,10 @@ import { ForgotPasswordPage } from '@/auth/components/ForgotPasswordPage';
 export const LoginPage = () => {
   const [mode, setMode] = useState('login'); // 'login' | 'signup' | 'forgot'
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || ROUTES.EXPERTS;
 
   const handleSuccess = useCallback(() => {
-    navigate(from, { replace: true });
-  }, [navigate, from]);
+    navigate(ROUTES.HOME, { replace: true });
+  }, [navigate]);
 
   const login = useLogin({ onSuccess: handleSuccess });
   const signup = useSignup({ onSuccess: handleSuccess });
@@ -66,14 +64,14 @@ export const LoginPage = () => {
         </span>
       </div>
 
-      <div className="flex min-h-screen w-full flex-col lg:flex-row">
-        {/* Left: full hero / marketing (70%) */}
-        <div className="hidden lg:flex basis-[70%]">
+      <div className="flex min-h-screen w-full flex-col md:flex-row">
+        {/* Left: full hero / marketing (tablet/desktop only) */}
+        <div className="hidden md:flex md:basis-[55%] lg:basis-[65%]">
           <Hero />
         </div>
 
-        {/* Right: auth panel (30%) */}
-        <div className="flex w-full lg:basis-[30%] items-center justify-center px-4 sm:px-6 lg:px-12 py-16 lg:py-0">
+        {/* Right: auth panel */}
+        <div className="flex w-full md:basis-[45%] lg:basis-[35%] items-start md:items-center justify-center px-4 sm:px-6 lg:px-12 py-10 sm:py-12 lg:py-0">
           <div className="w-full max-w-md">
             {renderRight()}
           </div>

@@ -39,14 +39,17 @@ export const ExpertCard = ({
   );
 
   const [selected, setSelected] = useState(options[0]);
+  const isManish = String(expert?.name || '').toLowerCase().includes('manish');
 
   return (
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ type: 'spring', stiffness: 380, damping: 26 }}
-      className="w-full bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md"
+      className={`w-full bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md ${
+        isManish ? 'flex flex-col' : ''
+      }`}
     >
-      <div className="p-5 sm:p-6">
+      <div className={`p-5 sm:p-6 ${isManish ? 'flex flex-col h-full' : ''}`}>
         <div className="flex gap-4">
           <div
             className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center font-bold text-sm sm:text-base flex-shrink-0 ${
@@ -74,7 +77,7 @@ export const ExpertCard = ({
             </p>
 
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 <span className="text-yellow-500">★</span>
                 <span className="font-semibold text-slate-800">
                   {typeof expert?.rating === 'number' ? expert.rating.toFixed(1) : '—'}
@@ -94,6 +97,8 @@ export const ExpertCard = ({
           </div>
         </div>
 
+        {isManish ? <div className="flex-1" /> : null}
+
         <div className="mt-5 pt-5 border-t border-slate-100 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
             <div className="flex w-full sm:w-auto rounded-lg border border-slate-200 bg-slate-50 p-1">
@@ -105,9 +110,9 @@ export const ExpertCard = ({
                     type="button"
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setSelected(opt)}
-                    className={`flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-semibold transition-colors ${
+            className={`flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-semibold transition-colors ${
                       active
-                        ? 'bg-slate-900 text-white shadow-sm'
+                        ? 'bg-slate-900 text-white'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                     }`}
                     aria-pressed={active}

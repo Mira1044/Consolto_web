@@ -17,16 +17,16 @@ export const SignupLayout = ({
   onBackToHome,
 }) => {
   return (
-    <div className="flex min-h-screen items-center justify-center px-0 py-0">
+    <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 py-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md space-y-8"
+        className="w-full max-w-md sm:max-w-lg space-y-6 sm:space-y-8"
       >
         <div className="text-center">
-          <h2 className="text-4xl font-bold text-gray-900">Create your account</h2>
-          <p className="mt-2 text-gray-600">Get started with Consolto today</p>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Create your account</h2>
+          <p className="mt-2 text-sm sm:text-base text-gray-600">Get started with Consolto today</p>
         </div>
 
         <motion.div

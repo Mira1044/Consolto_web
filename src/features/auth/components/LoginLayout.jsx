@@ -20,15 +20,15 @@ export const LoginLayout = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
-    <div className="w-full flex items-center justify-center px-0 py-0">
+    <div className="w-full flex items-start md:items-center justify-center px-2 sm:px-4 pt-4 pb-6 sm:pt-6 sm:pb-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md sm:max-w-lg space-y-6 sm:space-y-8"
+        className="w-full max-w-md sm:max-w-lg space-y-5 sm:space-y-7"
       >
         <div className="text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">Welcome back</h2>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Welcome back</h2>
           <p className="mt-2 text-sm sm:text-base text-gray-600">Sign in to your account to continue</p>
         </div>
 
@@ -37,14 +37,17 @@ export const LoginLayout = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+          <form noValidate onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             <FormField
-              label="Email address"
+              label={
+                <>
+                  Email address <span className="text-red-500">*</span>
+                </>
+              }
               id="email"
               name="email"
-              type="email"
+              type="text"
               autoComplete="email"
-              required
               value={fields.email}
               onChange={setField('email')}
               placeholder="Email"

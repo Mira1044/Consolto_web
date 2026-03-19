@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react';
 
 export const CTA = () => {
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-14 sm:py-16 lg:py-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700"></div>
 
       <div className="absolute inset-0 opacity-10">
@@ -19,10 +19,10 @@ export const CTA = () => {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-5 sm:mb-6">
             Start Your First Consultation Today
           </h2>
-          <p className="text-xl md:text-2xl text-blue-100 mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-2xl text-blue-100 mb-8 sm:mb-10 leading-relaxed">
             Join thousands of users connecting with experts worldwide. Get the guidance you need,
             when you need it.
           </p>
@@ -32,7 +32,7 @@ export const CTA = () => {
             whileTap={{ scale: 0.95 }}
             animate={{ scale: [1, 1.03, 1] }}
             transition={{ duration: 2.5, repeat: Infinity, repeatType: 'loop' }}
-            className="bg-white text-blue-600 px-10 py-5 rounded-full font-bold text-lg shadow-2xl hover:shadow-3xl transition-all inline-flex items-center gap-3 group"
+            className="bg-white text-blue-600 px-7 sm:px-10 py-4 sm:py-5 rounded-full font-bold text-base sm:text-lg shadow-2xl hover:shadow-3xl transition-all inline-flex items-center gap-2 sm:gap-3 group"
           >
             Get Started Now
             <ArrowRight className="group-hover:translate-x-2 transition-transform" size={24} />

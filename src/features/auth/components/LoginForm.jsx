@@ -50,14 +50,13 @@ export const LoginForm = ({ isOpen, onClose }) => {
                 <X size={24} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form noValidate onSubmit={handleSubmit} className="space-y-5">
               <FormField
                 label="Email"
                 id="login-email"
-                type="email"
+                type="text"
                 value={fields.email}
                 onChange={setField('email')}
-                required
               placeholder="Email"
                 inputComponent={Input}
                 error={!!errors.email}

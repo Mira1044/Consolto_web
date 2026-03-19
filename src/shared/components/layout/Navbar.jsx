@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/routes/config';
@@ -11,15 +11,17 @@ const baseNavLinks = [
   // { label: 'Features', path: ROUTES.HOME, hash: '#features' },
   // { label: 'How It Works', path: ROUTES.HOME, hash: '#how-it-works' },
   // { label: 'Testimonials', path: ROUTES.HOME, hash: '#testimonials' },
-  { label: 'Contact', path: ROUTES.CONTACT },
+  // { label: 'Contact', path: ROUTES.CONTACT },
 ];
 
 export const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, user, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef(null);
 
   const handleLogin = () => {
     setIsMobileMenuOpen(false);
@@ -39,6 +41,22 @@ export const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const onDown = (e) => {
+      if (!profileRef.current) return;
+      if (!profileRef.current.contains(e.target)) setIsProfileOpen(false);
+    };
+    const onEsc = (e) => {
+      if (e.key === 'Escape') setIsProfileOpen(false);
+    };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onEsc);
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onEsc);
+    };
+  }, []);
+
   const navHref = (item) => {
     if ('hash' in item) return location.pathname === ROUTES.HOME ? item.hash : `${item.path}${item.hash}`;
     return item.path;
@@ -54,7 +72,7 @@ export const Navbar = () => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 z-40 w-full transition-all duration-300 ${
         isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}
     >
@@ -117,6 +135,53 @@ export const Navbar = () => {
                 >
                   Log out
                 </MotionButton>
+
+                <div ref={profileRef} className="relative">
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setIsProfileOpen((v) => !v)}
+                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 px-3 py-2 shadow-sm hover:bg-white transition-colors"
+                    aria-haspopup="menu"
+                    aria-expanded={isProfileOpen}
+                  >
+                    <span className="h-8 w-8 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0">
+                      <User size={18} />
+                    </span>
+                    <ChevronDown
+                      size={16}
+                      className={`text-gray-500 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`}
+                    />
+                  </motion.button>
+
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-64 rounded-xl border border-gray-100 bg-white shadow-lg overflow-hidden">
+                      <div className="px-4 py-3">
+                        <p className="text-sm font-semibold text-gray-900 truncate">
+                          {user?.firstName || user?.name || 'User'}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email || '—'}</p>
+                      </div>
+                      <div className="border-t border-gray-100 p-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          fullWidth
+                          className="rounded-lg justify-start"
+                          onClick={() => {
+                            setIsProfileOpen(false);
+                            setIsMobileMenuOpen(false);
+                            logout();
+                          }}
+                        >
+                          Log out
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <>

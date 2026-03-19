@@ -36,8 +36,8 @@ export const ExpertsLayout = ({
                 <User className="text-white" size={32} />
               </div>
               <div>
-                <p className="text-white/80 text-base">Welcome back</p>
-                <p className="text-white font-semibold text-xl">{user?.email ?? 'User'}</p>
+                <p className="text-white/80 text-base">Welcome</p>
+                <p className="text-white font-semibold text-xl">{user?.firstName ?? 'User'}</p>
               </div>
             </div>
             {/* <button
@@ -138,8 +138,7 @@ export const ExpertsLayout = ({
                 </div>
 
                 <motion.div
-                  whileTap={{ scale: 0.96 }}
-                  className="hidden md:block absolute -right-16 top-1/2 -translate-y-1/2 z-10"
+                  className="hidden md:block fixed right-6 top-[90%] -translate-y-1/2 z-50"
                 >
                   <Button
                     type="button"
