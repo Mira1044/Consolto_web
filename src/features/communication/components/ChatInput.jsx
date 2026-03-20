@@ -43,7 +43,7 @@ export const ChatInput = ({ onUpload, uploading, uploadProgress, canSend }) => {
           <p className="mb-1 text-xs text-white">Uploading... {uploadProgress}%</p>
           <div className="h-2 overflow-hidden rounded-full bg-gray-600">
             <div
-              className="h-full bg-blue-500 transition-all"
+              className="h-full bg-primary-500 transition-all"
               style={{ width: `${uploadProgress}%` }}
             />
           </div>
@@ -57,21 +57,21 @@ export const ChatInput = ({ onUpload, uploading, uploadProgress, canSend }) => {
               onClick={() => triggerPicker('image/*')}
               className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-gray-800 hover:bg-gray-100"
             >
-              <ImageIcon size={20} className="text-blue-500" />
+              <ImageIcon size={20} className="text-primary-500" />
               <span className="text-sm">Image</span>
             </button>
             <button
               onClick={() => triggerPicker('video/*')}
               className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-gray-800 hover:bg-gray-100"
             >
-              <Film size={20} className="text-blue-500" />
+              <Film size={20} className="text-primary-500" />
               <span className="text-sm">Video</span>
             </button>
             <button
               onClick={() => triggerPicker('*/*')}
               className="flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-gray-800 hover:bg-gray-100"
             >
-              <FileText size={20} className="text-blue-500" />
+              <FileText size={20} className="text-primary-500" />
               <span className="text-sm">Document</span>
             </button>
           </div>

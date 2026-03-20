@@ -43,8 +43,8 @@ export const ScreenShareOverlay = () => {
   if (screenSharers.length === 0) return null;
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col bg-black">
-      <div className="bg-blue-600/90 px-4 py-2 text-center">
+      <div className="absolute inset-0 z-50 flex flex-col bg-black">
+      <div className="bg-primary-600/90 px-4 py-2 text-center">
         <span className="text-sm font-semibold text-white">
           <Monitor size={14} className="mr-1 inline" />
           {screenSharers.length === 1
@@ -57,9 +57,9 @@ export const ScreenShareOverlay = () => {
         {screenSharers.map(({ userId, name, stream }) => (
           <div
             key={userId}
-            className="relative min-h-[300px] flex-1 overflow-hidden rounded-xl border-2 border-blue-500 bg-gray-900"
+            className="relative min-h-[300px] flex-1 overflow-hidden rounded-xl border-2 border-primary-500 bg-gray-900"
           >
-            <div className="flex items-center justify-between bg-blue-600 px-4 py-2">
+            <div className="flex items-center justify-between bg-primary-600 px-4 py-2">
               <span className="text-sm font-semibold text-white">{name}</span>
               <span className="rounded-full bg-green-500 px-2 py-0.5 text-xs font-bold text-white">
                 LIVE

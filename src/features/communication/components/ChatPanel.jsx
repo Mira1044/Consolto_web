@@ -25,6 +25,8 @@ export const ChatPanel = ({
   onUpload,
   uploading,
   uploadProgress,
+  currentMode,
+  onEndSession,
 }) => {
   if (!chatClient || !channel) {
     return (
@@ -50,14 +52,30 @@ export const ChatPanel = ({
   );
 
   return (
-    <div className="flex h-full flex-col bg-gray-900">
+    <div className="flex h-full flex-col bg-gray-950">
       <Chat client={chatClient} theme="str-chat__theme-dark">
         <Channel channel={channel} Attachment={customRenderAttachments}>
           <Window>
             <div className="flex flex-1 flex-col overflow-hidden">
-              <MessageList />
+              {/* "Upper side" end option (consolto_app style) */}
+              {currentMode === 'chat' && (
+                <div className="flex flex-shrink-0 items-center justify-end border-b border-gray-800 bg-gray-950 px-4 py-3">
+                  <button
+                    type="button"
+                    onClick={onEndSession}
+                    className="rounded-full bg-red-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700"
+                  >
+                    End Chat
+                  </button>
+                </div>
+              )}
+
+              <div className="min-h-0 flex-1 overflow-auto">
+                <MessageList />
+              </div>
+
               {canSendMessage ? (
-                <div>
+                <div className="flex flex-col flex-shrink-0">
                   <ChatInput
                     onUpload={onUpload}
                     uploading={uploading}

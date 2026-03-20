@@ -128,7 +128,7 @@ export const ExpertCard = ({
             </div>
           </div>
 
-          <motion.div
+          {/* <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 500, damping: 30 }}
@@ -144,7 +144,7 @@ export const ExpertCard = ({
             >
               Book Now
             </Button>
-          </motion.div>
+          </motion.div> */}
         </div>
       </div>
     </motion.div>

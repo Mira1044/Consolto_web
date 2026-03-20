@@ -23,7 +23,7 @@ export const FileAttachment = ({ attachment }) => {
     return (
       <button
         onClick={handleDownload}
-        className="group relative max-w-xs overflow-hidden rounded-lg border border-gray-600"
+        className="group relative w-full max-w-[320px] overflow-hidden rounded-lg border border-gray-600"
       >
         <img
           src={src}
@@ -39,17 +39,17 @@ export const FileAttachment = ({ attachment }) => {
   }
 
   const iconMap = {
-    video: <Film size={32} className="text-blue-400" />,
-    document: <FileText size={32} className="text-blue-400" />,
-    file: <FileText size={32} className="text-blue-400" />,
+    video: <Film size={32} className="text-primary-400" />,
+    document: <FileText size={32} className="text-primary-400" />,
+    file: <FileText size={32} className="text-primary-400" />,
   };
 
   return (
     <button
       onClick={handleDownload}
-      className="flex w-60 items-center gap-3 rounded-lg bg-gray-700 p-4 text-left transition-colors hover:bg-gray-600"
+      className="flex w-full max-w-[320px] items-center gap-3 rounded-lg bg-gray-700 p-4 text-left transition-colors hover:bg-gray-600"
     >
-      {iconMap[type] || <FileText size={32} className="text-blue-400" />}
+      {iconMap[type] || <FileText size={32} className="text-primary-400" />}
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-white">{title || 'File'}</p>
         <p className="text-xs text-gray-400">Click to download</p>

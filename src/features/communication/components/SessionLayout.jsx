@@ -9,6 +9,7 @@ import { VideoPanel } from './VideoPanel';
 import { ChatPanel } from './ChatPanel';
 import { SessionExpired } from './SessionExpired';
 import { EndSessionModal } from './EndSessionModal';
+import { ROUTES } from '@/routes/config';
 
 /**
  * SessionLayout
@@ -54,7 +55,7 @@ export const SessionLayout = () => {
 
   const handleExpired = useCallback(async () => {
     await session.endSession();
-    navigate('/booking', { replace: true });
+    navigate(ROUTES.BOOKINGS, { replace: true });
   }, [session, navigate]);
 
   const timer = useSessionTimer({
@@ -72,19 +73,15 @@ export const SessionLayout = () => {
       handleExpired();
       return;
     }
-    if (session.currentMode === 'chat') {
-      if (window.confirm('Are you sure you want to end the chat session?')) {
-        session.endSession().then(() => navigate('/booking', { replace: true }));
-      }
-    } else {
-      setShowEndModal(true);
-    }
+    // Use the same confirmation modal for both chat and video.
+    // This keeps the "end session" UX consistent with consolto_app.
+    setShowEndModal(true);
   }, [timer.isExpired, session, navigate, handleExpired]);
 
   const confirmEnd = useCallback(async () => {
     setShowEndModal(false);
     await session.endSession();
-    navigate('/booking', { replace: true });
+    navigate(ROUTES.BOOKINGS, { replace: true });
   }, [session, navigate]);
 
   const handleToggleMode = useCallback(async () => {
@@ -134,7 +131,7 @@ export const SessionLayout = () => {
         <h2 className="mt-4 text-xl font-semibold text-white">Connection Error</h2>
         <p className="mt-2 text-gray-400">{session.error}</p>
         <button
-          onClick={() => navigate('/booking', { replace: true })}
+          onClick={() => navigate(ROUTES.BOOKINGS, { replace: true })}
           className="mt-6 rounded-full bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
         >
           Back to Bookings
@@ -147,9 +144,6 @@ export const SessionLayout = () => {
   if (timer.showTwoMinWarning) {
     setTimeout(timer.dismissTwoMinWarning, 5000);
   }
-
-  const isVideoMode = session.currentMode === 'video';
-  const showVideo = initialMode === 'video';
 
   return (
     <div className="flex h-screen flex-col bg-gray-950">
@@ -179,38 +173,33 @@ export const SessionLayout = () => {
       )}
 
       {/* Main content area */}
+      {/* Desktop-first split:
+          - Video fills remaining width
+          - Chat is fixed width on lg+
+          - On small screens, chat can take full width and video can be hidden in chat mode
+      */}
       <div className="flex flex-1 overflow-hidden">
         {/* Video area */}
-        {showVideo && (
-          <div
-            className={`flex transition-all duration-300 ${
-              isVideoMode
-                ? chatSidebarOpen
-                  ? 'w-[calc(100%-380px)]'
-                  : 'w-full'
-                : 'w-0 overflow-hidden'
-            }`}
-          >
-            <VideoPanel
-              streamClient={session.streamClient}
-              call={session.call}
-              onToggleChat={handleToggleChat}
-              unreadCount={session.unreadCount}
-              currentMode={session.currentMode}
-            />
-          </div>
-        )}
-
-        {/* Chat sidebar / main area */}
         <div
-          className={`flex flex-col border-l border-gray-800 transition-all duration-300 ${
-            !showVideo
-              ? 'w-full'
-              : isVideoMode
-                ? chatSidebarOpen
-                  ? 'w-[380px]'
-                  : 'w-0 overflow-hidden'
-                : 'w-full'
+          className={`flex flex-1 min-w-0 transition-all duration-300 ${
+            session.currentMode === 'chat' ? 'hidden lg:flex' : 'flex'
+          }`}
+        >
+          <VideoPanel
+            streamClient={session.streamClient}
+            call={session.call}
+            onToggleChat={handleToggleChat}
+            unreadCount={session.unreadCount}
+            currentMode={session.currentMode}
+          />
+        </div>
+
+        {/* Chat sidebar */}
+        <div
+          className={`flex flex-col transition-all duration-300 ${
+            chatSidebarOpen
+              ? 'w-full lg:w-[380px] border-l border-gray-800'
+              : 'w-0 overflow-hidden border-l-0'
           }`}
         >
           <ChatPanel
@@ -220,6 +209,8 @@ export const SessionLayout = () => {
             onUpload={fileUpload.upload}
             uploading={fileUpload.uploading}
             uploadProgress={fileUpload.uploadProgress}
+            currentMode={session.currentMode}
+            onEndSession={handleEndSession}
           />
         </div>
       </div>

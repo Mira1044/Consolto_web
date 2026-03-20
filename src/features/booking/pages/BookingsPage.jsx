@@ -801,7 +801,7 @@ function BookingCard({ booking, index, isUpcoming, onPrimary, onReschedule, onCa
         {/* Past – completed */}
         {!isUpcoming && booking.status === 'completed' && (
           <div className="flex flex-row gap-2 pt-4 border-t border-slate-100">
-            <motion.div whileTap={{ scale: 0.97 }} className="flex-1 min-w-0">
+            {/* <motion.div whileTap={{ scale: 0.97 }} className="flex-1 min-w-0">
               <Button
                 type="button"
                 variant="primary"
@@ -811,7 +811,7 @@ function BookingCard({ booking, index, isUpcoming, onPrimary, onReschedule, onCa
               >
                 Book Again
               </Button>
-            </motion.div>
+            </motion.div> */}
             <motion.div whileTap={{ scale: 0.97 }} className="flex-1 min-w-0">
               <Button
                 type="button"
