@@ -1,15 +1,16 @@
 import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 import {
+  AlertTriangle,
   CalendarDays,
-  CheckCircle2,
   Clock,
-  Download,
+  FileText,
   MessageSquare,
   Phone,
+  Star,
   Ticket,
+  User,
   Video,
-  XCircle,
 } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 import {
@@ -32,13 +33,16 @@ import {
 export const UpcomingAppointmentCard = ({
   booking,
   userRole, // 'user' | 'consultant' (logged-in role)
+  activeTab, // 'Upcoming' | 'Past'
   actionLoading = false, // join chat/video loader
   rescheduleLoading = false,
   cancelLoading = false,
+  invoiceLoading = false,
   onJoinChat,
   onJoinCall,
   onRescheduleBooking,
   onCancelBooking,
+  onDownloadInvoice,
   onViewSummary,
 }) => {
   const raw = booking?.raw || booking || {};
@@ -49,12 +53,11 @@ export const UpcomingAppointmentCard = ({
     displayName,
     specialization,
     isUpcomingByTime,
-    isCompleted,
     paymentStatus: memoPaymentStatus,
     amount: memoAmount,
     userJoined,
     consultantJoined,
-    feedbackSubmitted,
+    isFeedback,
     chatAvailability,
     videoAvailability,
     canCancel,
@@ -65,8 +68,6 @@ export const UpcomingAppointmentCard = ({
     const status = String(raw?.appointment_status || '').toUpperCase();
     const statusColor = getStatusColor(status);
     const statusLabel = String(status || '').replaceAll('_', ' ') || '—';
-    const isCompleted = status === 'COMPLETED';
-
     const amount = typeof raw?.amount === 'number' ? raw.amount : Number(raw?.amount || 0);
     const paymentStatus = raw?.payment_status;
 
@@ -76,14 +77,10 @@ export const UpcomingAppointmentCard = ({
     const userJoined = Boolean(raw?.is_user_joined);
     const consultantJoined = Boolean(raw?.is_consultant_joined);
 
-    // Feedback fields are not in `AppointmentPayment` schema you shared.
-    // Keep support for possible additional backend fields if present.
-    const feedbackSubmitted = Boolean(
-      raw?.feedback_submitted ||
-        raw?.feedbackSubmitted ||
-        raw?.is_feedback_submitted ||
-        String(raw?.feedback_status || '').toUpperCase().includes('SUBMIT'),
-    );
+    // Backend includes:
+    // - `isFeedback` boolean
+    // - `feedback` object (if exists)
+    const isFeedback = Boolean(raw?.isFeedback);
 
     const displayName =
       userRole === 'consultant'
@@ -123,21 +120,20 @@ export const UpcomingAppointmentCard = ({
       isUpcomingByTime;
 
     return {
-      statusColor,
-      statusLabel,
-      displayName,
-      specialization,
-      isUpcomingByTime,
-      isCompleted,
-      chatAvailability,
-      videoAvailability,
-      canCancel,
-      canReschedule,
-      amount,
-      paymentStatus,
-      userJoined,
-      consultantJoined,
-      feedbackSubmitted,
+      statusColor: statusColor,
+      statusLabel: statusLabel,
+      displayName: displayName,
+      specialization: specialization,
+      isUpcomingByTime: isUpcomingByTime,
+      chatAvailability: chatAvailability,
+      videoAvailability: videoAvailability,
+      canCancel: canCancel,
+      canReschedule: canReschedule,
+      amount: amount,
+      paymentStatus: paymentStatus,
+      userJoined: userJoined,
+      consultantJoined: consultantJoined,
+      isFeedback: isFeedback,
     };
   }, [raw, userRole]);
 
@@ -155,17 +151,25 @@ export const UpcomingAppointmentCard = ({
   const canShowCancel = canCancel && !chatAvailability.available && !videoAvailability.available;
 
   const showAvailabilityBanner =
-    (!chatAvailability.available && chatAvailability.reason) || (!videoAvailability.available && videoAvailability.reason);
+    raw?.appointment_status === 'CONFIRMED' &&
+    ((!chatAvailability.available && chatAvailability.reason) || (!videoAvailability.available && videoAvailability.reason));
 
-  const messageLabel = chatAvailability.available
-    ? isUpcomingByTime
-      ? 'Start Chat'
-      : 'Chat History'
-    : 'Message';
+  const isPast = String(activeTab || '').toLowerCase() === 'past';
 
-  const userJoinedText = userJoined ? 'Yes' : 'No';
-  const consultantJoinedText = consultantJoined ? 'Yes' : 'No';
-  const shouldShowInvoice = isCompleted && String(paymentStatus || '').toUpperCase() === 'PAID';
+  const missedAppointment =
+    isPast &&
+    String(raw?.appointment_status || '').toUpperCase() !== 'CANCELLED' &&
+    ((userRole === 'user' && !userJoined) || (userRole === 'consultant' && !consultantJoined));
+
+  const canSubmitFeedback =
+    userRole === 'user' &&
+    String(raw?.appointment_status || '').toUpperCase() === 'COMPLETED' &&
+    !isFeedback;
+
+  const shouldShowInvoice =
+    userRole === 'user' &&
+    (String(paymentStatus || '').toUpperCase() === 'PAID' ||
+      ['COMPLETED', 'IN_PROGRESS', 'CONFIRMED', 'CANCELLED'].includes(String(raw?.appointment_status || '').toUpperCase()));
 
   return (
     <motion.div
@@ -175,7 +179,7 @@ export const UpcomingAppointmentCard = ({
       exit={{ opacity: 0, y: -10, scale: 0.98 }}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.25 }}
-        className="bg-white rounded-2xl p-4 shadow-sm flex flex-col h-full"
+      className="bg-white rounded-2xl p-4 shadow-sm flex flex-col h-full"
       style={{
         borderLeftWidth: 4,
         borderLeftColor: statusColor,
@@ -195,6 +199,14 @@ export const UpcomingAppointmentCard = ({
           <span className="text-xs font-semibold text-center" style={{ color: statusColor }}>
             {statusLabel}
           </span>
+        </div>
+      </div>
+
+      {/* Missed appointment banner (Past only) */}
+      <div className={`mb-3 min-h-[40px] ${missedAppointment ? '' : 'opacity-0'}`}>
+        <div className="p-2 bg-red-100 rounded-lg flex items-center justify-center gap-2">
+          <AlertTriangle size={16} color="#EF4444" />
+          <span className="text-red-600 text-sm font-semibold text-center">You have missed this appointment!</span>
         </div>
       </div>
 
@@ -239,7 +251,7 @@ export const UpcomingAppointmentCard = ({
         )}
       </div>
 
-      {/* Message */}
+      {/* Message (web-only; app does not show it) */}
       {/* Keep height consistent across cards (even when message is missing) */}
       <div className="mb-2 min-h-[46px]">
         {messageText ? (
@@ -282,51 +294,32 @@ export const UpcomingAppointmentCard = ({
         )}
       </div>
 
-      {/* Joined info (keeps “yellow area” content linear across cards) */}
-      <div className="mb-1 min-h-[38px]">
+      {/* Joined info (Past only; keeps "yellow area" content linear across cards) */}
+      <div className={`mb-1 min-h-[38px] ${isPast ? '' : 'opacity-0'}`}>
         <div className="flex items-center gap-2 text-xs text-gray-600">
-          <span className={userJoined ? 'text-emerald-600' : 'text-slate-400'}>
-            {userJoined ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
-          </span>
-          <span>User Joined: {userJoinedText}</span>
+          <User size={14} color="#9CA3AF" />
+          <span>User Joined: {userJoined ? 'Yes' : 'No'}</span>
         </div>
         <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
-          <span className={consultantJoined ? 'text-emerald-600' : 'text-slate-400'}>
-            {consultantJoined ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
-          </span>
-          <span>Consultant Joined: {consultantJoinedText}</span>
+          <User size={14} color="#9CA3AF" />
+          <span>Consultant Joined: {consultantJoined ? 'Yes' : 'No'}</span>
         </div>
       </div>
 
       {/* Actions */}
       <div className="flex justify-end mt-auto flex-wrap gap-2 pt-1">
-        <Button
-          type="button"
-          variant="primary"
-          size="sm"
-          disabled={actionLoading || !chatAvailability.available}
-          onClick={() => onJoinChat?.(booking)}
-          className="h-9 text-xs rounded-xl !transition-none !px-4"
-        >
-          <span className="inline-flex items-center gap-2">
-            <MessageSquare size={16} color="#fff" />
-            <span>{messageLabel}</span>
-          </span>
-        </Button>
-
-        {/* Invoice (downloadable in app; on web we open summary placeholder) */}
-        {shouldShowInvoice && (
+        {chatAvailability.available && (
           <Button
             type="button"
-            variant="outline"
+            variant="primary"
             size="sm"
             disabled={actionLoading}
-            onClick={() => onViewSummary?.(booking)}
-            className="h-9 text-xs rounded-xl !transition-none !px-4 !border-slate-200 !text-slate-700 hover:!bg-slate-50"
+            onClick={() => onJoinChat?.(booking)}
+            className="h-9 text-xs rounded-xl !transition-none !px-4"
           >
             <span className="inline-flex items-center gap-2">
-              <Download size={16} />
-              <span className="font-semibold">Invoice</span>
+              <MessageSquare size={16} color="#fff" />
+              <span>{isUpcomingByTime ? 'Start Chat' : 'Chat History'}</span>
             </span>
           </Button>
         )}
@@ -374,22 +367,38 @@ export const UpcomingAppointmentCard = ({
             </span>
           </Button>
         )}
-      </div>
 
-      {/* Feedback section (kept linear; placed outside the main row) */}
-      <div className="mt-2 min-h-[34px] flex justify-end">
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          disabled={!isCompleted || feedbackSubmitted}
-          onClick={() => onViewSummary?.(booking)}
-          className="h-9 text-xs rounded-xl !transition-none !px-4"
-        >
-          <span className="font-semibold">
-            {feedbackSubmitted ? 'Feedback Submitted' : 'Submit Feedback'}
-          </span>
-        </Button>
+        {canSubmitFeedback && (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={actionLoading}
+            onClick={() => onViewSummary?.(booking)}
+            className="h-9 text-xs rounded-xl !transition-none !px-4 !bg-orange-500 !text-white !hover:bg-orange-600"
+          >
+            <span className="inline-flex items-center gap-2">
+              <Star size={16} color="#fff" />
+              <span className="font-semibold">Submit Feedback</span>
+            </span>
+          </Button>
+        )}
+
+        {shouldShowInvoice && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={actionLoading || invoiceLoading}
+            onClick={() => onDownloadInvoice?.(appointmentId)}
+            className="h-9 text-xs rounded-xl !transition-none !px-4 !bg-blue-100 !text-blue-600 !border-transparent hover:!bg-blue-200"
+          >
+            <span className="inline-flex items-center gap-2">
+              <FileText size={16} />
+              <span className="font-semibold">Invoice</span>
+            </span>
+          </Button>
+        )}
       </div>
     </motion.div>
   );
