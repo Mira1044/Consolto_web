@@ -867,7 +867,11 @@ export const BookingsPage = () => {
   const { handleApiError } = useErrorHandler();
   const isConsultant =
     String(user?.role || '').toUpperCase() === 'CONSULTANT' || String(user?.role || '').toUpperCase() === 'EXPERT';
-  const userRole = isConsultant ? 'consultant' : 'user';
+  // Mirrors consolto_app "roleTab" switcher.
+  // - left button ("Consultant Bookings") => roleTab = 'user'
+  // - right button ("Client Bookings") => roleTab = 'consultant'
+  const [roleTab, setRoleTab] = useState('user');
+  const userRole = roleTab;
   const [tab, setTab] = useState('Upcoming');
   const [filter, setFilter] = useState('All');
 
@@ -990,9 +994,8 @@ export const BookingsPage = () => {
     const load = async () => {
       setIsLoading(true);
       try {
-        const fetchAppointments = isConsultant
-          ? bookingService.getConsultantAppointments
-          : bookingService.getUserAppointments;
+        const fetchAppointments =
+          roleTab === 'consultant' ? bookingService.getConsultantAppointments : bookingService.getUserAppointments;
 
         const [upcomingResp, pastResp] = await Promise.all([
           fetchAppointments({ page: 1, limit: 10, status_type: 'upcoming' }),
@@ -1013,8 +1016,7 @@ export const BookingsPage = () => {
         handleApiError(err, {
           context: {
             feature: 'booking',
-            action:
-              String(user?.role || '').toUpperCase() === 'CONSULTANT' ? 'getConsultantAppointments' : 'getUserAppointments',
+            action: roleTab === 'consultant' ? 'getConsultantAppointments' : 'getUserAppointments',
           },
         });
       } finally {
@@ -1025,7 +1027,7 @@ export const BookingsPage = () => {
     return () => {
       mounted = false;
     };
-  }, [handleApiError, user?.role, refreshTick]);
+  }, [handleApiError, roleTab, refreshTick]);
 
   const filtered = useMemo(() => {
     const pool = tab === 'Upcoming' ? upcoming : past;
@@ -1294,23 +1296,61 @@ export const BookingsPage = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-1">
             <motion.div initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
-              <h1 className="text-2xl font-bold text-white tracking-tight">Your Bookings</h1>
-              <p className="text-sm text-indigo-200 mt-0.5">View and manage your consultations</p>
+              {/* Role switcher UI (match app) */}
+              <div className="flex w-full max-w-md bg-white/15 rounded-2xl p-1 gap-2 mb-4">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => { setRoleTab('user'); setTab('Upcoming'); setFilter('All'); }}
+                    className={`flex-1 h-12 rounded-xl text-sm font-semibold transition-colors !px-4 !py-0 ${
+                      roleTab === 'user'
+                        ? '!bg-white !text-violet-700 !shadow-sm !hover:bg-white'
+                        : '!bg-transparent !text-white/80 hover:!bg-white/10 hover:!text-white'
+                    }`}
+                  >
+                  Consultant Bookings
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => { setRoleTab('consultant'); setTab('Upcoming'); setFilter('All'); }}
+                    className={`flex-1 h-12 rounded-xl text-sm font-semibold transition-colors !px-4 !py-0 ${
+                      roleTab === 'consultant'
+                        ? '!bg-white !text-violet-700 !shadow-sm !hover:bg-white'
+                        : '!bg-transparent !text-white/80 hover:!bg-white/10 hover:!text-white'
+                    }`}
+                  >
+                  Client Bookings
+                  </Button>
+              </div>
+
+              <h1 className="text-2xl font-bold text-white tracking-tight">
+                {roleTab === 'consultant' ? 'Client Bookings' : 'Your Bookings'}
+              </h1>
+              <p className="text-sm text-indigo-200 mt-0.5">
+                {roleTab === 'consultant'
+                  ? 'Manage your client appointments'
+                  : 'View and manage your consultations'}
+              </p>
             </motion.div>
-            <motion.button
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
-              whileTap={{ scale: 0.96 }}
-              type="button"
-              onClick={() => navigate(ROUTES.EXPERTS)}
-              className="self-start sm:self-auto flex items-center gap-2 bg-white text-violet-700 text-sm font-semibold px-4 py-2 rounded-xl hover:bg-violet-50 transition-colors shadow-sm"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-              </svg>
-              New Booking
-            </motion.button>
+            {roleTab === 'user' && (
+              <motion.button
+                initial={{ opacity: 0, x: 16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4 }}
+                whileTap={{ scale: 0.96 }}
+                type="button"
+                onClick={() => navigate(ROUTES.EXPERTS)}
+                className="self-start sm:self-auto flex items-center gap-2 bg-white text-violet-700 text-sm font-semibold px-4 py-2 rounded-xl hover:bg-violet-50 transition-colors shadow-sm"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                New Booking
+              </motion.button>
+            )}
           </div>
         </div>
 
@@ -1419,14 +1459,17 @@ export const BookingsPage = () => {
               className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
             >
               {filtered.map((b, i) => {
+                const raw = b?.raw || {};
+                const bookingId = raw?._id || b?.id || i;
+                const activeBookingId = activeBooking?.raw?._id || activeBooking?.id;
                 if (tab === 'Upcoming') {
                   return (
                     <UpcomingAppointmentCard
-                      key={b.id}
+                      key={bookingId}
                       booking={b}
                       userRole={userRole}
-                      rescheduleLoading={rescheduleLoading && activeBooking?.id === b.id}
-                      cancelLoading={cancelLoading && activeBooking?.id === b.id}
+                      rescheduleLoading={rescheduleLoading && activeBookingId === bookingId}
+                      cancelLoading={cancelLoading && activeBookingId === bookingId}
                       onJoinChat={(booking) => {
                         const raw = booking?.raw || {};
                         const appointmentId = raw?._id || booking?.id;
@@ -1499,17 +1542,90 @@ export const BookingsPage = () => {
                       }}
                       onRescheduleBooking={handleReschedule}
                       onCancelBooking={handleCancel}
+                      onViewSummary={openSummary}
                     />
                   );
                 }
 
                 return (
-                  <BookingCard
-                    key={b.id}
+                  <UpcomingAppointmentCard
+                    key={bookingId}
                     booking={b}
-                    index={i}
-                    isUpcoming={false}
-                    onBookAgain={handleBookAgain}
+                    userRole={userRole}
+                    rescheduleLoading={rescheduleLoading && activeBookingId === bookingId}
+                    cancelLoading={cancelLoading && activeBookingId === bookingId}
+                    onJoinChat={(booking) => {
+                      const raw = booking?.raw || {};
+                      const appointmentId = raw?._id || booking?.id;
+                      const appointmentDate = String(raw?.appointment_booked_date || '').slice(0, 10);
+                      const appointmentStartTime = raw?.appointment_start_time;
+                      const appointmentEndTime = raw?.appointment_end_time;
+
+                      const otherUserName =
+                        userRole === 'consultant'
+                          ? raw?.user?.firstName && raw?.user?.lastName
+                            ? `${raw.user.firstName} ${raw.user.lastName}`
+                            : raw?.user?.firstName || raw?.user?.phoneNumber || 'Client'
+                          : raw?.consultant?.user_name || raw?.consultant?.name || 'Consultant';
+
+                      const otherUserId =
+                        userRole === 'consultant'
+                          ? raw?.user?._id || raw?.user_id
+                          : raw?.consultant?._id || raw?.consultant_id;
+
+                      if (!appointmentId || !appointmentDate || !otherUserId) return;
+
+                      navigate(ROUTES.SESSION, {
+                        state: {
+                          appointmentId,
+                          appointmentStartTime,
+                          appointmentEndTime,
+                          appointmentDate,
+                          otherUserName,
+                          otherUserId,
+                          mode: 'chat',
+                          userRole,
+                          appointmentStatus: raw?.appointment_status,
+                        },
+                      });
+                    }}
+                    onJoinCall={(booking) => {
+                      const raw = booking?.raw || {};
+                      const appointmentId = raw?._id || booking?.id;
+                      const appointmentDate = String(raw?.appointment_booked_date || '').slice(0, 10);
+                      const appointmentStartTime = raw?.appointment_start_time;
+                      const appointmentEndTime = raw?.appointment_end_time;
+
+                      const otherUserName =
+                        userRole === 'consultant'
+                          ? raw?.user?.firstName && raw?.user?.lastName
+                            ? `${raw.user.firstName} ${raw.user.lastName}`
+                            : raw?.user?.firstName || raw?.user?.phoneNumber || 'Client'
+                          : raw?.consultant?.user_name || raw?.consultant?.name || 'Consultant';
+
+                      const otherUserId =
+                        userRole === 'consultant'
+                          ? raw?.user?._id || raw?.user_id
+                          : raw?.consultant?._id || raw?.consultant_id;
+
+                      if (!appointmentId || !appointmentDate || !otherUserId) return;
+
+                      navigate(ROUTES.SESSION, {
+                        state: {
+                          appointmentId,
+                          appointmentStartTime,
+                          appointmentEndTime,
+                          appointmentDate,
+                          otherUserName,
+                          otherUserId,
+                          mode: 'video',
+                          userRole,
+                          appointmentStatus: raw?.appointment_status,
+                        },
+                      });
+                    }}
+                    onRescheduleBooking={handleReschedule}
+                    onCancelBooking={handleCancel}
                     onViewSummary={openSummary}
                   />
                 );

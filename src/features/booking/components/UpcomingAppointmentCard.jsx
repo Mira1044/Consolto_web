@@ -1,6 +1,16 @@
 import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
-import { CalendarDays, Clock, MessageSquare, Phone, Ticket, Video } from 'lucide-react';
+import {
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  Download,
+  MessageSquare,
+  Phone,
+  Ticket,
+  Video,
+  XCircle,
+} from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 import {
   canModifyBookingByDate,
@@ -29,6 +39,7 @@ export const UpcomingAppointmentCard = ({
   onJoinCall,
   onRescheduleBooking,
   onCancelBooking,
+  onViewSummary,
 }) => {
   const raw = booking?.raw || booking || {};
 
@@ -38,6 +49,12 @@ export const UpcomingAppointmentCard = ({
     displayName,
     specialization,
     isUpcomingByTime,
+    isCompleted,
+    paymentStatus: memoPaymentStatus,
+    amount: memoAmount,
+    userJoined,
+    consultantJoined,
+    feedbackSubmitted,
     chatAvailability,
     videoAvailability,
     canCancel,
@@ -48,6 +65,25 @@ export const UpcomingAppointmentCard = ({
     const status = String(raw?.appointment_status || '').toUpperCase();
     const statusColor = getStatusColor(status);
     const statusLabel = String(status || '').replaceAll('_', ' ') || '—';
+    const isCompleted = status === 'COMPLETED';
+
+    const amount = typeof raw?.amount === 'number' ? raw.amount : Number(raw?.amount || 0);
+    const paymentStatus = raw?.payment_status;
+
+    // Match backend `AppointmentPayment` schema:
+    // - `is_user_joined`
+    // - `is_consultant_joined`
+    const userJoined = Boolean(raw?.is_user_joined);
+    const consultantJoined = Boolean(raw?.is_consultant_joined);
+
+    // Feedback fields are not in `AppointmentPayment` schema you shared.
+    // Keep support for possible additional backend fields if present.
+    const feedbackSubmitted = Boolean(
+      raw?.feedback_submitted ||
+        raw?.feedbackSubmitted ||
+        raw?.is_feedback_submitted ||
+        String(raw?.feedback_status || '').toUpperCase().includes('SUBMIT'),
+    );
 
     const displayName =
       userRole === 'consultant'
@@ -92,10 +128,16 @@ export const UpcomingAppointmentCard = ({
       displayName,
       specialization,
       isUpcomingByTime,
+      isCompleted,
       chatAvailability,
       videoAvailability,
       canCancel,
       canReschedule,
+      amount,
+      paymentStatus,
+      userJoined,
+      consultantJoined,
+      feedbackSubmitted,
     };
   }, [raw, userRole]);
 
@@ -104,14 +146,26 @@ export const UpcomingAppointmentCard = ({
   const appointmentId = raw?._id || booking?.id;
   const durationLabel = raw?.appointment_duration ? String(raw.appointment_duration).replaceAll('_', ' ') : null;
   const reasonToVisit = raw?.reason_to_visit;
+  const messageText = raw?.message;
 
-  const amount = typeof raw?.amount === 'number' ? raw.amount : Number(raw?.amount || 0);
-  const paymentStatus = raw?.payment_status;
+  const amount = memoAmount;
+  const paymentStatus = memoPaymentStatus;
 
   const canShowReschedule = canReschedule && !chatAvailability.available && !videoAvailability.available;
   const canShowCancel = canCancel && !chatAvailability.available && !videoAvailability.available;
 
-  const showAvailabilityBanner = raw?.appointment_status === 'CONFIRMED' && (!chatAvailability.available || !videoAvailability.available);
+  const showAvailabilityBanner =
+    (!chatAvailability.available && chatAvailability.reason) || (!videoAvailability.available && videoAvailability.reason);
+
+  const messageLabel = chatAvailability.available
+    ? isUpcomingByTime
+      ? 'Start Chat'
+      : 'Chat History'
+    : 'Message';
+
+  const userJoinedText = userJoined ? 'Yes' : 'No';
+  const consultantJoinedText = consultantJoined ? 'Yes' : 'No';
+  const shouldShowInvoice = isCompleted && String(paymentStatus || '').toUpperCase() === 'PAID';
 
   return (
     <motion.div
@@ -121,7 +175,7 @@ export const UpcomingAppointmentCard = ({
       exit={{ opacity: 0, y: -10, scale: 0.98 }}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.25 }}
-      className="bg-white rounded-2xl p-4 shadow-sm"
+        className="bg-white rounded-2xl p-4 shadow-sm flex flex-col h-full"
       style={{
         borderLeftWidth: 4,
         borderLeftColor: statusColor,
@@ -170,48 +224,109 @@ export const UpcomingAppointmentCard = ({
       </div>
 
       {/* Reason */}
-      {reasonToVisit && (
-        <div className="mb-2">
-          <div className="text-gray-600 text-xs mb-1">Reason:</div>
-          <div className="text-gray-800 text-sm break-words">{reasonToVisit}</div>
-        </div>
-      )}
+      {/* Keep height consistent across cards (even when reason is missing) */}
+      <div className="mb-2 min-h-[46px]">
+        {reasonToVisit ? (
+          <div>
+            <div className="text-gray-600 text-xs mb-1">Reason:</div>
+            <div className="text-gray-800 text-sm break-words">{reasonToVisit}</div>
+          </div>
+        ) : (
+          <div className="opacity-0">
+            <div className="text-gray-600 text-xs mb-1">Reason:</div>
+            <div className="text-gray-800 text-sm break-words">—</div>
+          </div>
+        )}
+      </div>
+
+      {/* Message */}
+      {/* Keep height consistent across cards (even when message is missing) */}
+      <div className="mb-2 min-h-[46px]">
+        {messageText ? (
+          <div>
+            <div className="text-gray-600 text-xs mb-1">Message:</div>
+            <div className="text-gray-800 text-sm break-words">{messageText}</div>
+          </div>
+        ) : (
+          <div className="opacity-0">
+            <div className="text-gray-600 text-xs mb-1">Message:</div>
+            <div className="text-gray-800 text-sm break-words">—</div>
+          </div>
+        )}
+      </div>
 
       {/* Price */}
-      {amount > 0 && (
-        <div className="flex items-center gap-2 mb-3">
+      {/* Keep height consistent across cards (even when price is missing) */}
+      <div className={`mb-3 min-h-[28px] ${amount > 0 ? '' : 'opacity-0'}`}>
+        <div className="flex items-center gap-2">
           <Phone size={15} color="#9CA3AF" className="opacity-80" />
-          <span className="text-gray-800 text-sm font-medium">₹{amount}</span>
+          <span className="text-gray-800 text-sm font-medium">₹{amount || 0}</span>
           {paymentStatus && <span className="text-gray-500 text-xs">({paymentStatus})</span>}
         </div>
-      )}
+      </div>
 
       {/* Availability banner */}
-      {showAvailabilityBanner && (
-        <div className="mb-3 p-2 bg-blue-50 rounded-lg">
-          {!chatAvailability.available && (
-            <div className="text-blue-700 text-xs">💬 {chatAvailability.reason}</div>
-          )}
-          {!videoAvailability.available && (
-            <div className="text-blue-700 text-xs">📹 {videoAvailability.reason}</div>
-          )}
+      {/* Keep height consistent across cards (even when banner is missing) */}
+      <div
+        className={`mb-3 p-2 bg-blue-50 rounded-lg min-h-[44px] ${showAvailabilityBanner ? '' : 'opacity-0'}`}
+      >
+        {showAvailabilityBanner && (
+          <>
+            {!chatAvailability.available && (
+              <div className="text-blue-700 text-xs">💬 {chatAvailability.reason}</div>
+            )}
+            {!videoAvailability.available && (
+              <div className="text-blue-700 text-xs">📹 {videoAvailability.reason}</div>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Joined info (keeps “yellow area” content linear across cards) */}
+      <div className="mb-1 min-h-[38px]">
+        <div className="flex items-center gap-2 text-xs text-gray-600">
+          <span className={userJoined ? 'text-emerald-600' : 'text-slate-400'}>
+            {userJoined ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+          </span>
+          <span>User Joined: {userJoinedText}</span>
         </div>
-      )}
+        <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
+          <span className={consultantJoined ? 'text-emerald-600' : 'text-slate-400'}>
+            {consultantJoined ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+          </span>
+          <span>Consultant Joined: {consultantJoinedText}</span>
+        </div>
+      </div>
 
       {/* Actions */}
-      <div className="flex justify-end mt-2 flex-wrap gap-2">
-        {chatAvailability.available && (
+      <div className="flex justify-end mt-auto flex-wrap gap-2 pt-1">
+        <Button
+          type="button"
+          variant="primary"
+          size="sm"
+          disabled={actionLoading || !chatAvailability.available}
+          onClick={() => onJoinChat?.(booking)}
+          className="h-9 text-xs rounded-xl !transition-none !px-4"
+        >
+          <span className="inline-flex items-center gap-2">
+            <MessageSquare size={16} color="#fff" />
+            <span>{messageLabel}</span>
+          </span>
+        </Button>
+
+        {/* Invoice (downloadable in app; on web we open summary placeholder) */}
+        {shouldShowInvoice && (
           <Button
             type="button"
-            variant="primary"
+            variant="outline"
             size="sm"
             disabled={actionLoading}
-            onClick={() => onJoinChat?.(booking)}
-            className="h-9 text-xs rounded-xl !transition-none !px-4"
+            onClick={() => onViewSummary?.(booking)}
+            className="h-9 text-xs rounded-xl !transition-none !px-4 !border-slate-200 !text-slate-700 hover:!bg-slate-50"
           >
             <span className="inline-flex items-center gap-2">
-              <MessageSquare size={16} color="#fff" />
-              <span>{isUpcomingByTime ? 'Start Chat' : 'Chat History'}</span>
+              <Download size={16} />
+              <span className="font-semibold">Invoice</span>
             </span>
           </Button>
         )}
@@ -259,6 +374,22 @@ export const UpcomingAppointmentCard = ({
             </span>
           </Button>
         )}
+      </div>
+
+      {/* Feedback section (kept linear; placed outside the main row) */}
+      <div className="mt-2 min-h-[34px] flex justify-end">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          disabled={!isCompleted || feedbackSubmitted}
+          onClick={() => onViewSummary?.(booking)}
+          className="h-9 text-xs rounded-xl !transition-none !px-4"
+        >
+          <span className="font-semibold">
+            {feedbackSubmitted ? 'Feedback Submitted' : 'Submit Feedback'}
+          </span>
+        </Button>
       </div>
     </motion.div>
   );
