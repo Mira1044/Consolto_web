@@ -12,6 +12,29 @@ import {
  * Pure functions for expert-related business logic.
  */
 
+const slugify = (s) =>
+  String(s || '')
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+/**
+ * Build category chips from normalized experts (single source — no second API call).
+ */
+export const deriveCategoriesFromExperts = (experts) => {
+  const labels = new Set();
+  for (const e of experts) {
+    const tags = Array.isArray(e?.tags) ? e.tags : [];
+    for (const t of tags) labels.add(String(t));
+  }
+  return Array.from(labels)
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b))
+    .map((label) => ({ id: slugify(label), label }));
+};
+
 /**
  * Map a category id to its Lucide icon component.
  */

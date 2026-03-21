@@ -7,6 +7,7 @@
 import { apiRequest } from '@/shared/services/api';
 import { MOCK_EXPERTS, EXPERT_CATEGORIES } from '@/shared/constants';
 import { validateExperts, validateCategories } from '../validators/expertValidator';
+import { deriveCategoriesFromExperts } from '../utils/expertUtils';
 
 const PALETTE = [
   'bg-purple-100 text-purple-700',
@@ -27,14 +28,6 @@ const initialsFromName = (name) => {
   const second = parts.length > 1 ? parts[1]?.[0] ?? '' : (parts[0]?.[1] ?? '');
   return (first + second).toUpperCase().slice(0, 3) || cleaned.slice(0, 1).toUpperCase();
 };
-
-const slugify = (s) =>
-  String(s || '')
-    .toLowerCase()
-    .trim()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
 
 const getCharge = (charges = [], duration) => {
   const item = Array.isArray(charges) ? charges.find((c) => c?.duration === duration) : null;
@@ -91,20 +84,8 @@ export const expertsService = {
    */
   async getCategories() {
     try {
-      const payload = await apiRequest.get('/consultant/consultants');
-      const list = Array.isArray(payload?.data) ? payload.data : [];
-
-      const labels = new Set();
-      for (const c of list) {
-        const specs = Array.isArray(c?.specialization) ? c.specialization : [];
-        for (const s of specs) labels.add(String(s));
-      }
-
-      const derived = Array.from(labels)
-        .filter(Boolean)
-        .sort((a, b) => a.localeCompare(b))
-        .map((label) => ({ id: slugify(label), label }));
-
+      const experts = await this.getExperts();
+      const derived = deriveCategoriesFromExperts(experts);
       const result = validateCategories(derived.length ? derived : EXPERT_CATEGORIES);
       if (!result.success) throw new Error('Invalid categories data received');
       return result.value;

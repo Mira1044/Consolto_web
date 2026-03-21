@@ -35,8 +35,8 @@ export const bookingService = {
    * After interceptor unwrap, this method receives:
    *  { data: Appointment[], pagination: {...} }
    */
-  async getUserAppointments(params = {}) {
-    const payload = await apiRequest.get('/appointment/user', { params });
+  async getUserAppointments(params = {}, axiosConfig = {}) {
+    const payload = await apiRequest.get('/appointment/user', { params, ...axiosConfig });
 
     // Support both shapes:
     // 1) { data: Appointment[], pagination }
@@ -63,8 +63,8 @@ export const bookingService = {
    * After interceptor unwrap, this method receives:
    *  { data: Appointment[], pagination: {...} }
    */
-  async getConsultantAppointments(params = {}) {
-    const payload = await apiRequest.get('/appointment/consultant', { params });
+  async getConsultantAppointments(params = {}, axiosConfig = {}) {
+    const payload = await apiRequest.get('/appointment/consultant', { params, ...axiosConfig });
 
     const container = payload?.data && Array.isArray(payload.data)
       ? payload
@@ -76,6 +76,28 @@ export const bookingService = {
     const pagination = container?.pagination ?? null;
 
     return { appointments: list, pagination };
+  },
+
+  /**
+   * One round-trip when possible; falls back to upcoming+past if the unified call fails.
+   * @param {{ roleTab: 'user'|'consultant', signal?: AbortSignal }} opts
+   */
+  async loadAppointmentsForBookingsPage({ roleTab, signal }) {
+    const fetchFn = roleTab === 'consultant' ? this.getConsultantAppointments : this.getUserAppointments;
+    const extra = signal ? { signal } : {};
+    try {
+      const r = await fetchFn({ page: 1, limit: 50 }, extra);
+      return { appointments: r.appointments ?? [] };
+    } catch (e) {
+      if (signal?.aborted) throw e;
+      const [u, p] = await Promise.all([
+        fetchFn({ page: 1, limit: 10, status_type: 'upcoming' }, extra),
+        fetchFn({ page: 1, limit: 10, status_type: 'past' }, extra),
+      ]);
+      return {
+        appointments: [...(u.appointments || []), ...(p.appointments || [])],
+      };
+    }
   },
 
   /**
