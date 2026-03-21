@@ -57,7 +57,7 @@ export const LoginPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative">
       <div className="flex min-h-screen w-full flex-col lg:flex-row">
         {/* Top on tablet, left on desktop */}
-        <div className="hidden sm:flex w-full sm:flex-1 lg:h-auto lg:basis-[65%]">
+        <div className="hidden min-h-0 w-full sm:flex sm:min-h-screen sm:flex-1 sm:self-stretch lg:h-auto lg:basis-[65%]">
           <Hero />
         </div>
 

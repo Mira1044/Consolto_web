@@ -156,3 +156,23 @@ export const expertsService = {
     return { expert, raw: consultant };
   },
 };
+
+/**
+ * Build category chips from already-fetched normalized experts (same labels as getCategories).
+ * Use this after a single getExperts() call to avoid a duplicate GET /consultant/consultants.
+ */
+export function deriveCategoriesFromNormalizedExperts(experts) {
+  const labels = new Set();
+  for (const e of experts) {
+    const specs = Array.isArray(e?.tags) ? e.tags : [];
+    for (const s of specs) labels.add(String(s));
+  }
+  const derived = Array.from(labels)
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b))
+    .map((label) => ({ id: slugify(label), label }));
+
+  const result = validateCategories(derived.length ? derived : EXPERT_CATEGORIES);
+  if (!result.success) throw new Error('Invalid categories data received');
+  return result.value;
+}

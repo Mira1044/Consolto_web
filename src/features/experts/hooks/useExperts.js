@@ -1,63 +1,51 @@
-import { useEffect, useMemo, useState, useCallback } from 'react';
-import { expertsService } from '../services/expertsService';
+import { useMemo, useState, useCallback } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { expertsService, deriveCategoriesFromNormalizedExperts } from '../services/expertsService';
 import { filterExperts, getVisibleCategories, enrichCategoriesWithIcons } from '../utils/expertUtils';
 import { useErrorHandler } from '@/shared/services/error';
+import { queryKeys } from '@/lib/queryClient';
 
 /**
- * useExperts
- * Feature-level hook that encapsulates experts list, filters, and derived data.
- * All data flows through the service layer; filtering uses pure utility functions.
+ * Experts list + filters. Single network request; categories derived from the same payload.
  */
 export const useExperts = () => {
-  const [experts, setExperts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState(null);
   const [showAll, setShowAll] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const { handleApiError } = useErrorHandler();
 
-  // Load experts and categories from service layer on mount
-  useEffect(() => {
-    let mounted = true;
-
-    const load = async () => {
-      setIsLoading(true);
+  const expertsQuery = useQuery({
+    queryKey: queryKeys.experts.list,
+    queryFn: async () => {
       try {
-        const [expertsData, categoriesData] = await Promise.all([
-          expertsService.getExperts(),
-          expertsService.getCategories(),
-        ]);
-        if (mounted) {
-          setExperts(expertsData);
-          setCategories(categoriesData);
-        }
+        return await expertsService.getExperts();
       } catch (err) {
         handleApiError(err, { context: { feature: 'experts', action: 'load' } });
-      } finally {
-        if (mounted) setIsLoading(false);
+        throw err;
       }
-    };
+    },
+    staleTime: 60_000,
+  });
 
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, [handleApiError]);
+  const experts = expertsQuery.data ?? [];
+  const isLoading = expertsQuery.isPending;
 
-  // Derived: categories enriched with icons
-  const enrichedCategories = useMemo(
-    () => enrichCategoriesWithIcons(categories),
-    [categories],
-  );
+  const categories = useMemo(() => {
+    if (!experts.length) return [];
+    try {
+      return deriveCategoriesFromNormalizedExperts(experts);
+    } catch {
+      return [];
+    }
+  }, [experts]);
 
-  // Derived: visible categories (collapsed / expanded)
+  const enrichedCategories = useMemo(() => enrichCategoriesWithIcons(categories), [categories]);
+
   const visibleCategories = useMemo(
     () => getVisibleCategories(enrichedCategories, showAll),
     [enrichedCategories, showAll],
   );
 
-  // Derived: filtered experts list
   const filteredExperts = useMemo(
     () => filterExperts(experts, { search, activeCategory }),
     [experts, search, activeCategory],
@@ -66,17 +54,14 @@ export const useExperts = () => {
   const clearCategory = useCallback(() => setActiveCategory(null), []);
 
   return {
-    // state
     isLoading,
     search,
     activeCategory,
     showAll,
-    // setters
     setSearch,
     setActiveCategory,
     setShowAll,
     clearCategory,
-    // derived
     visibleCategories,
     filteredExperts,
   };

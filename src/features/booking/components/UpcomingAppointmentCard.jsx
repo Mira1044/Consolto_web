@@ -7,6 +7,7 @@ import {
   CheckCircle,
   Clock,
   FileText,
+  Info,
   MessageSquare,
   Star,
   Ticket,
@@ -53,7 +54,7 @@ export const UpcomingAppointmentCard = ({
     statusColor,
     statusLabel,
     displayName,
-    specialization,
+    specializationItems,
     isUpcomingByTime,
     paymentStatus: memoPaymentStatus,
     amount: memoAmount,
@@ -98,17 +99,17 @@ export const UpcomingAppointmentCard = ({
           })()
         : raw?.consultant?.user_name || raw?.consultant?.userName || raw?.consultant?.name || 'Unknown Consultant';
 
-    const specialization =
+    /** List of specialization strings for tooltip (user sees consultant’s skills). */
+    const specializationItems =
       userRole === 'user'
         ? (() => {
-            // App uses `booking.consultant_id` (populated object) for specialization
             const consultantObj =
               raw?.consultant_id && typeof raw.consultant_id === 'object' ? raw.consultant_id : raw?.consultant;
             const spec = consultantObj?.specialization;
-            if (Array.isArray(spec) && spec.length) return spec.join(', ');
-            return 'Specialist';
+            if (Array.isArray(spec) && spec.length) return spec.map((s) => String(s).trim()).filter(Boolean);
+            return ['Specialist'];
           })()
-        : null;
+        : [];
 
     const isUpcomingByTime = isAppointmentUpcoming(raw, now);
 
@@ -134,7 +135,7 @@ export const UpcomingAppointmentCard = ({
       statusColor: statusColor,
       statusLabel: statusLabel,
       displayName: displayName,
-      specialization: specialization,
+      specializationItems: specializationItems,
       isUpcomingByTime: isUpcomingByTime,
       chatAvailability: chatAvailability,
       videoAvailability: videoAvailability,
@@ -207,11 +208,38 @@ export const UpcomingAppointmentCard = ({
         </div>
       </div>
 
-      {/* 2) Header: name, role/specialization, status */}
-      <div className="flex items-start justify-between mb-2">
-        <div className="flex-1 min-w-0 pr-3">
-          <div className="text-base font-semibold text-gray-800 break-words">{displayName}</div>
-          {specialization && <div className="text-sm text-gray-600 mt-0.5 break-words">{specialization}</div>}
+      {/* 2) Header: name + info (specializations on hover), status */}
+      <div className="flex items-start justify-between mb-2 gap-2">
+        <div className="flex min-w-0 flex-1 items-start gap-1.5 pr-2">
+          <div className="min-w-0 flex-1 text-base font-semibold leading-snug text-gray-800 break-words">
+            {displayName}
+          </div>
+          {specializationItems.length > 0 && (
+            <div className="group relative shrink-0 pt-0.5">
+              <button
+                type="button"
+                className="inline-flex rounded-full p-1 text-blue-600 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
+                aria-label="Specializations"
+                aria-describedby={`spec-tip-${appointmentId}`}
+              >
+                <Info className="h-[18px] w-[18px]" strokeWidth={2.5} aria-hidden />
+              </button>
+              <div
+                id={`spec-tip-${appointmentId}`}
+                role="tooltip"
+                className="invisible absolute left-0 top-full z-[60] mt-1.5 w-max max-w-[min(18rem,calc(100vw-2rem))] rounded-lg border border-gray-200 bg-white px-3 py-2 text-left text-xs text-gray-700 shadow-lg opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+              >
+                <p className="mb-1.5 font-semibold text-gray-900">Specializations</p>
+                <ul className="max-h-48 list-disc space-y-1 overflow-y-auto pl-4 pr-1">
+                  {specializationItems.map((item, idx) => (
+                    <li key={`${idx}-${item}`} className="leading-snug">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
         </div>
 
         <div
@@ -323,8 +351,12 @@ export const UpcomingAppointmentCard = ({
         )}
       </div>
 
-      {/* Actions */}
-      <div className="flex justify-end mt-auto flex-wrap gap-2 pt-1">
+      {/*
+        One row: CSS grid with equal columns (count = number of buttons).
+        `minmax(0,1fr)` lets labels shrink/wrap instead of forcing a wrap to a new row.
+        Narrow screens: horizontal scroll instead of stacking.
+      */}
+      <div className="mt-auto grid w-full min-w-0 grid-flow-col auto-cols-[minmax(0,1fr)] gap-2 pt-1 max-[380px]:auto-cols-[minmax(5.5rem,1fr)] max-[380px]:overflow-x-auto max-[380px]:pb-0.5 [scrollbar-width:thin]">
         {chatAvailability.available && (
           <Button
             type="button"
@@ -332,11 +364,11 @@ export const UpcomingAppointmentCard = ({
             size="sm"
             disabled={actionLoading}
             onClick={() => onJoinChat?.(booking)}
-            className="h-9 text-xs rounded-xl !transition-none !px-4"
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs"
           >
-            <span className="inline-flex items-center gap-2">
-              <MessageSquare size={16} color="#fff" />
-              <span>{isUpcomingByTime ? 'Start Chat' : 'Chat History'}</span>
+            <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
+              <MessageSquare className="shrink-0" size={16} color="#fff" />
+              <span className="text-center font-semibold">{isUpcomingByTime ? 'Start Chat' : 'Chat History'}</span>
             </span>
           </Button>
         )}
@@ -347,11 +379,11 @@ export const UpcomingAppointmentCard = ({
             variant="secondary"
             disabled={actionLoading}
             onClick={() => onJoinCall?.(booking)}
-            className="h-9 text-xs rounded-xl !transition-none !px-4 !bg-green-600 !text-white !hover:bg-green-700"
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-green-600 !text-white !hover:bg-green-700"
           >
-            <span className="inline-flex items-center gap-2">
-              <Video size={16} color="#fff" />
-              <span>Join Video Call</span>
+            <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
+              <Video className="shrink-0" size={16} color="#fff" />
+              <span className="text-center font-semibold leading-tight">Video Call</span>
             </span>
           </Button>
         )}
@@ -362,11 +394,11 @@ export const UpcomingAppointmentCard = ({
             variant="secondary"
             disabled={rescheduleLoading}
             onClick={() => onRescheduleBooking?.(booking)}
-            className="h-9 text-xs rounded-xl !transition-none !px-4 !bg-yellow-500 !text-white !hover:bg-yellow-600"
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-yellow-500 !text-white !hover:bg-yellow-600"
           >
-            <span className="inline-flex items-center gap-2">
-              <CalendarDays size={16} color="#fff" />
-              <span>Reschedule</span>
+            <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
+              <CalendarDays className="shrink-0" size={16} color="#fff" />
+              <span className="text-center font-semibold">Reschedule</span>
             </span>
           </Button>
         )}
@@ -377,10 +409,10 @@ export const UpcomingAppointmentCard = ({
             variant="danger"
             disabled={cancelLoading}
             onClick={() => onCancelBooking?.(booking)}
-            className="h-9 text-xs rounded-xl !transition-none !px-4"
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs"
           >
-            <span className="inline-flex items-center gap-2">
-              <span className="font-semibold">Cancel</span>
+            <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
+              <span className="text-center font-semibold">Cancel</span>
             </span>
           </Button>
         )}
@@ -391,11 +423,11 @@ export const UpcomingAppointmentCard = ({
             variant="secondary"
             disabled={completeLoading}
             onClick={() => onCompleteBooking?.(booking)}
-            className="h-9 text-xs rounded-xl !transition-none !px-4 !bg-green-600 !text-white !hover:bg-green-700"
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-green-600 !text-white !hover:bg-green-700"
           >
-            <span className="inline-flex items-center gap-2">
-              <CheckCircle size={16} color="#fff" />
-              <span className="font-semibold">Complete</span>
+            <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
+              <CheckCircle className="shrink-0" size={16} color="#fff" />
+              <span className="text-center font-semibold">Complete</span>
             </span>
           </Button>
         )}
@@ -407,11 +439,11 @@ export const UpcomingAppointmentCard = ({
             size="sm"
             disabled={actionLoading}
             onClick={() => onViewSummary?.(booking)}
-            className="h-9 text-xs rounded-xl !transition-none !px-4 !bg-orange-500 !text-white !hover:bg-orange-600"
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-orange-500 !text-white !hover:bg-orange-600"
           >
-            <span className="inline-flex items-center gap-2">
-              <Star size={16} color="#fff" />
-              <span className="font-semibold">Submit Feedback</span>
+            <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
+              <Star className="shrink-0" size={16} color="#fff" />
+              <span className="text-center font-semibold leading-snug">Feedback</span>
             </span>
           </Button>
         )}
@@ -423,11 +455,11 @@ export const UpcomingAppointmentCard = ({
             size="sm"
             disabled={actionLoading || invoiceLoading}
             onClick={() => onDownloadInvoice?.(appointmentId)}
-            className="h-9 text-xs rounded-xl !transition-none !px-4 !bg-blue-100 !text-blue-600 !border-transparent hover:!bg-blue-200"
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-blue-100 !text-blue-600 !border-transparent hover:!bg-blue-200"
           >
-            <span className="inline-flex items-center gap-2">
-              <FileText size={16} />
-              <span className="font-semibold">Invoice</span>
+            <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
+              <FileText className="shrink-0" size={16} />
+              <span className="text-center font-semibold">Invoice</span>
             </span>
           </Button>
         )}

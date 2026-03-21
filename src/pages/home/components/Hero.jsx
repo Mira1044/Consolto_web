@@ -1,18 +1,18 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Play } from 'lucide-react';
 import { BRAND_HIGHLIGHT_GRADIENT_CLASSES } from '@/shared/constants/brand';
 
 export const Hero = () => {
+  /** Percent-based positions so cards stay inside the visual frame on all widths */
   const floatingCards = [
-    { delay: 0, x: 50, y: 30 },
-    { delay: 0.2, x: -30, y: 50 },
-    { delay: 0.4, x: 70, y: -20 },
+    { delay: 0, left: '8%', top: '12%' },
+    { delay: 0.2, left: '42%', top: '38%' },
+    { delay: 0.4, left: '18%', top: '52%' },
   ];
 
   return (
     <section
       id="home"
-      className="relative flex h-full items-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50 py-8 sm:py-10 md:py-8 lg:py-12"
+      className="relative flex min-h-[min(100dvh,880px)] w-full flex-1 flex-col justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50 py-8 sm:h-full sm:min-h-0 sm:py-10 md:py-8 lg:min-h-screen lg:py-12"
     >
       <div className="absolute inset-0 overflow-hidden">
         <div className="w-72 h-72 absolute left-10 top-20 animate-blob rounded-full bg-blue-200 opacity-30 mix-blend-multiply blur-xl filter"></div>
@@ -20,8 +20,8 @@ export const Hero = () => {
         <div className="w-72 h-72 animation-delay-4000 absolute -bottom-8 left-1/2 animate-blob rounded-full bg-blue-400 opacity-30 mix-blend-multiply blur-xl filter"></div>
       </div>
 
-      <div className="z-10 relative mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 md:py-8 lg:px-8 lg:py-10">
-        <div className="grid items-center gap-8 lg:grid-cols-2">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 md:py-8 lg:px-8 lg:py-10">
+        <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -54,32 +54,32 @@ export const Hero = () => {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             whileHover={{ rotateX: -6, rotateY: 6, scale: 1.02 }}
-            className="relative mt-6 flex items-center justify-center [perspective:1200px] lg:mt-0"
+            className="relative mx-auto mt-8 flex w-full max-w-md items-center justify-center [perspective:1200px] sm:mt-10 lg:mx-0 lg:mt-0 lg:max-w-none"
           >
-            <div className="relative h-48 w-48 md:h-44 md:w-44 lg:h-56 lg:w-56">
+            <div className="relative aspect-square w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[360px]">
               {floatingCards.map((card, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: card.delay + 0.5, duration: 0.5 }}
-                  className="absolute"
-                  style={{ left: `${card.x}px`, top: `${card.y}px` }}
+                  className="absolute z-[1] w-[min(42%,140px)] sm:w-[min(40%,150px)]"
+                  style={{ left: card.left, top: card.top }}
                 >
                   <motion.div
                     animate={{
-                      y: [0, -20, 0],
+                      y: [0, -12, 0],
                     }}
                     transition={{
                       duration: 3,
                       repeat: Infinity,
                       delay: card.delay,
                     }}
-                    className="rounded-2xl border border-blue-100 bg-white/80 p-6 shadow-xl backdrop-blur-md"
+                    className="rounded-2xl border border-blue-100 bg-white/90 p-4 shadow-xl backdrop-blur-md sm:p-5"
                   >
-                    <div className="mb-3 h-16 w-16 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600"></div>
-                    <div className="rounded mb-2 h-3 w-24 bg-gray-200"></div>
-                    <div className="rounded h-2 w-16 bg-gray-100"></div>
+                    <div className="mb-2 h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 sm:mb-3 sm:h-14 sm:w-14" />
+                    <div className="mb-1.5 h-2.5 w-20 rounded bg-gray-200 sm:h-3 sm:w-24" />
+                    <div className="h-2 w-14 rounded bg-gray-100 sm:w-16" />
                   </motion.div>
                 </motion.div>
               ))}

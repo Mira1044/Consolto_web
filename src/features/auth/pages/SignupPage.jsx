@@ -48,7 +48,7 @@ export const SignupPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="flex h-screen w-full">
         {/* Left: full hero / marketing (60%) */}
-        <div className="hidden flex-[3] lg:flex">
+        <div className="hidden min-h-0 w-full flex-[3] self-stretch lg:flex lg:min-h-screen">
           <Hero />
         </div>
 

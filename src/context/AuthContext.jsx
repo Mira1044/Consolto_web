@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { apiRequest } from '@/shared/services/api';
+import { queryClient } from '@/lib/queryClient';
 
 const AUTH_KEY = 'consolto_user';
 
@@ -118,6 +119,7 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(() => {
     setUser(null);
+    queryClient.clear();
   }, []);
 
   const isLoggedIn = isValidAuthToken(user?.token);

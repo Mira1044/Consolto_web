@@ -545,105 +545,18 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ROUTES } from '@/routes/config';
 import { bookingService } from '../services/bookingService';
-import { Button, Loader } from '@/shared/components/ui';
+import { Button } from '@/shared/components/ui';
 import { useErrorHandler } from '@/shared/services/error';
 import { useAuth } from '@/context/AuthContext';
 import { expertsService } from '@/features/experts/services/expertsService';
 import { apiRequest } from '@/shared/services/api';
-import { UpcomingAppointmentCard } from '../components/UpcomingAppointmentCard';
-
-const upcomingBookings = [
-  {
-    id: 1,
-    doctor: 'Dr. Priya Sharma',
-    specialty: 'Cardiologist',
-    date: 'Mon, 24 Mar 2026',
-    time: '10:30 AM',
-    mode: 'Video',
-    status: 'upcoming',
-    avatar: 'PS',
-    color: 'bg-violet-100 text-violet-700',
-    accent: '#7c3aed',
-  },
-  {
-    id: 2,
-    doctor: 'Dr. Rahul Mehta',
-    specialty: 'Dermatologist',
-    date: 'Wed, 26 Mar 2026',
-    time: '02:00 PM',
-    mode: 'In-person',
-    status: 'upcoming',
-    avatar: 'RM',
-    color: 'bg-blue-100 text-blue-700',
-    accent: '#2563eb',
-  },
-  {
-    id: 3,
-    doctor: 'Dr. Sneha Patel',
-    specialty: 'Neurologist',
-    date: 'Fri, 28 Mar 2026',
-    time: '11:00 AM',
-    mode: 'Video',
-    status: 'upcoming',
-    avatar: 'SP',
-    color: 'bg-pink-100 text-pink-700',
-    accent: '#db2777',
-  },
-];
-
-const pastBookings = [
-  {
-    id: 4,
-    doctor: 'Dr. Amit Joshi',
-    specialty: 'Orthopedic',
-    date: 'Mon, 10 Mar 2026',
-    time: '09:00 AM',
-    mode: 'In-person',
-    status: 'completed',
-    avatar: 'AJ',
-    color: 'bg-green-100 text-green-700',
-    accent: '#16a34a',
-  },
-  {
-    id: 5,
-    doctor: 'Dr. Kavita Nair',
-    specialty: 'Gynecologist',
-    date: 'Thu, 06 Mar 2026',
-    time: '03:30 PM',
-    mode: 'Video',
-    status: 'completed',
-    avatar: 'KN',
-    color: 'bg-teal-100 text-teal-700',
-    accent: '#0d9488',
-  },
-  {
-    id: 6,
-    doctor: 'Dr. Rohan Das',
-    specialty: 'Psychiatrist',
-    date: 'Tue, 04 Mar 2026',
-    time: '01:00 PM',
-    mode: 'Video',
-    status: 'cancelled',
-    avatar: 'RD',
-    color: 'bg-red-100 text-red-700',
-    accent: '#dc2626',
-  },
-  {
-    id: 7,
-    doctor: 'Dr. Meera Iyer',
-    specialty: 'Pediatrician',
-    date: 'Sat, 01 Mar 2026',
-    time: '10:00 AM',
-    mode: 'In-person',
-    status: 'cancelled',
-    avatar: 'MI',
-    color: 'bg-orange-100 text-orange-700',
-    accent: '#ea580c',
-  },
-];
+import { BookingsSegmentedToggle, UpcomingAppointmentCard } from '../components';
+import { useBookingsAppointments } from '../hooks/useBookingsAppointments';
+import { useConsultantSelf } from '../hooks/useConsultantSelf';
 
 function StatusBadge({ status }) {
   const label = status.charAt(0).toUpperCase() + status.slice(1);
@@ -863,16 +776,16 @@ function EmptyState({ tab, filter }) {
 
 export const BookingsPage = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const { handleApiError } = useErrorHandler();
   /** Fallback if JWT `role` is set (not all backends set this). */
   const isConsultantByRole =
     String(user?.role || '').toUpperCase() === 'CONSULTANT' || String(user?.role || '').toUpperCase() === 'EXPERT';
-  /**
-   * consolto_app uses `ConsultantProvider` → GET `/consultant/self` to set `isConsultant`, NOT `user.role`.
-   * If we only checked role on web, real consultants often never saw the switcher.
-   */
-  const [hasConsultantProfile, setHasConsultantProfile] = useState(false);
+
+  /** GET /consultant/self — cached via React Query (see useConsultantSelf). */
+  const consultantSelfQuery = useConsultantSelf();
+  const hasConsultantProfile = consultantSelfQuery.isSuccess;
   const showBookingsRoleSwitcher = hasConsultantProfile || isConsultantByRole;
 
   // Same mapping as consolto_app `RoleSwitch.TabSwitcher` + bookings initial state:
@@ -884,22 +797,8 @@ export const BookingsPage = () => {
 
   useEffect(() => {
     if (!user?.token) {
-      setHasConsultantProfile(false);
       roleTabInitRef.current = false;
-      return;
     }
-    let cancelled = false;
-    (async () => {
-      try {
-        await expertsService.getSelfConsultant();
-        if (!cancelled) setHasConsultantProfile(true);
-      } catch {
-        if (!cancelled) setHasConsultantProfile(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
   }, [user?.token]);
 
   // Default tab: consultants open "Consultant Bookings" once we know they can switch (matches app intent)
@@ -909,15 +808,20 @@ export const BookingsPage = () => {
     roleTabInitRef.current = true;
     setRoleTab('consultant');
   }, [user, showBookingsRoleSwitcher]);
+
   const [tab, setTab] = useState('Upcoming');
   const [filter, setFilter] = useState('All');
 
-  const [upcoming, setUpcoming] = useState(upcomingBookings);
-  const [past, setPast] = useState(pastBookings);
-  const [isLoading, setIsLoading] = useState(false);
+  const appointmentsQuery = useBookingsAppointments(roleTab);
+  const upcoming = appointmentsQuery.data?.upcoming ?? [];
+  const past = appointmentsQuery.data?.past ?? [];
+
   const [activeBooking, setActiveBooking] = useState(null);
   const [modal, setModal] = useState(null);
-  const [refreshTick, setRefreshTick] = useState(0);
+
+  const invalidateBookings = () => {
+    void queryClient.invalidateQueries({ queryKey: ['bookings', 'appointments'] });
+  };
 
   // Upcoming actions modals
   const [cancelReason, setCancelReason] = useState('');
@@ -931,148 +835,6 @@ export const BookingsPage = () => {
   const [completeLoading, setCompleteLoading] = useState(false);
   const [completeBookingId, setCompleteBookingId] = useState(null);
   const [invoiceLoadingMap, setInvoiceLoadingMap] = useState({});
-
-  const initialsFromName = (name) => {
-    const cleaned = String(name || '').trim();
-    if (!cleaned) return '?';
-    const parts = cleaned.split(/\s+/).filter(Boolean);
-    const first = parts[0]?.[0] ?? '';
-    const second = parts.length > 1 ? parts[1]?.[0] ?? '' : (parts[0]?.[1] ?? '');
-    return (first + second).toUpperCase().slice(0, 3) || cleaned.slice(0, 1).toUpperCase();
-  };
-
-  const formatDateTime = ({ bookedDate, startTime }) => {
-    const d = bookedDate ? new Date(bookedDate) : null;
-    if (!d || Number.isNaN(d.getTime())) {
-      return { date: 'Date not set', time: startTime || 'Time not set', ts: null };
-    }
-
-    const date = d.toLocaleDateString(undefined, {
-      weekday: 'short',
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-
-    // Build a sortable timestamp from date + appointment_start_time (e.g. "5:00 PM")
-    let ts = null;
-    if (startTime) {
-      const m = String(startTime).trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-      if (m) {
-        let hour = Number(m[1]);
-        const minute = Number(m[2]);
-        const period = m[3].toUpperCase();
-        if (period === 'PM' && hour !== 12) hour += 12;
-        if (period === 'AM' && hour === 12) hour = 0;
-        const withTime = new Date(d);
-        withTime.setHours(hour, minute, 0, 0);
-        ts = withTime.getTime();
-      }
-    }
-
-    return { date, time: startTime || 'Time not set', ts };
-  };
-
-  const normalizeAppointment = (a, index) => {
-    // Try common backend shapes; falls back safely if fields are missing
-    const consultantFromBooking =
-      a?.consultant_id && typeof a.consultant_id === 'object' ? a.consultant_id : a?.consultant;
-
-    const consultantName =
-      consultantFromBooking?.user_name ??
-      a?.consultant?.user_name ??
-      a?.consultant_name ??
-      a?.consultant?.name ??
-      a?.consultant?.userName ??
-      'Consultant';
-
-    const specialization =
-      (Array.isArray(consultantFromBooking?.specialization) && consultantFromBooking.specialization[0]) ||
-      (Array.isArray(a?.consultant?.specialization) && a.consultant.specialization[0]) ||
-      a?.specialization ||
-      a?.category ||
-      'Consultation';
-
-    const modeRaw = a?.mode ?? a?.meeting_type ?? a?.type ?? a?.session_type ?? a?.appointment_mode;
-    const mode = String(modeRaw || '').toLowerCase().includes('video') ? 'Video' : 'In-person';
-
-    const statusRaw = String(a?.status ?? a?.appointment_status ?? '').toLowerCase();
-    const when = formatDateTime({
-      bookedDate: a?.appointment_booked_date ?? a?.scheduledAt ?? a?.start_time ?? a?.startTime ?? a?.dateTime ?? a?.createdAt,
-      startTime: a?.appointment_start_time ?? a?.start_time_label ?? a?.startTimeLabel ?? a?.start_time,
-    });
-    const now = Date.now();
-    const computedUpcoming = when.ts != null ? when.ts > now : statusRaw === 'upcoming';
-
-    let status = 'upcoming';
-    if (statusRaw.includes('cancel')) status = 'cancelled';
-    else if (statusRaw.includes('complete') || statusRaw.includes('done')) status = 'completed';
-    else status = computedUpcoming ? 'upcoming' : 'completed';
-
-    const palette = [
-      ['bg-violet-100 text-violet-700', '#7c3aed'],
-      ['bg-blue-100 text-blue-700', '#2563eb'],
-      ['bg-pink-100 text-pink-700', '#db2777'],
-      ['bg-green-100 text-green-700', '#16a34a'],
-      ['bg-orange-100 text-orange-700', '#ea580c'],
-      ['bg-teal-100 text-teal-700', '#0d9488'],
-    ];
-    const [color, accent] = palette[index % palette.length];
-
-    return {
-      id: a?._id ?? a?.id ?? `appt-${index}`,
-      doctor: String(consultantName).trim(),
-      specialty: String(specialization).trim(),
-      date: when.date,
-      time: when.time,
-      mode,
-      status,
-      avatar: initialsFromName(consultantName),
-      color,
-      accent,
-      raw: a,
-    };
-  };
-
-  useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      setIsLoading(true);
-      try {
-        const fetchAppointments =
-          roleTab === 'consultant' ? bookingService.getConsultantAppointments : bookingService.getUserAppointments;
-
-        const [upcomingResp, pastResp] = await Promise.all([
-          fetchAppointments({ page: 1, limit: 10, status_type: 'upcoming' }),
-          fetchAppointments({ page: 1, limit: 10, status_type: 'past' }),
-        ]);
-
-        const normalizedUpcoming = (upcomingResp?.appointments || []).map((a, i) =>
-          normalizeAppointment(a, i),
-        );
-        const normalizedPast = (pastResp?.appointments || []).map((a, i) =>
-          normalizeAppointment(a, i + normalizedUpcoming.length),
-        );
-
-        if (!mounted) return;
-        setUpcoming(normalizedUpcoming);
-        setPast(normalizedPast);
-      } catch (err) {
-        handleApiError(err, {
-          context: {
-            feature: 'booking',
-            action: roleTab === 'consultant' ? 'getConsultantAppointments' : 'getUserAppointments',
-          },
-        });
-      } finally {
-        if (mounted) setIsLoading(false);
-      }
-    };
-    load();
-    return () => {
-      mounted = false;
-    };
-  }, [handleApiError, roleTab, refreshTick]);
 
   const filtered = useMemo(() => {
     const pool = tab === 'Upcoming' ? upcoming : past;
@@ -1377,7 +1139,7 @@ export const BookingsPage = () => {
       setModal(null);
       setActiveBooking(null);
       setCancelReason('');
-      setRefreshTick((t) => t + 1);
+      invalidateBookings();
     } catch (err) {
       handleApiError(err, { context: { feature: 'booking', action: 'cancelAppointment' } });
     } finally {
@@ -1398,7 +1160,7 @@ export const BookingsPage = () => {
     setCompleteLoading(true);
     try {
       await bookingService.markAppointmentComplete({ appointmentId });
-      setRefreshTick((t) => t + 1);
+      invalidateBookings();
     } catch (err) {
       handleApiError(err, { context: { feature: 'booking', action: 'markAppointmentComplete' } });
     } finally {
@@ -1444,7 +1206,7 @@ export const BookingsPage = () => {
       setAvailableSlots([]);
       setRescheduleFilterDate('');
 
-      setRefreshTick((t) => t + 1);
+      invalidateBookings();
     } catch (err) {
       handleApiError(err, { context: { feature: 'booking', action: 'rescheduleAppointment' } });
     } finally {
@@ -1490,11 +1252,6 @@ export const BookingsPage = () => {
 
   return (
     <div className="bg-slate-50 min-h-screen overflow-x-hidden">
-      {isLoading ? (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <Loader size="lg" text="Loading your bookings..." />
-        </div>
-      ) : null}
       {/* Header */}
       <div
         className="relative overflow-hidden"
@@ -1504,99 +1261,78 @@ export const BookingsPage = () => {
         <div className="absolute top-8 -right-4 w-28 h-28 rounded-full bg-white opacity-5" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 pb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-1">
-            <motion.div initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
-              {/* Role tab switcher — same wiring as consolto_app `RoleSwitch.TabSwitcher` (consultant-only) */}
-              {showBookingsRoleSwitcher ? (
-                <div className="flex w-full max-w-md bg-white/15 rounded-2xl p-1 gap-2 mb-4">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      setRoleTab('consultant');
-                      setTab('Upcoming');
-                      setFilter('All');
-                    }}
-                    className={`flex-1 h-12 rounded-xl text-sm font-semibold transition-colors !px-4 !py-0 ${
-                      roleTab === 'consultant'
-                        ? '!bg-white !text-violet-700 !shadow-sm !hover:bg-white'
-                        : '!bg-transparent !text-white/80 hover:!bg-white/10 hover:!text-white'
-                    }`}
-                  >
-                    Consultant Bookings
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      setRoleTab('user');
-                      setTab('Upcoming');
-                      setFilter('All');
-                    }}
-                    className={`flex-1 h-12 rounded-xl text-sm font-semibold transition-colors !px-4 !py-0 ${
-                      roleTab === 'user'
-                        ? '!bg-white !text-violet-700 !shadow-sm !hover:bg-white'
-                        : '!bg-transparent !text-white/80 hover:!bg-white/10 hover:!text-white'
-                    }`}
-                  >
-                    Client Bookings
-                  </Button>
-                </div>
-              ) : null}
-
-              <h1 className="text-2xl font-bold text-white tracking-tight">
-                {roleTab === 'consultant' ? 'Client Bookings' : 'Your Bookings'}
-              </h1>
-              <p className="text-sm text-indigo-200 mt-0.5">
-                {roleTab === 'consultant'
-                  ? 'Manage your client appointments'
-                  : 'View and manage your consultations'}
-              </p>
-            </motion.div>
-            {/* {roleTab === 'user' && (
-              <motion.button
-                initial={{ opacity: 0, x: 16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4 }}
-                whileTap={{ scale: 0.96 }}
-                type="button"
-                onClick={() => navigate(ROUTES.EXPERTS)}
-                className="self-start sm:self-auto flex items-center gap-2 bg-white text-violet-700 text-sm font-semibold px-4 py-2 rounded-xl hover:bg-violet-50 transition-colors shadow-sm"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-                New Booking
-              </motion.button>
-            )} */}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mb-1"
+          >
+            <h1 className="text-2xl font-bold text-white tracking-tight">
+              {roleTab === 'consultant' ? 'Client Bookings' : 'Your Bookings'}
+            </h1>
+            <p className="text-sm text-indigo-200 mt-0.5">
+              {roleTab === 'consultant'
+                ? 'Manage your client appointments'
+                : 'View and manage your consultations'}
+            </p>
+          </motion.div>
         </div>
 
-        {/* Tab switcher */}
+        {/* Tab switchers — reusable BookingsSegmentedToggle; responsive grid when consultant */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-5">
-          <div className="flex bg-white/15 rounded-xl p-1.5 gap-1.5 w-full max-w-md mx-auto">
-            {['Upcoming', 'Past'].map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => { setTab(t); setFilter('All'); }}
-                className={`relative flex-1 min-h-[2.75rem] rounded-xl px-4 sm:px-6 py-2.5 text-sm font-semibold transition-all duration-200 ${
-                  tab === t ? 'text-violet-700' : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                {tab === t && (
-                  <motion.div
-                    layoutId="tab-bg"
-                    className="absolute inset-0 bg-white rounded-xl shadow-sm"
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                <span className="relative z-10 block leading-tight">{t}</span>
-              </button>
-            ))}
-          </div>
+          {showBookingsRoleSwitcher ? (
+            <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-4 xl:gap-6">
+              <div className="min-w-0 flex justify-center">
+                <BookingsSegmentedToggle
+                  aria-label="Upcoming or past appointments"
+                  layoutId="tab-bg"
+                  value={tab}
+                  onChange={(next) => {
+                    setTab(next);
+                    setFilter('All');
+                  }}
+                  className="w-full max-w-md"
+                  options={[
+                    { value: 'Upcoming', label: 'Upcoming' },
+                    { value: 'Past', label: 'Past' },
+                  ]}
+                />
+              </div>
+              <div className="min-w-0 flex w-full justify-center lg:max-w-none lg:justify-end">
+                <BookingsSegmentedToggle
+                  aria-label="Booking role"
+                  layoutId="bookings-role-pill"
+                  value={roleTab}
+                  onChange={(next) => {
+                    setRoleTab(next);
+                    setTab('Upcoming');
+                    setFilter('All');
+                  }}
+                  className="w-full max-w-md lg:w-[min(100%,26rem)] lg:shrink-0 xl:w-[min(100%,30rem)]"
+                  options={[
+                    { value: 'consultant', label: 'Consultant Bookings' },
+                    { value: 'user', label: 'Client Bookings' },
+                  ]}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="mx-auto w-full max-w-md">
+              <BookingsSegmentedToggle
+                aria-label="Upcoming or past appointments"
+                layoutId="tab-bg"
+                value={tab}
+                onChange={(next) => {
+                  setTab(next);
+                  setFilter('All');
+                }}
+                options={[
+                  { value: 'Upcoming', label: 'Upcoming' },
+                  { value: 'Past', label: 'Past' },
+                ]}
+              />
+            </div>
+          )}
         </div>
       </div>
 
