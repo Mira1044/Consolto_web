@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { BRAND_HIGHLIGHT_GRADIENT_CLASSES } from '@/shared/constants/brand';
 import { Star } from 'lucide-react';
 
 export const Testimonials = () => {
@@ -44,9 +45,7 @@ export const Testimonials = () => {
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             What Our{' '}
-            <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-              Users Say
-            </span>
+            <span className={BRAND_HIGHLIGHT_GRADIENT_CLASSES}>Users Say</span>
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
             Join thousands of satisfied users who trust Consolto for their consultation needs

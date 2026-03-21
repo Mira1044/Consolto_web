@@ -2,11 +2,12 @@ import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 import {
   AlertTriangle,
+  Banknote,
   CalendarDays,
+  CheckCircle,
   Clock,
   FileText,
   MessageSquare,
-  Phone,
   Star,
   Ticket,
   User,
@@ -26,9 +27,8 @@ import {
 /**
  * UpcomingAppointmentCard
  *
- * Web equivalent of `consolto_app/components/EnhancedBookingCard.jsx` (upcoming path).
- * It computes the same window availability for Chat/Video and shows the same
- * Reschedule/Cancel buttons when allowed.
+ * Web equivalent of `consolto_app/components/EnhancedBookingCard.jsx`.
+ * Same availability rules, status labels, and action gating as the mobile card.
  */
 export const UpcomingAppointmentCard = ({
   booking,
@@ -37,11 +37,13 @@ export const UpcomingAppointmentCard = ({
   actionLoading = false, // join chat/video loader
   rescheduleLoading = false,
   cancelLoading = false,
+  completeLoading = false,
   invoiceLoading = false,
   onJoinChat,
   onJoinCall,
   onRescheduleBooking,
   onCancelBooking,
+  onCompleteBooking,
   onDownloadInvoice,
   onViewSummary,
 }) => {
@@ -62,12 +64,15 @@ export const UpcomingAppointmentCard = ({
     videoAvailability,
     canCancel,
     canReschedule,
+    canComplete,
   } = useMemo(() => {
     const now = new Date();
 
     const status = String(raw?.appointment_status || '').toUpperCase();
+    
     const statusColor = getStatusColor(status);
-    const statusLabel = String(status || '').replaceAll('_', ' ') || '—';
+    // Same as app: `booking.appointment_status.replace('_', ' ')` (first underscore only)
+    const statusLabel = String(raw?.appointment_status || '').replace('_', ' ') || '—';
     const amount = typeof raw?.amount === 'number' ? raw.amount : Number(raw?.amount || 0);
     const paymentStatus = raw?.payment_status;
 
@@ -96,13 +101,19 @@ export const UpcomingAppointmentCard = ({
     const specialization =
       userRole === 'user'
         ? (() => {
-            const spec = raw?.consultant?.specialization;
+            // App uses `booking.consultant_id` (populated object) for specialization
+            const consultantObj =
+              raw?.consultant_id && typeof raw.consultant_id === 'object' ? raw.consultant_id : raw?.consultant;
+            const spec = consultantObj?.specialization;
             if (Array.isArray(spec) && spec.length) return spec.join(', ');
             return 'Specialist';
           })()
         : null;
 
     const isUpcomingByTime = isAppointmentUpcoming(raw, now);
+
+    const canComplete =
+      userRole === 'consultant' && status === 'IN_PROGRESS' && !isUpcomingByTime;
     const chatAvailability = getChatAvailability(raw, now);
     const videoAvailability = getVideoAvailability(raw, now);
 
@@ -129,6 +140,7 @@ export const UpcomingAppointmentCard = ({
       videoAvailability: videoAvailability,
       canCancel: canCancel,
       canReschedule: canReschedule,
+      canComplete: canComplete,
       amount: amount,
       paymentStatus: paymentStatus,
       userJoined: userJoined,
@@ -150,6 +162,7 @@ export const UpcomingAppointmentCard = ({
   const canShowReschedule = canReschedule && !chatAvailability.available && !videoAvailability.available;
   const canShowCancel = canCancel && !chatAvailability.available && !videoAvailability.available;
 
+  /** App: only `CONFIRMED` shows chat/video window hints (see EnhancedBookingCard). */
   const showAvailabilityBanner =
     raw?.appointment_status === 'CONFIRMED' &&
     ((!chatAvailability.available && chatAvailability.reason) || (!videoAvailability.available && videoAvailability.reason));
@@ -168,7 +181,7 @@ export const UpcomingAppointmentCard = ({
 
   const shouldShowInvoice =
     userRole === 'user' &&
-    (String(paymentStatus || '').toUpperCase() === 'PAID' ||
+    (String(paymentStatus || '').toLowerCase() === 'paid' ||
       ['COMPLETED', 'IN_PROGRESS', 'CONFIRMED', 'CANCELLED'].includes(String(raw?.appointment_status || '').toUpperCase()));
 
   return (
@@ -186,6 +199,15 @@ export const UpcomingAppointmentCard = ({
         borderLeftStyle: 'solid',
       }}
     >
+      {/* 1) Missed appointment — top of card (same order as app) */}
+      <div className={`mb-3 min-h-[40px] ${missedAppointment ? '' : 'opacity-0 pointer-events-none'}`}>
+        <div className="p-2 bg-red-100 rounded-lg flex items-center justify-center gap-2">
+          <AlertTriangle size={16} color="#EF4444" />
+          <span className="text-red-600 text-sm font-semibold text-center">You have missed this appointment!</span>
+        </div>
+      </div>
+
+      {/* 2) Header: name, role/specialization, status */}
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0 pr-3">
           <div className="text-base font-semibold text-gray-800 break-words">{displayName}</div>
@@ -193,24 +215,19 @@ export const UpcomingAppointmentCard = ({
         </div>
 
         <div
-          className="px-2.5 py-1.5 rounded-xl flex items-center justify-center min-w-20"
+          className="shrink-0 px-3 py-2 rounded-xl flex items-center justify-center min-w-[5.5rem] max-w-[11rem]"
           style={{ backgroundColor: `${statusColor}20` }}
         >
-          <span className="text-xs font-semibold text-center" style={{ color: statusColor }}>
+          <span
+            className="text-[11px] sm:text-xs font-semibold text-center leading-snug break-words"
+            style={{ color: statusColor }}
+          >
             {statusLabel}
           </span>
         </div>
       </div>
 
-      {/* Missed appointment banner (Past only) */}
-      <div className={`mb-3 min-h-[40px] ${missedAppointment ? '' : 'opacity-0'}`}>
-        <div className="p-2 bg-red-100 rounded-lg flex items-center justify-center gap-2">
-          <AlertTriangle size={16} color="#EF4444" />
-          <span className="text-red-600 text-sm font-semibold text-center">You have missed this appointment!</span>
-        </div>
-      </div>
-
-      {/* Booking ID */}
+      {/* 3) Booking ID */}
       <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
         <Ticket size={15} color="#9CA3AF" />
         <span>
@@ -218,13 +235,13 @@ export const UpcomingAppointmentCard = ({
         </span>
       </div>
 
-      {/* Date */}
+      {/* 4) Date */}
       <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
         <CalendarDays size={15} color="#9CA3AF" />
         <span className="font-medium">{formatAppointmentDate(raw?.appointment_booked_date)}</span>
       </div>
 
-      {/* Time + duration */}
+      {/* 5) Time + duration */}
       <div className="flex items-center gap-2 text-sm text-gray-700 mb-2 flex-wrap">
         <Clock size={15} color="#9CA3AF" />
         <span className="font-medium">{formatAppointmentTime(raw?.appointment_start_time, raw?.appointment_end_time)}</span>
@@ -235,8 +252,7 @@ export const UpcomingAppointmentCard = ({
         )}
       </div>
 
-      {/* Reason */}
-      {/* Keep height consistent across cards (even when reason is missing) */}
+      {/* 6) Reason — label on one line, value next (app layout) */}
       <div className="mb-2 min-h-[46px]">
         {reasonToVisit ? (
           <div>
@@ -251,8 +267,7 @@ export const UpcomingAppointmentCard = ({
         )}
       </div>
 
-      {/* Message (web-only; app does not show it) */}
-      {/* Keep height consistent across cards (even when message is missing) */}
+      {/* Web-only: Message (after Reason, before joined lines — keeps app sequence for shared rows) */}
       <div className="mb-2 min-h-[46px]">
         {messageText ? (
           <div>
@@ -267,43 +282,45 @@ export const UpcomingAppointmentCard = ({
         )}
       </div>
 
-      {/* Price */}
-      {/* Keep height consistent across cards (even when price is missing) */}
-      <div className={`mb-3 min-h-[28px] ${amount > 0 ? '' : 'opacity-0'}`}>
-        <div className="flex items-center gap-2">
-          <Phone size={15} color="#9CA3AF" className="opacity-80" />
-          <span className="text-gray-800 text-sm font-medium">₹{amount || 0}</span>
-          {paymentStatus && <span className="text-gray-500 text-xs">({paymentStatus})</span>}
+      {/* 7–8) User / Consultant joined (Past tab; placeholders keep grid aligned on Upcoming) */}
+      <div className={`mb-2 min-h-[38px] ${isPast ? '' : 'opacity-0 pointer-events-none'}`}>
+        <div className="flex items-center gap-2 text-sm text-gray-700">
+          <User size={15} color="#9CA3AF" />
+          <span>User Joined: {userJoined ? 'Yes' : 'No'}</span>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-gray-700 mt-1">
+          <User size={15} color="#9CA3AF" />
+          <span>Consultant Joined: {consultantJoined ? 'Yes' : 'No'}</span>
         </div>
       </div>
 
-      {/* Availability banner */}
-      {/* Keep height consistent across cards (even when banner is missing) */}
+      {/* 9) Payment — banknote icon like app */}
+      <div className={`mb-3 min-h-[28px] ${amount > 0 || paymentStatus ? '' : 'opacity-0 pointer-events-none'}`}>
+        <div className="flex items-center gap-2 text-sm text-gray-700">
+          <Banknote size={15} color="#9CA3AF" />
+          <span className="text-gray-800 font-medium">
+            ₹{amount || 0}
+            {paymentStatus ? <span className="text-gray-500 font-normal"> ({paymentStatus})</span> : null}
+          </span>
+        </div>
+      </div>
+
+      {/* 10) Chat/video window hints — same as app (CONFIRMED only, upcoming tab) */}
       <div
-        className={`mb-3 p-2 bg-blue-50 rounded-lg min-h-[44px] ${showAvailabilityBanner ? '' : 'opacity-0'}`}
+        className={`mb-3 p-2 bg-blue-50 rounded-lg min-h-[44px] ${
+          !isPast && showAvailabilityBanner ? '' : 'opacity-0 pointer-events-none'
+        }`}
       >
-        {showAvailabilityBanner && (
+        {!isPast && showAvailabilityBanner && (
           <>
-            {!chatAvailability.available && (
+            {!chatAvailability.available && chatAvailability.reason && (
               <div className="text-blue-700 text-xs">💬 {chatAvailability.reason}</div>
             )}
-            {!videoAvailability.available && (
+            {!videoAvailability.available && videoAvailability.reason && (
               <div className="text-blue-700 text-xs">📹 {videoAvailability.reason}</div>
             )}
           </>
         )}
-      </div>
-
-      {/* Joined info (Past only; keeps "yellow area" content linear across cards) */}
-      <div className={`mb-1 min-h-[38px] ${isPast ? '' : 'opacity-0'}`}>
-        <div className="flex items-center gap-2 text-xs text-gray-600">
-          <User size={14} color="#9CA3AF" />
-          <span>User Joined: {userJoined ? 'Yes' : 'No'}</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-gray-600 mt-1">
-          <User size={14} color="#9CA3AF" />
-          <span>Consultant Joined: {consultantJoined ? 'Yes' : 'No'}</span>
-        </div>
       </div>
 
       {/* Actions */}
@@ -364,6 +381,21 @@ export const UpcomingAppointmentCard = ({
           >
             <span className="inline-flex items-center gap-2">
               <span className="font-semibold">Cancel</span>
+            </span>
+          </Button>
+        )}
+
+        {canComplete && (
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={completeLoading}
+            onClick={() => onCompleteBooking?.(booking)}
+            className="h-9 text-xs rounded-xl !transition-none !px-4 !bg-green-600 !text-white !hover:bg-green-700"
+          >
+            <span className="inline-flex items-center gap-2">
+              <CheckCircle size={16} color="#fff" />
+              <span className="font-semibold">Complete</span>
             </span>
           </Button>
         )}

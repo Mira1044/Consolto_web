@@ -133,4 +133,12 @@ export const bookingService = {
 
     return apiRequest.put(endpoint, body);
   },
+
+  /**
+   * Mark appointment complete (consultant).
+   * Mirrors consolto_app `useBookingActions` → PATCH `/appointment/mark-complete`
+   */
+  async markAppointmentComplete({ appointmentId }) {
+    return apiRequest.patch('/appointment/mark-complete', { appointmentId });
+  },
 };

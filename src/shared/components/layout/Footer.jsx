@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { BrandLogo } from '@/shared/components/BrandLogo';
+import { ROUTES } from '@/routes/config';
 
 export const Footer = () => {
   const quickLinks = ['Features', 'How It Works', 'Pricing', 'About Us', 'Blog', 'Careers'];
@@ -20,9 +22,9 @@ export const Footer = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-blue-300 bg-clip-text text-transparent mb-4">
-              Consolto
-            </h3>
+            <div className="mb-4">
+              <BrandLogo variant="onDark" to={ROUTES.HOME} />
+            </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               Connect with verified experts anytime, anywhere. Professional consultation made simple
               and accessible.

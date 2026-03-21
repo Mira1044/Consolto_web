@@ -1,4 +1,6 @@
 import { Clock } from 'lucide-react';
+import { BrandLogo } from '@/shared/components/BrandLogo';
+import { ROUTES } from '@/routes/config';
 
 /**
  * SessionExpired
@@ -9,6 +11,9 @@ import { Clock } from 'lucide-react';
 export const SessionExpired = ({ timeStatus, onConfirm }) => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-10 text-center">
+      <div className="mb-8">
+        <BrandLogo variant="session" to={ROUTES.BOOKINGS} showText={false} imgClassName="opacity-95" />
+      </div>
       <Clock size={80} className="text-gray-500" />
       <h2 className="mt-5 mb-2 text-2xl font-semibold text-white">Session Ended</h2>
       <p className="mb-8 text-base leading-relaxed text-gray-300">{timeStatus}</p>

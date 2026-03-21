@@ -1,6 +1,12 @@
 // Shared constants
 // Export app-wide constants here
 
+export {
+  CONSOLTO_WORDMARK_PRIMARY_CLASSES,
+  BRAND_HIGHLIGHT_GRADIENT_CLASSES,
+  CONSOLTO_WORDMARK_ON_DARK_CLASSES,
+} from './brand';
+
 export const EXPERT_CATEGORIES = [
   { id: 'health', label: 'Health & Wellness' },
   { id: 'career', label: 'Career & Education' },

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Play } from 'lucide-react';
+import { BRAND_HIGHLIGHT_GRADIENT_CLASSES } from '@/shared/constants/brand';
 
 export const Hero = () => {
   const floatingCards = [
@@ -13,17 +14,6 @@ export const Hero = () => {
       id="home"
       className="relative flex h-full items-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-blue-50 py-8 sm:py-10 md:py-8 lg:py-12"
     >
-      {/* Top-left Consolto logo on hero */}
-      <div className="z-20 absolute left-4 sm:left-6 top-2 sm:top-3 flex items-center gap-2">
-        <img
-          src="/assets/Consolto-002.png"
-          alt="Consolto"
-          className="h-10 sm:h-12 w-auto max-w-[160px] sm:max-w-[176px] flex-shrink-0 select-none object-contain"
-          draggable="false"
-        />
-        <span className="text-base sm:text-lg font-semibold tracking-tight text-blue-600">consolto</span>
-      </div>
-
       <div className="absolute inset-0 overflow-hidden">
         <div className="w-72 h-72 absolute left-10 top-20 animate-blob rounded-full bg-blue-200 opacity-30 mix-blend-multiply blur-xl filter"></div>
         <div className="w-72 h-72 animation-delay-2000 absolute right-10 top-40 animate-blob rounded-full bg-blue-300 opacity-30 mix-blend-multiply blur-xl filter"></div>
@@ -44,9 +34,7 @@ export const Hero = () => {
               className="mb-5 text-4xl sm:text-5xl font-bold leading-tight text-gray-900 md:text-5xl lg:text-7xl"
             >
               Connect with{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
-                Experts
-              </span>{' '}
+              <span className={BRAND_HIGHLIGHT_GRADIENT_CLASSES}>Experts</span>{' '}
               Anytime, Anywhere
             </motion.h1>
 
