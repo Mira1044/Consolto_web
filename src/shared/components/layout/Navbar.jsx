@@ -1,10 +1,11 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, User, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/routes/config';
 import { Button } from '@/shared/components/ui';
+import { createPortal } from 'react-dom';
 
 const baseNavLinks = [
   { label: 'Home', path: ROUTES.HOME, hash: '#home' },
@@ -22,6 +23,8 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const profileDropdownRef = useRef(null);
+  const [profileDropdownPos, setProfileDropdownPos] = useState({ top: 0, left: 0 });
 
   const handleLogin = () => {
     setIsMobileMenuOpen(false);
@@ -44,7 +47,10 @@ export const Navbar = () => {
   useEffect(() => {
     const onDown = (e) => {
       if (!profileRef.current) return;
-      if (!profileRef.current.contains(e.target)) setIsProfileOpen(false);
+      const dropdownEl = profileDropdownRef.current;
+      const clickedInsideTrigger = profileRef.current.contains(e.target);
+      const clickedInsideDropdown = dropdownEl ? dropdownEl.contains(e.target) : false;
+      if (!clickedInsideTrigger && !clickedInsideDropdown) setIsProfileOpen(false);
     };
     const onEsc = (e) => {
       if (e.key === 'Escape') setIsProfileOpen(false);
@@ -61,6 +67,49 @@ export const Navbar = () => {
     if ('hash' in item) return location.pathname === ROUTES.HOME ? item.hash : `${item.path}${item.hash}`;
     return item.path;
   };
+
+  useLayoutEffect(() => {
+    if (!isProfileOpen) return;
+    if (!profileRef.current) return;
+    if (!profileDropdownRef.current) return;
+    if (typeof window === 'undefined') return;
+
+    const triggerRect = profileRef.current.getBoundingClientRect();
+
+    // Measure dropdown after it renders
+    const dropdownEl = profileDropdownRef.current;
+    const dropdownHeight = dropdownEl.offsetHeight || 180;
+    const dropdownWidth = dropdownEl.offsetWidth || 256;
+
+    const spaceBelow = window.innerHeight - triggerRect.bottom;
+    const spaceAbove = triggerRect.top;
+
+    const openUp = spaceAbove > spaceBelow;
+
+    let top = openUp ? triggerRect.top - dropdownHeight : triggerRect.bottom;
+    let left = triggerRect.right - dropdownWidth;
+
+    const margin = 8;
+    top = Math.max(margin, Math.min(top, window.innerHeight - dropdownHeight - margin));
+    left = Math.max(margin, Math.min(left, window.innerWidth - dropdownWidth - margin));
+
+    setProfileDropdownPos({ top, left });
+  }, [isProfileOpen]);
+
+  useEffect(() => {
+    if (!isProfileOpen) return;
+    const onUpdate = () => {
+      // Re-run measurement logic by toggling state update via layout effect dependency.
+      // This keeps it simple without a custom throttle.
+      setProfileDropdownPos((p) => ({ ...p }));
+    };
+    window.addEventListener('resize', onUpdate);
+    window.addEventListener('scroll', onUpdate, true);
+    return () => {
+      window.removeEventListener('resize', onUpdate);
+      window.removeEventListener('scroll', onUpdate, true);
+    };
+  }, [isProfileOpen]);
 
   const navLinks = isLoggedIn
     ? [baseNavLinks[0], { label: 'Bookings', path: ROUTES.BOOKINGS }, ...baseNavLinks.slice(1)]
@@ -136,7 +185,7 @@ export const Navbar = () => {
                   Log out
                 </MotionButton>
 
-                <div ref={profileRef} className="relative">
+                <div ref={profileRef} className="relative z-[10000]">
                   <motion.button
                     type="button"
                     whileHover={{ scale: 1.05 }}
@@ -155,32 +204,38 @@ export const Navbar = () => {
                     />
                   </motion.button>
 
-                  {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-64 rounded-xl border border-gray-100 bg-white shadow-lg overflow-hidden">
-                      <div className="px-4 py-3">
-                        <p className="text-sm font-semibold text-gray-900 truncate">
-                          {user?.firstName || user?.name || 'User'}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">{user?.email || '—'}</p>
-                      </div>
-                      <div className="border-t border-gray-100 p-2">
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          fullWidth
-                          className="rounded-lg justify-start"
-                          onClick={() => {
-                            setIsProfileOpen(false);
-                            setIsMobileMenuOpen(false);
-                            logout();
-                          }}
-                        >
-                          Log out
-                        </Button>
-                      </div>
-                    </div>
-                  )}
+                  {isProfileOpen &&
+                    createPortal(
+                      <div
+                        ref={profileDropdownRef}
+                        className="fixed w-64 rounded-xl border border-gray-100 bg-white shadow-lg max-h-[70vh] overflow-auto z-[10001]"
+                        style={{ top: profileDropdownPos.top, left: profileDropdownPos.left }}
+                      >
+                        <div className="px-4 py-3">
+                          <p className="text-sm font-semibold text-gray-900 truncate">
+                            {user?.firstName || user?.name || 'User'}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">{user?.email || '—'}</p>
+                        </div>
+                        <div className="border-t border-gray-100 p-2">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            fullWidth
+                            className="rounded-lg justify-start"
+                            onClick={() => {
+                              setIsProfileOpen(false);
+                              setIsMobileMenuOpen(false);
+                              logout();
+                            }}
+                          >
+                            Log out
+                          </Button>
+                        </div>
+                      </div>,
+                      document.body,
+                    )}
                 </div>
               </>
             ) : (

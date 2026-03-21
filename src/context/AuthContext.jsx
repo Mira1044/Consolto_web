@@ -8,7 +8,11 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem(AUTH_KEY);
-      return stored ? JSON.parse(stored) : null;
+      if (!stored) return null;
+      const parsed = JSON.parse(stored);
+      // Only treat as authenticated when we have a real token.
+      // This prevents old/mock saved users (no token) from skipping login.
+      return parsed?.token ? parsed : null;
     } catch {
       return null;
     }
@@ -55,7 +59,7 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  const isLoggedIn = !!user;
+  const isLoggedIn = !!user?.token;
   const token = user?.token ?? null;
 
   return (

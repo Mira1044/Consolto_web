@@ -66,12 +66,12 @@ export const LoginPage = () => {
 
       <div className="flex min-h-screen w-full flex-col lg:flex-row">
         {/* Top on tablet, left on desktop */}
-        <div className="hidden md:flex w-full md:h-[46vh] lg:h-auto lg:basis-[65%]">
+        <div className="hidden sm:flex w-full sm:flex-1 lg:h-auto lg:basis-[65%]">
           <Hero />
         </div>
 
         {/* Right: auth panel */}
-        <div className="flex w-full lg:basis-[35%] items-start md:items-center justify-center px-4 sm:px-6 lg:px-12 py-10 sm:py-12 lg:py-0">
+        <div className="flex w-full lg:basis-[35%] items-start sm:flex-1 sm:items-center sm:justify-end justify-center px-4 sm:px-6 lg:px-12 py-10 sm:py-10 lg:py-0">
           <div className="w-full max-w-md">
             {renderRight()}
           </div>
