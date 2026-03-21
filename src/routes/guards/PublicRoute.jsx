@@ -1,20 +1,18 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { ROUTES } from '@/routes/config';
 
 /**
- * PublicRoute - Redirects authenticated users away from public-only pages (like login/signup)
- * @param {Object} props
- * @param {React.ReactNode} props.children - Child components to render
- * @param {string} props.redirectTo - Path to redirect to if user is authenticated (default: '/experts')
+ * PublicRoute - Redirects authenticated users away from guest-only pages (login/signup on `/`, etc.)
+ *
+ * Do not restore `location.state.from` here: it sent users to `/bookings` after login and
+ * conflicted with post-login navigation. Always use `redirectTo` (default: experts).
  */
-export const PublicRoute = ({ children, redirectTo = '/experts' }) => {
+export const PublicRoute = ({ children, redirectTo = ROUTES.EXPERTS }) => {
   const { isLoggedIn } = useAuth();
-  const location = useLocation();
 
   if (isLoggedIn) {
-    // Redirect authenticated users to the specified route or the page they were trying to access
-    const from = location.state?.from?.pathname || redirectTo;
-    return <Navigate to={from} replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   return <>{children}</>;

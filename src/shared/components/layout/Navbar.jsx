@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { ROUTES } from '@/routes/config';
 import { Button } from '@/shared/components/ui';
+import { BrandLogo } from '@/shared/components/BrandLogo';
 import { createPortal } from 'react-dom';
 
 const baseNavLinks = [
@@ -127,14 +128,9 @@ export const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20 gap-3">
-          <Link to="/" className="flex items-center gap-2.5">
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent"
-            >
-              Consolto
-            </motion.span>
-          </Link>
+          <motion.div whileHover={{ scale: 1.02 }} className="origin-left">
+            <BrandLogo variant="primary" to={ROUTES.HOME} />
+          </motion.div>
 
           <div className="hidden md:flex items-center gap-6 lg:gap-8">
             {navLinks.map((link) => (

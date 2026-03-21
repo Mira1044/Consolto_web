@@ -10,6 +10,7 @@ import { ChatPanel } from './ChatPanel';
 import { SessionExpired } from './SessionExpired';
 import { EndSessionModal } from './EndSessionModal';
 import { ROUTES } from '@/routes/config';
+import { BrandLogo } from '@/shared/components/BrandLogo';
 
 /**
  * SessionLayout
@@ -114,9 +115,12 @@ export const SessionLayout = () => {
   // Loading state
   if (session.loading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-4">
+        <div className="mb-8">
+          <BrandLogo variant="session" to={ROUTES.BOOKINGS} showText={false} imgClassName="opacity-95" />
+        </div>
         <Loader2 size={40} className="animate-spin text-blue-500" />
-        <p className="mt-3 text-base text-white">
+        <p className="mt-3 text-center text-base text-white">
           {initialMode === 'chat' ? 'Connecting to chat...' : 'Connecting to video call...'}
         </p>
       </div>
@@ -127,6 +131,9 @@ export const SessionLayout = () => {
   if (session.error) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-6 text-center">
+        <div className="mb-6">
+          <BrandLogo variant="session" to={ROUTES.BOOKINGS} showText={false} imgClassName="opacity-95" />
+        </div>
         <AlertTriangle size={48} className="text-red-400" />
         <h2 className="mt-4 text-xl font-semibold text-white">Connection Error</h2>
         <p className="mt-2 text-gray-400">{session.error}</p>

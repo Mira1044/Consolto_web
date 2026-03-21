@@ -137,7 +137,7 @@ export const ExpertsLayout = ({
                   ))}
                 </div>
 
-                <motion.div
+                {/* <motion.div
                   className="hidden md:block fixed right-6 top-[90%] -translate-y-1/2 z-50"
                 >
                   <Button
@@ -153,7 +153,7 @@ export const ExpertsLayout = ({
                   >
                     <Plus size={20} />
                   </Button>
-                </motion.div>
+                </motion.div> */}
               </div>
             </>
           )}

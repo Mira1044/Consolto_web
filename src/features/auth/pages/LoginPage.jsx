@@ -16,8 +16,11 @@ export const LoginPage = () => {
   const [mode, setMode] = useState('login'); // 'login' | 'signup' | 'forgot'
   const navigate = useNavigate();
 
+  // `/` (ROUTES.HOME) is this same login screen (guest-only). Navigating there after login
+  // leaves you on a route where PublicRoute hides the form — looks like "home without login".
+  // Send users to the app entry instead.
   const handleSuccess = useCallback(() => {
-    navigate(ROUTES.HOME, { replace: true });
+    navigate(ROUTES.EXPERTS, { replace: true });
   }, [navigate]);
 
   const login = useLogin({ onSuccess: handleSuccess });
@@ -52,18 +55,6 @@ export const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative">
-      {/* Top-left Consolto logo + text */}
-      <div className="absolute left-4 sm:left-6 top-4 z-10 flex items-center gap-3">
-        <div className="h-9 w-9 rounded-full border-2 border-blue-500 bg-white flex items-center justify-center shadow-sm">
-          <div className="h-5 w-5 rounded-full border border-blue-500 flex items-center justify-center">
-            <span className="text-[10px] text-blue-500 font-semibold">...</span>
-          </div>
-        </div>
-        <span className="text-xl font-semibold tracking-tight text-blue-600">
-          consolto
-        </span>
-      </div>
-
       <div className="flex min-h-screen w-full flex-col lg:flex-row">
         {/* Top on tablet, left on desktop */}
         <div className="hidden sm:flex w-full sm:flex-1 lg:h-auto lg:basis-[65%]">
