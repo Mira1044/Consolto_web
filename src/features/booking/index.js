@@ -1,7 +1,5 @@
 // Booking feature barrel export
 export { useBooking } from './hooks/useBooking';
-export { useBookingsAppointments } from './hooks/useBookingsAppointments';
-export { useConsultantSelf } from './hooks/useConsultantSelf';
 export { BookingLayout } from './components/BookingLayout';
 export { BookingPage } from './pages/BookingPage';
 export { BookingsPage } from './pages/BookingsPage';
