@@ -248,24 +248,29 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
       const sessionResp = await streamService.checkActiveSession().catch(() => null);
 
       if (sessionResp?.hasActiveSession) {
-        if (sessionResp.appointmentId === appointmentId) {
+        if (String(sessionResp.appointmentId) === String(appointmentId)) {
           await initializeServices();
           return;
         }
-        // Different session active — force end it
-        await streamService.forceEndSession().catch(() => {});
+        /**
+         * Stale IN_PROGRESS rows are common on web when users close the tab or refresh
+         * without going through “End call” (no `beforeunload` end-call today). The backend
+         * still reports `hasActiveSession` for the *previous* Mongo appointment id, while
+         * this join may be a different booking (e.g. dev test ids) — so ids never match
+         * and a native `confirm()` blocked every join.
+         *
+         * Mobile can prompt; here we clear the server-side session and continue, same as
+         * tapping “End & join” on the app.
+         */
+        await streamService.forceEndSession().catch((err) => {
+          console.warn('[useStreamSession] forceEndSession before join:', err);
+        });
         clearActiveSession();
       }
 
-      // Fallback: check local storage
       const local = getActiveSession();
-      if (local) {
-        const ageMin = (Date.now() - local.timestamp) / 60_000;
-        if (ageMin > 60 || local.appointmentId === appointmentId) {
-          clearActiveSession();
-        } else {
-          clearActiveSession();
-        }
+      if (local && String(local.appointmentId) !== String(appointmentId)) {
+        clearActiveSession();
       }
 
       await initializeServices();
@@ -292,14 +297,26 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
   // Initialize on mount
   useEffect(() => {
     isMountedRef.current = true;
-    if (appointmentId) checkAndInit();
+    if (!appointmentId || !otherUserId) {
+      setLoading(false);
+      setError(
+        !appointmentId
+          ? 'Missing appointment information.'
+          : 'Missing participant — open this session from Bookings.',
+      );
+      return () => {
+        isMountedRef.current = false;
+      };
+    }
+
+    checkAndInit();
 
     return () => {
       isMountedRef.current = false;
       cleanup(true).catch(() => {});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appointmentId]);
+  }, [appointmentId, otherUserId]);
 
   return {
     streamClient,

@@ -144,10 +144,16 @@ export const routeConfig = [
 ];
 
 /**
- * Get route config by path
+ * Get route config by path (supports `:param` segments, e.g. `/session/:appointmentId`).
  */
 export const getRouteByPath = (path) => {
-  return routeConfig.find((route) => route.path === path);
+  const exact = routeConfig.find((route) => route.path === path);
+  if (exact) return exact;
+  return routeConfig.find((route) => {
+    if (!route.path.includes(':')) return false;
+    const pattern = `^${route.path.replace(/:[^/]+/g, '[^/]+')}$`;
+    return new RegExp(pattern).test(path);
+  });
 };
 
 /**

@@ -15,7 +15,8 @@ export const ROUTES = {
   EXPERTS: '/experts',
   BOOKING: '/booking',
   BOOKINGS: '/bookings',
-  SESSION: '/session',
+  /** Dynamic segment must match `react-router` path in routeConfig */
+  SESSION: '/session/:appointmentId',
 
   // Fallback
   NOT_FOUND: '/404',

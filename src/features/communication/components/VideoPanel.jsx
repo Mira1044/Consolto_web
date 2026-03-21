@@ -27,8 +27,11 @@ export const VideoPanel = ({
 }) => {
   if (!streamClient || !call) {
     return (
-      <div className="flex flex-1 items-center justify-center bg-gray-950">
-        <p className="text-gray-400">Initializing video...</p>
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center bg-gray-950 px-4">
+        <p className="text-center text-sm text-gray-400">Starting camera and microphone…</p>
+        <p className="mt-2 max-w-xs text-center text-xs text-gray-600">
+          If nothing happens, check the permission icon in your browser’s address bar.
+        </p>
       </div>
     );
   }
@@ -36,10 +39,10 @@ export const VideoPanel = ({
   return (
     <StreamVideo client={streamClient}>
       <StreamCall call={call}>
-        <StreamTheme>
-          <div className="relative flex flex-1 flex-col bg-gray-950">
+        <StreamTheme className="flex h-full min-h-0 min-w-0 w-full flex-1 flex-col">
+          <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-gray-950">
             <ScreenShareOverlay />
-            <div className="flex-1">
+            <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
               <SpeakerLayout participantsBarPosition="bottom" />
             </div>
             <CallControls

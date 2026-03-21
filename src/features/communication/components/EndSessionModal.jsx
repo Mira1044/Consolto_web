@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Check } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 
@@ -10,18 +10,42 @@ import { Button } from '@/shared/components/ui';
  */
 export const EndSessionModal = ({ currentMode, onCancel, onConfirm }) => {
   const [agreed, setAgreed] = useState(false);
+  const panelRef = useRef(null);
   const isChat = currentMode === 'chat';
   const label = isChat ? 'Chat Session' : 'Video Call';
 
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape') onCancel();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onCancel]);
+
+  useEffect(() => {
+    const el = panelRef.current?.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    el?.focus?.();
+  }, [isChat]);
+
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60" onClick={onCancel}>
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
+      role="presentation"
+      onClick={onCancel}
+    >
       {/* Chat: match consolto_app style (simple confirm dialog, no checkbox) */}
       {isChat ? (
         <div
-          className="w-[90%] max-w-[420px] rounded-xl border border-slate-200 bg-white p-6 text-center shadow-xl"
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="end-session-chat-title"
+          className="max-h-[85dvh] w-full max-w-[420px] overflow-y-auto rounded-xl border border-slate-200 bg-white p-6 text-center shadow-xl"
           onClick={(e) => e.stopPropagation()}
         >
-          <h3 className="mb-3 text-xl font-bold text-slate-900">End chat session?</h3>
+          <h3 id="end-session-chat-title" className="mb-3 text-xl font-bold text-slate-900">
+            End chat session?
+          </h3>
           <p className="mb-6 text-sm leading-relaxed text-slate-700">
             Are you sure you want to end the chat session?
           </p>
@@ -49,10 +73,16 @@ export const EndSessionModal = ({ currentMode, onCancel, onConfirm }) => {
         </div>
       ) : (
       <div
-        className="w-[90%] max-w-[400px] rounded-xl border border-gray-700 bg-gray-800 p-6 text-center shadow-xl"
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="end-session-video-title"
+        className="max-h-[85dvh] w-full max-w-[400px] overflow-y-auto rounded-xl border border-gray-700 bg-gray-800 p-6 text-center shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="mb-4 text-xl font-bold text-gray-100">End {label}?</h3>
+        <h3 id="end-session-video-title" className="mb-4 text-xl font-bold text-gray-100">
+          End {label}?
+        </h3>
         <p className="mb-6 text-base leading-relaxed text-gray-300">
           Are you sure you want to end the session? You will not be able to rejoin.
         </p>

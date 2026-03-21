@@ -9,6 +9,8 @@ import { useErrorHandler } from '@/shared/services/error';
  * All data flows through the service layer; filtering uses pure utility functions.
  */
 export const useExperts = () => {
+  const [experts, setExperts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState(null);
   const [showAll, setShowAll] = useState(false);

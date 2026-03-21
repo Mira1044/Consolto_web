@@ -1,10 +1,10 @@
-import { Mic, MicOff, Video, VideoOff, Monitor, MonitorOff, MessageSquare } from 'lucide-react';
-import { useCallStateHooks, useCall } from '@stream-io/video-react-sdk';
+import { Mic, MicOff, Video, VideoOff, MessageSquare } from 'lucide-react';
+import { useCallStateHooks } from '@stream-io/video-react-sdk';
 
 /**
  * CallControls
  *
- * Custom video-call control bar: mic, camera, screen share, chat toggle.
+ * Custom video-call control bar: mic, camera, chat toggle.
  * Mirrors CustomCallControls from consolto_app videoCall.jsx lines 281-374.
  *
  * Uses Stream Video React SDK hooks instead of the RN variants.
@@ -14,12 +14,10 @@ export const CallControls = ({
   unreadCount,
   currentMode,
 }) => {
-  const currentCall = useCall();
-  const { useMicrophoneState, useCameraState, useScreenShareState } = useCallStateHooks();
+  const { useMicrophoneState, useCameraState } = useCallStateHooks();
 
   const { isMute: micMuted, microphone } = useMicrophoneState();
   const { isMute: camMuted, camera } = useCameraState();
-  const { screenShare, isMute: screenShareOff } = useScreenShareState();
 
   const toggleMic = async () => {
     try {
@@ -39,54 +37,48 @@ export const CallControls = ({
     }
   };
 
-  const toggleScreenShare = async () => {
-    if (!currentCall) return;
-    try {
-      await screenShare.toggle();
-    } catch (err) {
-      console.error('Screen share error:', err);
-    }
-  };
-
-  const btnBase = 'flex h-12 w-12 items-center justify-center rounded-full transition-colors';
+  /** Grid + block SVG fixes optical centering of Lucide icons in circles */
+  const btnBase =
+    'inline-grid h-[3.25rem] w-[3.25rem] shrink-0 place-items-center rounded-full transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 sm:h-14 sm:w-14 [&_svg]:block [&_svg]:shrink-0';
 
   return (
-    <div className="flex items-center justify-center gap-3 bg-gray-950/80 py-3">
-      {/* Mic */}
+    <div className="mt-auto flex flex-shrink-0 flex-wrap items-center justify-center gap-3 border-t border-gray-800/90 bg-gray-950/95 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-gray-950/80 sm:gap-4 sm:px-6 sm:py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
       <button
+        type="button"
         onClick={toggleMic}
+        aria-pressed={!micMuted}
         className={`${btnBase} ${micMuted ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'}`}
-        title={micMuted ? 'Unmute' : 'Mute'}
+        title={micMuted ? 'Unmute microphone' : 'Mute microphone'}
       >
-        {micMuted ? <MicOff size={20} className="text-white" /> : <Mic size={20} className="text-white" />}
+        {micMuted ? (
+          <MicOff size={22} strokeWidth={2} className="text-white" aria-hidden />
+        ) : (
+          <Mic size={22} strokeWidth={2} className="text-white" aria-hidden />
+        )}
       </button>
 
-      {/* Camera */}
       <button
+        type="button"
         onClick={toggleCamera}
+        aria-pressed={!camMuted}
         className={`${btnBase} ${camMuted ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'}`}
-        title={camMuted ? 'Turn on camera' : 'Turn off camera'}
+        title={camMuted ? 'Turn camera on' : 'Turn camera off'}
       >
-        {camMuted ? <VideoOff size={20} className="text-white" /> : <Video size={20} className="text-white" />}
+        {camMuted ? (
+          <VideoOff size={22} strokeWidth={2} className="text-white" aria-hidden />
+        ) : (
+          <Video size={22} strokeWidth={2} className="text-white" aria-hidden />
+        )}
       </button>
 
-      {/* Screen Share */}
-      <button
-        onClick={toggleScreenShare}
-        className={`${btnBase} ${!screenShareOff ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-700 hover:bg-gray-600'}`}
-        title={!screenShareOff ? 'Stop sharing' : 'Share screen'}
-      >
-        {!screenShareOff ? <MonitorOff size={20} className="text-white" /> : <Monitor size={20} className="text-white" />}
-      </button>
-
-      {/* Chat toggle */}
-      <div className="relative">
+      <div className="relative inline-grid place-items-center">
         <button
+          type="button"
           onClick={onToggleChat}
-          className={`${btnBase} bg-blue-600 hover:bg-blue-700`}
-          title="Toggle chat"
+          className={`${btnBase} bg-violet-600 hover:bg-violet-500`}
+          title="Open or close chat"
         >
-          <MessageSquare size={20} className="text-white" />
+          <MessageSquare size={22} strokeWidth={2} className="text-white" aria-hidden />
         </button>
         {currentMode === 'video' && unreadCount > 0 && (
           <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white">

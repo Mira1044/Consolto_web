@@ -10,16 +10,17 @@ import { ROUTES } from '@/routes/config';
  */
 export const SessionExpired = ({ timeStatus, onConfirm }) => {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-950 px-10 text-center">
+    <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-gray-950 px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))] text-center sm:px-10">
       <div className="mb-8">
         <BrandLogo variant="session" to={ROUTES.BOOKINGS} showText={false} imgClassName="opacity-95" />
       </div>
-      <Clock size={80} className="text-gray-500" />
-      <h2 className="mt-5 mb-2 text-2xl font-semibold text-white">Session Ended</h2>
-      <p className="mb-8 text-base leading-relaxed text-gray-300">{timeStatus}</p>
+      <Clock className="h-16 w-16 text-gray-500 sm:h-20 sm:w-20" strokeWidth={1.25} aria-hidden />
+      <h2 className="mt-5 mb-2 text-xl font-semibold text-white sm:text-2xl">Session ended</h2>
+      <p className="mb-8 max-w-md text-sm leading-relaxed text-gray-300 sm:text-base">{timeStatus}</p>
       <button
+        type="button"
         onClick={onConfirm}
-        className="rounded-full bg-blue-600 px-8 py-3 text-base font-semibold text-white transition-colors hover:bg-blue-700"
+        className="min-h-12 min-w-[8rem] rounded-full bg-violet-600 px-8 py-3 text-base font-semibold text-white transition-colors hover:bg-violet-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-300"
       >
         OK
       </button>

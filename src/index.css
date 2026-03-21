@@ -202,3 +202,316 @@
     display: none;
   }
 }
+
+/* Session page: Stream Chat + layout tweaks for in-browser calls */
+.session-shell {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* True black — avoids navy (#030712) strip vs session bg */
+.session-shell .str-chat__message-list,
+.session-shell .str-chat__ul,
+.session-shell .str-chat__list,
+.session-shell .str-chat__message-list-scroll {
+  background-color: #000000 !important;
+}
+
+.session-shell #str-chat__channel {
+  background-color: #000000 !important;
+}
+
+.session-shell .str-chat {
+  --str-chat__background-color: #000000;
+  --str-chat__secondary-background-color: #0a0a0a;
+  --str-chat__message-list-background-color: #000000;
+}
+
+/* Own messages: neutral bubble (no Stream primary blue) */
+.session-shell .str-chat {
+  --str-chat__own-message-bubble-background-color: rgb(55 65 81);
+  --str-chat__own-message-bubble-color: rgb(243 244 246);
+}
+
+.session-shell .str-chat__message--me .str-chat__message-bubble {
+  background-color: rgb(55 65 81) !important;
+  color: rgb(243 244 246) !important;
+}
+
+/* Tight vertical spacing between messages */
+.session-shell .str-chat__ul .str-chat__li {
+  padding-block: 0.125rem;
+}
+
+/* Stream MessageInput: styled only inside fused composer surface (see below) */
+
+/* Our + is outside Stream; hide Stream’s menu + inline file upload (SimpleAttachmentSelector) */
+.session-shell .str-chat__attachment-selector {
+  display: none !important;
+}
+
+.session-shell .session-chat-composer-surface .str-chat__file-input-container {
+  display: none !important;
+}
+
+/* Channel → main panel fills height so list + composer partition space correctly */
+.session-shell #str-chat__channel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.session-shell .str-chat__main-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-height: 0;
+  min-width: 0;
+  /* Don’t clip the custom attachment menu that opens above the composer */
+  overflow: visible;
+}
+
+/* Composer: attachment menu stacks above Stream input */
+.session-shell .session-chat-composer-shell {
+  overflow: visible;
+}
+
+.session-shell .session-chat-composer-row {
+  position: relative;
+  padding-inline: 1rem;
+  padding-top: 0.75rem;
+  padding-bottom: max(0.875rem, env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 640px) {
+  .session-shell .session-chat-composer-row {
+    padding-inline: 1.25rem;
+    padding-top: 0.875rem;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Rounded field only (+ sits outside, left of this) */
+.session-shell .session-chat-composer-surface {
+  gap: 0.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgb(75 85 99);
+  background: rgb(31 41 55);
+  padding: 0.375rem 0.625rem;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+}
+
+@media (min-width: 640px) {
+  .session-shell .session-chat-composer-surface {
+    gap: 0.625rem;
+    padding: 0.45rem 0.75rem;
+  }
+}
+
+.session-shell .session-chat-composer-attach-wrap {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Portaled to body — must not be nested under .session-shell */
+.session-chat-attachment-menu {
+  z-index: 500;
+}
+
+.session-shell .session-chat-composer-input-slot {
+  position: relative;
+  z-index: 0;
+  min-width: 0;
+  flex: 1 1 0%;
+  overflow: visible;
+}
+
+/* Flatten Stream chrome inside the rounded field */
+.session-shell .session-chat-composer-surface .str-chat__message-input {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.session-shell .session-chat-composer-surface .str-chat__message-input-inner {
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.session-shell .session-chat-composer-surface .str-chat__message-textarea-container {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.session-shell .session-chat-composer-surface .str-chat__message-textarea-with-emoji-picker {
+  padding: 0.2rem 0.25rem 0.2rem 0 !important;
+  column-gap: 0.375rem !important;
+}
+
+.session-shell .session-chat-composer-surface .str-chat__send-button:not(:disabled) svg path {
+  fill: rgb(229 231 235);
+}
+
+.session-shell .session-chat-composer-surface .str-chat__send-button:disabled svg path {
+  fill: rgb(107 114 128);
+}
+
+.session-shell .str-chat__textarea {
+  color: rgb(243 244 246);
+  max-height: 8rem;
+}
+
+.session-shell .str-chat__textarea::placeholder {
+  color: rgb(156 163 175);
+}
+
+.session-shell .str-chat__send-button {
+  border-radius: 0.5rem;
+}
+
+/* Stream Video: fill viewport column; pin custom CallControls to bottom */
+.session-shell .str-video {
+  flex: 1 1 0%;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.session-shell .str-video__speaker-layout__wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+}
+
+.session-shell .str-video__speaker-layout__wrapper > .str-video__speaker-layout {
+  flex: 1 1 0%;
+  min-height: 0;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.session-shell .str-video__speaker-layout {
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
+/* Spotlight fills space; SDK uses max-width 1280px, 16:9, and (≥600px) height:auto → letterboxing */
+.session-shell .str-video__speaker-layout .str-video__speaker-layout__spotlight {
+  flex: 1 1 0%;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100%;
+  align-items: stretch !important;
+  justify-content: center;
+}
+
+@media (min-width: 600px) {
+  .session-shell .str-video__speaker-layout .str-video__speaker-layout__spotlight {
+    flex: 1 1 0%;
+    min-height: 0 !important;
+    height: 100% !important;
+    align-items: stretch !important;
+  }
+
+  .session-shell .str-video__speaker-layout .str-video__speaker-layout__spotlight .str-video__video {
+    object-fit: cover !important;
+  }
+}
+
+.session-shell
+  .str-video__speaker-layout
+  .str-video__speaker-layout__spotlight
+  .str-video__participant-view {
+  width: 100% !important;
+  max-width: none !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  aspect-ratio: unset !important;
+}
+
+.session-shell .str-video__speaker-layout .str-video__speaker-layout__spotlight .str-video__video {
+  object-fit: cover !important;
+}
+
+.session-shell .str-video__speaker-layout .str-video__speaker-layout__spotlight .str-video__video-placeholder {
+  aspect-ratio: unset !important;
+  max-width: none;
+}
+
+/*
+ * Stream Video: floating menus often portal to `document.body`. Generic menu buttons use
+ * `all: unset`, so label color inherits from `body` (app dark text) → invisible on dark panels.
+ * These selectors are global so portaled UI still matches Stream’s dark chrome.
+ */
+.str-video__menu-container {
+  color: #f3f4f6;
+}
+
+.str-video__generic-menu .str-video__generic-menu--item button {
+  color: #f3f4f6 !important;
+}
+
+.str-video__generic-menu .str-video__generic-menu--item button:hover,
+.str-video__generic-menu .str-video__generic-menu--item button:focus-visible {
+  color: #ffffff !important;
+}
+
+/* Label-only rows: indent like icon + label (icon 1.25rem + gap 10px per SDK). */
+.str-video__generic-menu .str-video__generic-menu--item button:not(:has(.str-video__icon)) {
+  padding-left: calc(var(--str-video__spacing-lg, 16px) + 1.25rem + 10px) !important;
+}
+
+.str-video__dropdown-list {
+  color: #f3f4f6;
+}
+
+.str-video__dropdown-selected__label {
+  color: #f3f4f6 !important;
+}
+
+.str-video__dropdown-option:not(.str-video__dropdown-option--selected) {
+  color: #f3f4f6 !important;
+}
+
+.str-video__dropdown-option:hover .str-video__dropdown-label {
+  color: #ffffff !important;
+}
+
+.str-video__participant-listing-item .str-video__participant-listing-item__display-name {
+  color: #f3f4f6 !important;
+}
+
+.str-video__participant-view .str-video__participant-details .str-video__participant-details__name {
+  color: #f3f4f6 !important;
+}
+
+.str-video__notification .str-video__notification__message {
+  color: #f3f4f6 !important;
+}
+
+.str-video__device-settings {
+  color: #f3f4f6;
+}
+
+.str-video__device-settings__device-kind .str-video__device-settings__device-selector-title {
+  color: #f3f4f6 !important;
+}
+
+.str-video__call-stats {
+  color: #f3f4f6;
+}
+
+.str-video__call-stats h3 {
+  color: inherit;
+}

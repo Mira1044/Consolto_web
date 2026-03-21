@@ -543,9 +543,8 @@
 //   );
 // };
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ROUTES } from '@/routes/config';
 import { bookingService } from '../services/bookingService';
@@ -554,7 +553,7 @@ import { useErrorHandler } from '@/shared/services/error';
 import { useAuth } from '@/context/AuthContext';
 import { expertsService } from '@/features/experts/services/expertsService';
 import { apiRequest } from '@/shared/services/api';
-import { UpcomingAppointmentCard } from '../components/UpcomingAppointmentCard';
+import { BookingsSegmentedToggle, UpcomingAppointmentCard } from '../components';
 
 const upcomingBookings = [
   {
@@ -864,7 +863,6 @@ function EmptyState({ tab, filter }) {
 
 export const BookingsPage = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { user } = useAuth();
   const { handleApiError } = useErrorHandler();
   /** Fallback if JWT `role` is set (not all backends set this). */

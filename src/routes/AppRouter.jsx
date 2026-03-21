@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, Fragment } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { routeConfig, ROUTES } from './config';
@@ -59,7 +59,13 @@ export const AppRouter = () => {
 
           // Determine which layout to use
           const LayoutComponent =
-            layout === 'auth' ? AuthLayout : layout === 'main-no-footer' ? MainLayoutNoFooter : MainLayout;
+            layout === 'auth'
+              ? AuthLayout
+              : layout === 'none'
+                ? Fragment
+                : layout === 'main-no-footer'
+                  ? MainLayoutNoFooter
+                  : MainLayout;
 
           return (
             <Route
