@@ -141,4 +141,73 @@ export const bookingService = {
   async markAppointmentComplete({ appointmentId }) {
     return apiRequest.patch('/appointment/mark-complete', { appointmentId });
   },
+
+  /**
+   * Check whether the current user already has an active Stream session.
+   * GET /stream/check-active-session
+   */
+  async checkActiveSession() {
+    return apiRequest.get('/stream/check-active-session');
+  },
+
+  /**
+   * Get the logged-in user's own consultant profile (if any).
+   * GET /consultant/self
+   */
+  async getConsultantSelf() {
+    return apiRequest.get('/consultant/self');
+  },
+
+  /**
+   * Fetch a consultant by ID for re-booking.
+   * GET /consultant/consultants/:id
+   *
+   * Returns `{ expert, raw }` — the same shape BookingPage expects.
+   */
+  async getConsultantForRebooking(id) {
+    const c = await apiRequest.get(`/consultant/consultants/${id}`);
+    const name = String(c?.user_name ?? '').trim() || 'Consultant';
+    const tags = Array.isArray(c?.specialization) ? c.specialization : [];
+    const charge = (dur) => {
+      const item = Array.isArray(c?.charges) ? c.charges.find((ch) => ch?.duration === dur) : null;
+      return item?.charge_amount ?? 0;
+    };
+    const parts = name.split(/\s+/).filter(Boolean);
+    const first = parts[0]?.[0] ?? '';
+    const second = parts.length > 1 ? parts[1]?.[0] ?? '' : (parts[0]?.[1] ?? '');
+    const initials = (first + second).toUpperCase().slice(0, 3) || name.slice(0, 1).toUpperCase();
+
+    return {
+      expert: {
+        id: c?._id ?? `consultant-${id}`,
+        name,
+        tags: tags.length ? tags : ['General'],
+        rating: typeof c?.avgRating === 'number' ? c.avgRating : null,
+        reviews: typeof c?.totalFeedbacks === 'number' ? c.totalFeedbacks : null,
+        experience: `${c?.experience_years ?? 0} years`,
+        sessions: typeof c?.totalCompletedAppointments === 'number' ? c.totalCompletedAppointments : null,
+        price15: charge('15_minutes'),
+        price30: charge('30_minutes'),
+        initials,
+        color: 'bg-purple-100 text-purple-700',
+      },
+      raw: c,
+    };
+  },
+
+  /**
+   * Download an invoice for an appointment.
+   * GET /user/invoice/:appointmentId
+   */
+  async getInvoice(appointmentId) {
+    return apiRequest.get(`/user/invoice/${appointmentId}`);
+  },
+
+  /**
+   * Fetch consultant availability slots.
+   * GET /consultant/availability
+   */
+  async getAvailabilitySlots(params) {
+    return apiRequest.get('/consultant/availability', { params });
+  },
 };

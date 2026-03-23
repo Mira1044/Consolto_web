@@ -1,6 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 import defaultTheme from 'tailwindcss/defaultTheme';
-import defaultColors from 'tailwindcss/colors';
+import twColors from 'tailwindcss/colors';
+
+const deprecated = new Set(['lightBlue', 'warmGray', 'trueGray', 'coolGray', 'blueGray']);
+const defaultColors = {};
+for (const key of Object.keys(twColors)) {
+  if (!deprecated.has(key)) {
+    defaultColors[key] = twColors[key];
+  }
+}
 import { colors, typography, spacing, borderRadius, shadows, breakpoints, zIndex, transitions, layout } from './src/shared/theme/tokens.js';
 
 export default {

@@ -59,8 +59,6 @@ export const SessionLayout = () => {
     otherUserName = 'Participant',
     otherUserId = '',
     mode: initialMode = 'video',
-    userRole,
-    appointmentStatus,
   } = sessionParams;
 
   const [showEndModal, setShowEndModal] = useState(false);
@@ -96,7 +94,7 @@ export const SessionLayout = () => {
       return;
     }
     setShowEndModal(true);
-  }, [timer.isExpired, session, navigate, handleExpired]);
+  }, [timer.isExpired, handleExpired]);
 
   const confirmEnd = useCallback(async () => {
     setShowEndModal(false);

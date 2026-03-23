@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { queryKeys } from '@/lib/queryClient';
-import { expertsService } from '@/features/experts/services/expertsService';
+import { bookingService } from '../services/bookingService';
 
 /**
  * Whether the logged-in user has a consultant profile (GET /consultant/self).
@@ -12,7 +12,7 @@ export function useConsultantSelf() {
 
   return useQuery({
     queryKey: queryKeys.consultant.self,
-    queryFn: () => expertsService.getSelfConsultant(),
+    queryFn: () => bookingService.getConsultantSelf(),
     enabled: !!user?.token,
     retry: false,
     staleTime: 5 * 60_000,

@@ -3,9 +3,14 @@ import {
   StreamCall,
   SpeakerLayout,
   StreamTheme,
+  DefaultParticipantViewUI,
 } from '@stream-io/video-react-sdk';
 import { CallControls } from './CallControls';
 import { ScreenShareOverlay } from './ScreenShareOverlay';
+
+const CleanParticipantViewUI = () => (
+  <DefaultParticipantViewUI showMenuButton={false} />
+);
 
 /**
  * VideoPanel
@@ -43,7 +48,11 @@ export const VideoPanel = ({
           <div className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-gray-950">
             <ScreenShareOverlay />
             <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-              <SpeakerLayout participantsBarPosition="bottom" />
+              <SpeakerLayout
+                participantsBarPosition="bottom"
+                ParticipantViewUISpotlight={CleanParticipantViewUI}
+                ParticipantViewUIBar={CleanParticipantViewUI}
+              />
             </div>
             <CallControls
               onToggleChat={onToggleChat}
