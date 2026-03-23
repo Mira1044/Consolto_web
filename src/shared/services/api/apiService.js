@@ -7,7 +7,7 @@
 
 import { apiClient } from './apiClient';
 import { handleApiError } from './errorHandler';
-import { AppError, ErrorCode } from './errors';
+import { ErrorCode } from './errors';
 
 /**
  * Request Configuration Options
@@ -100,7 +100,7 @@ export class ApiService {
   /**
    * Transform response to standardized format
    */
-  transformResponse(response, config) {
+  transformResponse(response, _config) {
     const { data, status, headers } = response;
 
     // Handle different response structures
@@ -389,6 +389,4 @@ export const apiService = new ApiService();
  * Create a new API service instance with custom base URL
  * Useful for feature-specific services
  */
-export const createApiService = (baseURL) => {
-  return new ApiService(baseURL);
-};
+export const createApiService = (baseURL) => new ApiService(baseURL);

@@ -2,11 +2,12 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSignup } from '../hooks/useSignup';
 import { useLogin } from '../hooks/useLogin';
+import { useForgotPassword } from '../hooks/useForgotPassword';
 import { SignupLayout } from '../components/SignupLayout';
 import { LoginLayout } from '../components/LoginLayout';
+import { ForgotPasswordLayout } from '../components/ForgotPasswordLayout';
 import { ROUTES } from '@/routes/config';
 import { Hero } from '@/pages/home';
-import { ForgotPasswordPage } from '@/auth/components/ForgotPasswordPage';
 
 /**
  * SignupPage
@@ -22,6 +23,7 @@ export const SignupPage = () => {
 
   const signup = useSignup({ onSuccess: handleSuccess });
   const login = useLogin({ onSuccess: handleSuccess });
+  const forgotPassword = useForgotPassword({ onBackToLogin: () => setMode('login') });
 
   const goHome = () => navigate(ROUTES.HOME);
 
@@ -30,18 +32,30 @@ export const SignupPage = () => {
       return (
         <LoginLayout
           {...login}
+          onBackToHome={goHome}
           onForgotPassword={() => setMode('forgot')}
           onGoToSignup={() => setMode('signup')}
-          onBackToHome={goHome}
         />
       );
     }
 
     if (mode === 'forgot') {
-      return <ForgotPasswordPage onBackToLogin={() => setMode('login')} />;
+      return (
+        <ForgotPasswordLayout
+          {...forgotPassword}
+          onConfirmPasswordChange={forgotPassword.setConfirmPassword}
+          onEmailChange={forgotPassword.setEmail}
+          onGoToLogin={forgotPassword.goToLogin}
+          onNewPasswordChange={forgotPassword.setNewPassword}
+          onOtpChange={forgotPassword.handleOtpChange}
+          onResetPassword={forgotPassword.handleResetPassword}
+          onSendOtp={forgotPassword.handleSendOtp}
+          onVerifyOtp={forgotPassword.handleVerifyOtp}
+        />
+      );
     }
 
-    return <SignupLayout {...signup} onGoToLogin={() => setMode('login')} onBackToHome={goHome} />;
+    return <SignupLayout {...signup} onBackToHome={goHome} onGoToLogin={() => setMode('login')} />;
   };
 
   return (
@@ -57,24 +71,24 @@ export const SignupPage = () => {
           <div className="w-full max-w-md">
             <div className="mb-6 inline-flex max-w-xs self-end rounded-full bg-white/60 p-1 shadow-sm">
               <button
-                type="button"
-                onClick={() => setMode('login')}
                 className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition ${
                   mode === 'login'
                     ? 'bg-primary shadow text-white'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
+                type="button"
+                onClick={() => setMode('login')}
               >
                 Sign in
               </button>
               <button
-                type="button"
-                onClick={() => setMode('signup')}
                 className={`flex-1 rounded-full px-4 py-2 text-sm font-medium transition ${
                   mode === 'signup'
                     ? 'bg-primary shadow text-white'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
+                type="button"
+                onClick={() => setMode('signup')}
               >
                 Sign up
               </button>

@@ -27,17 +27,17 @@ export const SessionHeader = ({
   return (
     <header className="grid min-h-[3.25rem] flex-shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 border-b border-gray-800 bg-gray-950 px-2 py-2.5 pt-[max(0.625rem,env(safe-area-inset-top))] sm:gap-3 sm:px-4 sm:py-3">
       <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
-        <BrandLogo variant="session" to={ROUTES.BOOKINGS} showText={false} imgClassName="opacity-95" />
+        <BrandLogo imgClassName="opacity-95" showText={false} to={ROUTES.BOOKINGS} variant="session" />
         <button
+          aria-label={currentMode === 'chat' ? 'End chat session' : 'End video call'}
+          className={`${headerPill} bg-red-600 text-white hover:bg-red-700 focus-visible:outline-red-400`}
           type="button"
           onClick={onEndSession}
-          className={`${headerPill} bg-red-600 text-white hover:bg-red-700 focus-visible:outline-red-400`}
-          aria-label={currentMode === 'chat' ? 'End chat session' : 'End video call'}
         >
           {currentMode === 'chat' ? (
-            <MessageSquare className="h-[1.125rem] w-[1.125rem] shrink-0" strokeWidth={2.25} aria-hidden />
+            <MessageSquare aria-hidden className="h-[1.125rem] w-[1.125rem] shrink-0" strokeWidth={2.25} />
           ) : (
-            <Phone className="h-[1.125rem] w-[1.125rem] shrink-0" strokeWidth={2.25} aria-hidden />
+            <Phone aria-hidden className="h-[1.125rem] w-[1.125rem] shrink-0" strokeWidth={2.25} />
           )}
           <span className="hidden sm:inline">End {currentMode === 'chat' ? 'chat' : 'call'}</span>
         </button>
@@ -56,29 +56,29 @@ export const SessionHeader = ({
         {initialMode === 'video' ? (
           <div className="relative shrink-0">
             <button
+              aria-label={currentMode === 'video' ? 'Switch to chat' : 'Switch to video call'}
+              className={`${headerPill} bg-violet-600 text-white hover:bg-violet-500`}
               type="button"
               onClick={onToggleMode}
-              className={`${headerPill} bg-violet-600 text-white hover:bg-violet-500`}
-              aria-label={currentMode === 'video' ? 'Switch to chat' : 'Switch to video call'}
             >
               {currentMode === 'video' ? (
-                <MessageSquare className="h-[1.125rem] w-[1.125rem] shrink-0" strokeWidth={2.25} aria-hidden />
+                <MessageSquare aria-hidden className="h-[1.125rem] w-[1.125rem] shrink-0" strokeWidth={2.25} />
               ) : (
-                <Video className="h-[1.125rem] w-[1.125rem] shrink-0" strokeWidth={2.25} aria-hidden />
+                <Video aria-hidden className="h-[1.125rem] w-[1.125rem] shrink-0" strokeWidth={2.25} />
               )}
               <span className="hidden sm:inline">{currentMode === 'chat' ? 'Video' : 'Chat'}</span>
             </button>
             {currentMode === 'video' && unreadCount > 0 && (
               <span
-                className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white"
                 aria-hidden
+                className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white"
               >
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
           </div>
         ) : (
-          <div className="h-10 w-11 shrink-0 sm:w-[5.75rem]" aria-hidden />
+          <div aria-hidden className="h-10 w-11 shrink-0 sm:w-[5.75rem]" />
         )}
       </div>
     </header>

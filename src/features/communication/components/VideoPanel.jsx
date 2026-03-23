@@ -50,14 +50,14 @@ export const VideoPanel = ({
             <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
               <SpeakerLayout
                 participantsBarPosition="bottom"
-                ParticipantViewUISpotlight={CleanParticipantViewUI}
                 ParticipantViewUIBar={CleanParticipantViewUI}
+                ParticipantViewUISpotlight={CleanParticipantViewUI}
               />
             </div>
             <CallControls
-              onToggleChat={onToggleChat}
-              unreadCount={unreadCount}
               currentMode={currentMode}
+              unreadCount={unreadCount}
+              onToggleChat={onToggleChat}
             />
           </div>
         </StreamTheme>

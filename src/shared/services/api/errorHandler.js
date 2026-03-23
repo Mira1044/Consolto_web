@@ -126,7 +126,7 @@ export const showErrorToUser = (error) => {
   // Try to use error context if available (lazy import to avoid circular dependencies)
   // This will be handled by the ErrorContext when used through hooks
   // For direct calls, we'll just log - the context will handle display
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     // In development, show alert as fallback if error context is not available
     // This should rarely happen as errors should be handled through hooks
     console.warn('Error displayed without ErrorContext. Consider using useErrorHandler hook.');

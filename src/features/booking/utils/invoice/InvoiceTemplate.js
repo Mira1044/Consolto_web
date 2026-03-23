@@ -7,17 +7,17 @@ export const generateInvoiceHtml = (data) => {
         invoiceNumber,
         invoiceDate,
         customerName,
-        customerAddress, // Assuming this might contain city/state if generic
+        customerAddress: _customerAddress, // Assuming this might contain city/state if generic
         customerCity,
         customerState, // e.g., "27-Maharashtra" or "Karnataka"
         customerCountry, // e.g., "India" or "United States"
-        customerPincode,
+        customerPincode: _customerPincode,
         customerGst,
         customerPhone, // Need to ensure this is passed or handled
         items, // Array of { description, hsn, quantity, rate, amount, duration }
         subTotal,
-        discount, // Not shown in image but good to keep
-        taxableAmount,
+        discount: _discount, // Not shown in image but good to keep
+        taxableAmount: _taxableAmount,
         cgst,
         sgst,
         igst,
@@ -44,17 +44,17 @@ export const generateInvoiceHtml = (data) => {
 
     // Helper for formatting currency
     // Helper for formatting currency
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-IN', {
+    const formatCurrency = (amount) => new Intl.NumberFormat('en-IN', {
             style: 'currency',
             currency: 'INR',
             minimumFractionDigits: 2
         }).format(amount || 0);
-    };
 
     // Helper for formatting date
     const formatDate = (dateString) => {
-        if (!dateString) return '';
+        if (!dateString) {
+return '';
+}
         const date = new Date(dateString);
         return date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }).split('/').join('-'); // DD-MM-YYYY
     };
@@ -62,7 +62,9 @@ export const generateInvoiceHtml = (data) => {
     // Determine GST Label for Table Row
     // Image 2 shows "₹ 152.54 (18%)" for IGST case
     const getGstContent = () => {
-        if (isInternational) return '₹0.00';
+        if (isInternational) {
+return '₹0.00';
+}
 
         const totalTax = (igst || 0) + (cgst || 0) + (sgst || 0);
         let rate = '0%';
@@ -404,7 +406,7 @@ export const generateInvoiceHtml = (data) => {
             <div class="left-footer">
                 <div class="amount-words-group">
                     <div class="amount-words-label">Invoice Amount In Words</div>
-                    <div class="amount-words-value">${totalAmountWords || 'INR ' + totalAmount + ' Only'}</div>
+                    <div class="amount-words-value">${totalAmountWords || `INR ${ totalAmount } Only`}</div>
                 </div>
                 
                 <div class="terms-group">

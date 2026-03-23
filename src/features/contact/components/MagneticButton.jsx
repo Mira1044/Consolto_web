@@ -27,13 +27,13 @@ export const MagneticButton = ({ children, disabled, type = 'submit' }) => {
   return (
     <motion.button
       ref={ref}
-      type={type}
+      className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4 text-lg font-semibold text-white shadow-lg hover:shadow-xl transition-shadow disabled:opacity-60 cursor-pointer overflow-hidden relative group"
       disabled={disabled}
       style={{ x: sx, y: sy }}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
+      type={type}
       whileTap={{ scale: 0.95 }}
-      className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-4 text-lg font-semibold text-white shadow-lg hover:shadow-xl transition-shadow disabled:opacity-60 cursor-pointer overflow-hidden relative group"
+      onMouseLeave={handleLeave}
+      onMouseMove={handleMove}
     >
       <span className="absolute inset-0 translate-x-[-110%] group-hover:translate-x-[110%] transition-transform duration-500 bg-white/20 skew-x-[-20deg] pointer-events-none" />
       <span className="relative flex items-center gap-2">{children}</span>

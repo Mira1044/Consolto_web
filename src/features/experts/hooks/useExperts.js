@@ -35,7 +35,9 @@ export const useExperts = () => {
       } catch (err) {
         handleApiError(err, { context: { feature: 'experts', action: 'load' } });
       } finally {
-        if (mounted) setIsLoading(false);
+        if (mounted) {
+setIsLoading(false);
+}
       }
     };
 

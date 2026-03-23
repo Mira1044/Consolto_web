@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/routes/config';
 import { useErrorHandler } from '@/shared/services/error';
 import { bookingService } from '../services/bookingService';
-import { useSessionGuard } from './useSessionGuard';
 import { toDateOnly, timeToMinutes } from '../utils/bookingNormalization';
 
 /**
@@ -16,8 +15,6 @@ import { toDateOnly, timeToMinutes } from '../utils/bookingNormalization';
 export function useBookingActions({ userRole, onRefresh }) {
   const navigate = useNavigate();
   const { handleApiError } = useErrorHandler();
-  const { guardJoin } = useSessionGuard();
-
   // Modal state
   const [modal, setModal] = useState(null);
   const [activeBooking, setActiveBooking] = useState(null);
@@ -331,13 +328,11 @@ return;
 return;
 }
 
-    guardJoin(() => {
-      navigate(
-        ROUTES.SESSION.replace(':appointmentId', encodeURIComponent(String(sessionState.appointmentId))),
-        { state: sessionState },
-      );
-    });
-  }, [buildSessionStateFromBooking, guardJoin, navigate]);
+    navigate(
+      ROUTES.SESSION.replace(':appointmentId', encodeURIComponent(String(sessionState.appointmentId))),
+      { state: sessionState },
+    );
+  }, [buildSessionStateFromBooking, navigate]);
 
   return {
     modal,

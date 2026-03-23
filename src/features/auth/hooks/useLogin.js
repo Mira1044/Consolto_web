@@ -13,7 +13,7 @@ export const useLogin = ({ onSuccess } = {}) => {
   const [fields, setFields] = useState(createDefaultLogin());
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [_hasSubmitted, setHasSubmitted] = useState(false);
   const { login } = useAuth();
   const { handleApiError, showSuccess } = useErrorHandler();
 
@@ -59,7 +59,7 @@ export const useLogin = ({ onSuccess } = {}) => {
    */
   const setField = useCallback(
     (key) => (e) => {
-      const value = e.target.value;
+      const {value} = e.target;
       setFields((prev) => ({ ...prev, [key]: value }));
     },
     [],
@@ -92,8 +92,11 @@ export const useLogin = ({ onSuccess } = {}) => {
         onSuccess?.(authUser);
       } catch (err) {
         if (err.fieldErrors) {
-          if (err.fieldErrors.email?.length) setSingleInvalidCredentialError('email');
-          else setSingleInvalidCredentialError('password');
+          if (err.fieldErrors.email?.length) {
+setSingleInvalidCredentialError('email');
+} else {
+setSingleInvalidCredentialError('password');
+}
         } else {
           // For login we don't want a toast for validation errors.
           const appError = handleApiError(err, {

@@ -21,8 +21,11 @@ export const CallControls = ({
 
   const toggleMic = async () => {
     try {
-      if (micMuted) await microphone.enable();
-      else await microphone.disable();
+      if (micMuted) {
+await microphone.enable();
+} else {
+await microphone.disable();
+}
     } catch (err) {
       console.error('Mic toggle error:', err);
     }
@@ -30,8 +33,11 @@ export const CallControls = ({
 
   const toggleCamera = async () => {
     try {
-      if (camMuted) await camera.enable();
-      else await camera.disable();
+      if (camMuted) {
+await camera.enable();
+} else {
+await camera.disable();
+}
     } catch (err) {
       console.error('Camera toggle error:', err);
     }
@@ -44,41 +50,41 @@ export const CallControls = ({
   return (
     <div className="mt-auto flex flex-shrink-0 flex-wrap items-center justify-center gap-3 border-t border-gray-800/90 bg-gray-950/95 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-gray-950/80 sm:gap-4 sm:px-6 sm:py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
       <button
-        type="button"
-        onClick={toggleMic}
         aria-pressed={!micMuted}
         className={`${btnBase} ${micMuted ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'}`}
         title={micMuted ? 'Unmute microphone' : 'Mute microphone'}
+        type="button"
+        onClick={toggleMic}
       >
         {micMuted ? (
-          <MicOff size={22} strokeWidth={2} className="text-white" aria-hidden />
+          <MicOff aria-hidden className="text-white" size={22} strokeWidth={2} />
         ) : (
-          <Mic size={22} strokeWidth={2} className="text-white" aria-hidden />
+          <Mic aria-hidden className="text-white" size={22} strokeWidth={2} />
         )}
       </button>
 
       <button
-        type="button"
-        onClick={toggleCamera}
         aria-pressed={!camMuted}
         className={`${btnBase} ${camMuted ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-700 hover:bg-gray-600'}`}
         title={camMuted ? 'Turn camera on' : 'Turn camera off'}
+        type="button"
+        onClick={toggleCamera}
       >
         {camMuted ? (
-          <VideoOff size={22} strokeWidth={2} className="text-white" aria-hidden />
+          <VideoOff aria-hidden className="text-white" size={22} strokeWidth={2} />
         ) : (
-          <Video size={22} strokeWidth={2} className="text-white" aria-hidden />
+          <Video aria-hidden className="text-white" size={22} strokeWidth={2} />
         )}
       </button>
 
       <div className="relative inline-grid place-items-center">
         <button
-          type="button"
-          onClick={onToggleChat}
           className={`${btnBase} bg-violet-600 hover:bg-violet-500`}
           title="Open or close chat"
+          type="button"
+          onClick={onToggleChat}
         >
-          <MessageSquare size={22} strokeWidth={2} className="text-white" aria-hidden />
+          <MessageSquare aria-hidden className="text-white" size={22} strokeWidth={2} />
         </button>
         {currentMode === 'video' && unreadCount > 0 && (
           <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white">

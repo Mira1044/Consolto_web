@@ -12,7 +12,7 @@
  */
 
 import { apiRequest } from '@/shared/services/api';
-import { validateLogin, validateSignup } from '../validators/authValidator';
+import { validateLogin, validateSignup, validateForgotPasswordEmail, validateResetPassword } from '../validators/authValidator';
 
 export const authService = {
   /**
@@ -66,5 +66,55 @@ export const authService = {
     });
 
     return result;
+  },
+
+  /**
+   * POST /auth/forgot-password/send-otp
+   *
+   * Sends a 6-digit OTP to the provided email address.
+   */
+  async sendOtp(email) {
+    const validation = validateForgotPasswordEmail({ email });
+    if (!validation.success) {
+      const err = new Error('Validation failed');
+      err.fieldErrors = validation.errors;
+      throw err;
+    }
+
+    return apiRequest.post('/auth/forgot-password/send-otp', { email }, {
+      skipAuth: true,
+      skipErrorHandler: true,
+    });
+  },
+
+  /**
+   * POST /auth/forgot-password/verify-otp
+   *
+   * Verifies the OTP sent to the user's email.
+   */
+  async verifyOtp({ email, otp }) {
+    return apiRequest.post('/auth/forgot-password/verify-otp', { email, otp }, {
+      skipAuth: true,
+      skipErrorHandler: true,
+    });
+  },
+
+  /**
+   * POST /auth/forgot-password/reset
+   *
+   * Resets the password after OTP verification.
+   */
+  async resetPassword({ email, otp, newPassword, confirmPassword }) {
+    const validation = validateResetPassword({ newPassword, confirmPassword });
+    if (!validation.success) {
+      const err = new Error('Validation failed');
+      err.fieldErrors = validation.errors;
+      throw err;
+    }
+
+    return apiRequest.post('/auth/forgot-password/reset', { email, otp, newPassword }, {
+      skipAuth: true,
+      skipErrorHandler: true,
+    });
   },
 };

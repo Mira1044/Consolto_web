@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/shared/components/ui';
-
 export const ExpertCard = ({
   expert = {
     name: 'Harsha Waghmare',
@@ -11,10 +9,12 @@ export const ExpertCard = ({
     experience: '5 years',
     sessions: 128,
   },
-  onBook,
+  onBook: _onBook,
 }) => {
   const initials = useMemo(() => {
-    if (expert?.initials) return String(expert.initials).slice(0, 3).toUpperCase();
+    if (expert?.initials) {
+return String(expert.initials).slice(0, 3).toUpperCase();
+}
     const parts = String(expert?.name || '')
       .trim()
       .split(/\s+/)
@@ -25,8 +25,12 @@ export const ExpertCard = ({
   }, [expert?.initials, expert?.name]);
 
   const specializationText = useMemo(() => {
-    if (expert?.specialization) return String(expert.specialization);
-    if (Array.isArray(expert?.tags) && expert.tags.length) return expert.tags.join(' • ');
+    if (expert?.specialization) {
+return String(expert.specialization);
+}
+    if (Array.isArray(expert?.tags) && expert.tags.length) {
+return expert.tags.join(' • ');
+}
     return 'General';
   }, [expert?.specialization, expert?.tags]);
 
@@ -43,11 +47,11 @@ export const ExpertCard = ({
 
   return (
     <motion.div
-      whileHover={{ y: -2 }}
-      transition={{ type: 'spring', stiffness: 380, damping: 26 }}
       className={`w-full bg-white rounded-xl border border-slate-100 shadow-sm hover:shadow-md ${
         isManish ? 'flex flex-col' : ''
       }`}
+      transition={{ type: 'spring', stiffness: 380, damping: 26 }}
+      whileHover={{ y: -2 }}
     >
       <div className={`p-5 sm:p-6 ${isManish ? 'flex flex-col h-full' : ''}`}>
         <div className="flex gap-4">
@@ -107,15 +111,15 @@ export const ExpertCard = ({
                 return (
                   <motion.button
                     key={opt.minutes}
-                    type="button"
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSelected(opt)}
-            className={`flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-semibold transition-colors ${
+                    aria-pressed={active}
+                    className={`flex-1 sm:flex-none px-3 py-2 rounded-md text-sm font-semibold transition-colors ${
                       active
                         ? 'bg-slate-900 text-white'
                         : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                     }`}
-                    aria-pressed={active}
+                    type="button"
+            whileTap={{ scale: 0.98 }}
+                    onClick={() => setSelected(opt)}
                   >
                     {opt.label}
                   </motion.button>
@@ -127,24 +131,6 @@ export const ExpertCard = ({
               ₹{selected.price}
             </div>
           </div>
-
-          {/* <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-            className="w-full sm:w-auto"
-          >
-            <Button
-              type="button"
-              variant="primary"
-              size="sm"
-              fullWidth
-              onClick={() => onBook?.(expert, selected.minutes)}
-              className="rounded-lg px-5 py-2.5 text-sm sm:text-base shadow-sm hover:shadow-md"
-            >
-              Book Now
-            </Button>
-          </motion.div> */}
         </div>
       </div>
     </motion.div>

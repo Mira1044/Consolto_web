@@ -34,14 +34,14 @@ export const Testimonials = () => {
   ];
 
   return (
-    <section id="testimonials" className="py-14 sm:py-16 lg:py-20 bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <section className="py-14 sm:py-16 lg:py-20 bg-gradient-to-br from-blue-50 via-white to-blue-50" id="testimonials">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-12 lg:mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          whileInView={{ opacity: 1, y: 0 }}
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             What Our{' '}
@@ -56,19 +56,19 @@ export const Testimonials = () => {
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2, duration: 0.6 }}
-              whileHover={{ y: -10, transition: { duration: 0.2 } }}
               className="group"
+              initial={{ opacity: 0, y: 50 }}
+              transition={{ delay: index * 0.2, duration: 0.6 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -10, transition: { duration: 0.2 } }}
+              whileInView={{ opacity: 1, y: 0 }}
             >
               <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all border border-blue-100 h-full">
                 <div className="flex items-center mb-6">
                   <img
-                    src={testimonial.image}
                     alt={testimonial.name}
                     className="w-16 h-16 rounded-full object-cover mr-4 ring-4 ring-blue-100 group-hover:ring-blue-200 transition-all"
+                    src={testimonial.image}
                   />
                   <div>
                     <h4 className="font-bold text-gray-900 text-lg">{testimonial.name}</h4>

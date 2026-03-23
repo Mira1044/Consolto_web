@@ -10,7 +10,7 @@ export const validateBooking = (booking) => {
     return { success: true };
   }
 
-  const fieldErrors = result.error.flatten().fieldErrors;
+  const {fieldErrors} = result.error.flatten();
   return {
     success: false,
     errors: fieldErrors,

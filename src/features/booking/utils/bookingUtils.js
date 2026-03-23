@@ -4,12 +4,10 @@ import { formatINR } from '@/shared/utils/formatters/priceFormatter';
 /**
  * Build a summary object for booking, used by presentation layer.
  */
-export const buildBookingSummary = (expert, { duration, selectedDate, selectedSlot, price }) => {
-  return {
+export const buildBookingSummary = (expert, { duration, selectedDate, selectedSlot, price }) => ({
     expertName: expert?.name,
     duration,
     dateLabel: formatDateShort(selectedDate),
     timeLabel: selectedSlot,
     priceLabel: formatINR(price),
-  };
-};
+  });

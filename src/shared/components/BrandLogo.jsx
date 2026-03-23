@@ -51,8 +51,12 @@ export function BrandLogo({
   const [useLightAssetFailed, setUseLightAssetFailed] = useState(false);
 
   const imgSrc = (() => {
-    if (!isOnDarkBg) return CONSOLTO_LOGO_PRIMARY_SRC;
-    if (hasDedicatedLightAsset && !useLightAssetFailed) return CONSOLTO_LOGO_ON_DARK_SRC;
+    if (!isOnDarkBg) {
+return CONSOLTO_LOGO_PRIMARY_SRC;
+}
+    if (hasDedicatedLightAsset && !useLightAssetFailed) {
+return CONSOLTO_LOGO_ON_DARK_SRC;
+}
     return CONSOLTO_LOGO_PRIMARY_SRC;
   })();
 
@@ -67,13 +71,13 @@ export function BrandLogo({
     isOnDarkBg && (!hasDedicatedLightAsset || useLightAssetFailed);
 
   return (
-    <Link to={to} className={`flex items-center ${s.gap} ${className}`}>
+    <Link className={`flex items-center ${s.gap} ${className}`} to={to}>
       <img
-        src={imgSrc}
         alt="Consolto"
-        onError={onImgError}
         className={`${s.img} flex-shrink-0 select-none object-contain ${invertForDarkBg ? 'brightness-0 invert' : ''} ${imgClassName}`}
         draggable={false}
+        src={imgSrc}
+        onError={onImgError}
       />
       {showText && <span className={s.text}>Consolto</span>}
     </Link>

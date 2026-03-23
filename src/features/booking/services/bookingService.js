@@ -7,6 +7,7 @@
  */
 
 import { apiRequest } from '@/shared/services/api';
+import { initialsFromName } from '@/shared/utils/stringUtils';
 
 export const bookingService = {
   /**
@@ -89,7 +90,9 @@ export const bookingService = {
       const r = await fetchFn({ page: 1, limit: 50 }, extra);
       return { appointments: r.appointments ?? [] };
     } catch (e) {
-      if (signal?.aborted) throw e;
+      if (signal?.aborted) {
+throw e;
+}
       const [u, p] = await Promise.all([
         fetchFn({ page: 1, limit: 10, status_type: 'upcoming' }, extra),
         fetchFn({ page: 1, limit: 10, status_type: 'past' }, extra),
@@ -129,7 +132,9 @@ export const bookingService = {
     };
 
     // Only send booking_date for WEEKLY/DAILY slots (SPECIFIC doesn't need it).
-    if (booking_date) body.booking_date = booking_date;
+    if (booking_date) {
+body.booking_date = booking_date;
+}
 
     return apiRequest.put(endpoint, body);
   },
@@ -140,14 +145,6 @@ export const bookingService = {
    */
   async markAppointmentComplete({ appointmentId }) {
     return apiRequest.patch('/appointment/mark-complete', { appointmentId });
-  },
-
-  /**
-   * Check whether the current user already has an active Stream session.
-   * GET /stream/check-active-session
-   */
-  async checkActiveSession() {
-    return apiRequest.get('/stream/check-active-session');
   },
 
   /**
@@ -172,10 +169,7 @@ export const bookingService = {
       const item = Array.isArray(c?.charges) ? c.charges.find((ch) => ch?.duration === dur) : null;
       return item?.charge_amount ?? 0;
     };
-    const parts = name.split(/\s+/).filter(Boolean);
-    const first = parts[0]?.[0] ?? '';
-    const second = parts.length > 1 ? parts[1]?.[0] ?? '' : (parts[0]?.[1] ?? '');
-    const initials = (first + second).toUpperCase().slice(0, 3) || name.slice(0, 1).toUpperCase();
+    const initials = initialsFromName(name);
 
     return {
       expert: {

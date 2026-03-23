@@ -25,14 +25,14 @@ export const HowItWorks = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-14 sm:py-16 lg:py-20 bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <section className="py-14 sm:py-16 lg:py-20 bg-gradient-to-br from-blue-50 via-white to-blue-50" id="how-it-works">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-12 lg:mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          whileInView={{ opacity: 1, y: 0 }}
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             How It{' '}
@@ -42,23 +42,23 @@ export const HowItWorks = () => {
         </motion.div>
 
         <div className="relative">
-          <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200 -translate-y-1/2"></div>
+          <div className="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-200 via-blue-400 to-blue-200 -translate-y-1/2" />
 
           <div className="grid md:grid-cols-3 gap-5 sm:gap-6 md:gap-4 relative">
             {steps.map((step, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2, duration: 0.6 }}
                 className="relative"
+                initial={{ opacity: 0, y: 50 }}
+                transition={{ delay: index * 0.2, duration: 0.6 }}
+                viewport={{ once: true }}
+                whileInView={{ opacity: 1, y: 0 }}
               >
                 <motion.div
-                  whileHover={{ scale: 1.05, y: -6 }}
                   animate={{ y: [0, -4, 0] }}
-                  transition={{ duration: 4, repeat: Infinity, delay: index * 0.3 }}
                   className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border border-blue-100 relative z-10"
+                  transition={{ duration: 4, repeat: Infinity, delay: index * 0.3 }}
+                  whileHover={{ scale: 1.05, y: -6 }}
                 >
                   <div className="flex flex-col items-center text-center">
                     <div className="relative mb-6">

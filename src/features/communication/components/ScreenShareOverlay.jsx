@@ -40,13 +40,15 @@ export const ScreenShareOverlay = () => {
     return result;
   }, [localParticipant, remoteParticipants]);
 
-  if (screenSharers.length === 0) return null;
+  if (screenSharers.length === 0) {
+return null;
+}
 
   return (
       <div className="absolute inset-0 z-50 flex flex-col bg-black">
       <div className="bg-primary-600/90 px-4 py-2 text-center">
         <span className="text-sm font-semibold text-white">
-          <Monitor size={14} className="mr-1 inline" />
+          <Monitor className="mr-1 inline" size={14} />
           {screenSharers.length === 1
             ? `${screenSharers[0].name} is sharing screen`
             : `${screenSharers.length} people sharing screens`}
@@ -66,12 +68,15 @@ export const ScreenShareOverlay = () => {
               </span>
             </div>
             <video
-              className="h-full w-full object-contain"
+              ref={(el) => {
+                if (el && stream) {
+                  // eslint-disable-next-line no-param-reassign -- assign MediaStream to video element
+                  el.srcObject = stream;
+                }
+              }}
               autoPlay
               playsInline
-              ref={(el) => {
-                if (el && stream) el.srcObject = stream;
-              }}
+              className="h-full w-full object-contain"
             />
           </div>
         ))}

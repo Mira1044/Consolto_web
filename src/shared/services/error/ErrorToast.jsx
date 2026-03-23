@@ -66,10 +66,10 @@ const Toast = ({ error, onClose }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -20, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
       className={`rounded-lg border p-4 shadow-lg ${getToastBgColor(type)}`}
+      exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+      initial={{ opacity: 0, y: -20, scale: 0.95 }}
     >
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">{getToastIcon(type)}</div>
@@ -80,9 +80,9 @@ const Toast = ({ error, onClose }) => {
           )}
         </div>
         <button
-          onClick={onClose}
-          className="flex-shrink-0 rounded p-1 text-gray-400 hover:text-gray-600 transition-colors"
           aria-label="Close"
+          className="flex-shrink-0 rounded p-1 text-gray-400 hover:text-gray-600 transition-colors"
+          onClick={onClose}
         >
           <X size={16} />
         </button>

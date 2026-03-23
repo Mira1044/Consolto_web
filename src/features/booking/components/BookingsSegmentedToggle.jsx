@@ -30,25 +30,25 @@ export function BookingsSegmentedToggle({
 }) {
   return (
     <div
+      aria-label={ariaLabel}
       className={`${trackClass} ${className}`.trim()}
       role="tablist"
-      aria-label={ariaLabel}
     >
       {options.map((opt) => {
         const isActive = value === opt.value;
         return (
           <button
             key={String(opt.value)}
-            type="button"
-            role="tab"
             aria-selected={isActive}
-            onClick={() => onChange(opt.value)}
             className={`${segmentClass} ${isActive ? activeText : inactiveText}`}
+            role="tab"
+            type="button"
+            onClick={() => onChange(opt.value)}
           >
             {isActive && (
               <motion.div
-                layoutId={layoutId}
                 className="absolute inset-0 rounded-xl bg-white shadow-sm"
+                layoutId={layoutId}
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             )}

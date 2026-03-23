@@ -34,7 +34,9 @@ export const ChatInput = ({
 
   useLayoutEffect(() => {
     updateMenuPosition();
-    if (!showMenu) return undefined;
+    if (!showMenu) {
+return undefined;
+}
     window.addEventListener('resize', updateMenuPosition);
     window.addEventListener('scroll', updateMenuPosition, true);
     return () => {
@@ -44,11 +46,17 @@ export const ChatInput = ({
   }, [showMenu, updateMenuPosition]);
 
   useEffect(() => {
-    if (!showMenu) return;
+    if (!showMenu) {
+return;
+}
     const close = (e) => {
       const t = e.target;
-      if (buttonWrapRef.current?.contains(t)) return;
-      if (menuPortalRef.current?.contains(t)) return;
+      if (buttonWrapRef.current?.contains(t)) {
+return;
+}
+      if (menuPortalRef.current?.contains(t)) {
+return;
+}
       setShowMenu(false);
     };
     document.addEventListener('mousedown', close);
@@ -73,7 +81,9 @@ export const ChatInput = ({
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
-    if (file) onUpload(file);
+    if (file) {
+onUpload(file);
+}
     e.target.value = '';
   };
 
@@ -82,39 +92,39 @@ export const ChatInput = ({
       <div
         ref={menuPortalRef}
         className="session-chat-attachment-menu fixed rounded-xl border border-gray-600 bg-gray-900 py-2 pl-2 pr-2 shadow-2xl ring-1 ring-black/50 sm:py-2.5 sm:pl-2.5 sm:pr-2.5"
+        role="menu"
         style={{
           left: menuStyle.left,
           bottom: menuStyle.bottom,
           width: menuStyle.width,
         }}
-        role="menu"
       >
         <div className="session-chat-attachment-menu__list flex flex-col gap-1.5 px-1.5 py-1 sm:gap-2 sm:px-2 sm:py-1.5">
           <button
-            type="button"
-            role="menuitem"
-            onClick={() => triggerPicker('image/*')}
             className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-gray-100 hover:bg-gray-800"
+            role="menuitem"
+            type="button"
+            onClick={() => triggerPicker('image/*')}
           >
-            <ImageIcon size={20} className="shrink-0 text-violet-400" aria-hidden />
+            <ImageIcon aria-hidden className="shrink-0 text-violet-400" size={20} />
             <span className="text-sm">Image</span>
           </button>
           <button
-            type="button"
-            role="menuitem"
-            onClick={() => triggerPicker('video/*')}
             className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-gray-100 hover:bg-gray-800"
+            role="menuitem"
+            type="button"
+            onClick={() => triggerPicker('video/*')}
           >
-            <Film size={20} className="shrink-0 text-violet-400" aria-hidden />
+            <Film aria-hidden className="shrink-0 text-violet-400" size={20} />
             <span className="text-sm">Video</span>
           </button>
           <button
-            type="button"
-            role="menuitem"
-            onClick={() => triggerPicker('*/*')}
             className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-gray-100 hover:bg-gray-800"
+            role="menuitem"
+            type="button"
+            onClick={() => triggerPicker('*/*')}
           >
-            <FileText size={20} className="shrink-0 text-violet-400" aria-hidden />
+            <FileText aria-hidden className="shrink-0 text-violet-400" size={20} />
             <span className="text-sm">Document</span>
           </button>
         </div>
@@ -136,20 +146,20 @@ export const ChatInput = ({
       )}
 
       <div className="session-chat-composer-row flex w-full min-w-0 items-center gap-2.5 sm:gap-3">
-        <div className="session-chat-composer-attach-wrap shrink-0" ref={buttonWrapRef}>
+        <div ref={buttonWrapRef} className="session-chat-composer-attach-wrap shrink-0">
           <button
-            type="button"
-            onClick={() => setShowMenu((v) => !v)}
-            disabled={uploading}
             aria-expanded={showMenu}
             aria-haspopup="menu"
             aria-label={showMenu ? 'Close attachment options' : 'Add attachment'}
             className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-700 p-2.5 text-white shadow-sm transition-colors hover:bg-gray-600 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400"
+            disabled={uploading}
+            type="button"
+            onClick={() => setShowMenu((v) => !v)}
           >
             {showMenu ? (
-              <X size={18} className="block shrink-0" strokeWidth={2.25} aria-hidden />
+              <X aria-hidden className="block shrink-0" size={18} strokeWidth={2.25} />
             ) : (
-              <Plus size={18} className="block shrink-0" strokeWidth={2.25} aria-hidden />
+              <Plus aria-hidden className="block shrink-0" size={18} strokeWidth={2.25} />
             )}
           </button>
         </div>
@@ -162,10 +172,10 @@ export const ChatInput = ({
 
         <input
           ref={fileInputRef}
-          type="file"
           accept={acceptRef.current}
-          onChange={handleFileChange}
           className="hidden"
+          type="file"
+          onChange={handleFileChange}
         />
       </div>
 

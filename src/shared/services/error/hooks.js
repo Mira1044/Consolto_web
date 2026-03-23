@@ -27,9 +27,7 @@ export const useErrorHandler = () => {
    * Handle generic errors
    */
   const handleGenericError = useCallback(
-    (error, options = {}) => {
-      return handleError(error, options);
-    },
+    (error, options = {}) => handleError(error, options),
     [handleError]
   );
 
@@ -37,15 +35,13 @@ export const useErrorHandler = () => {
    * Show success message
    */
   const showSuccess = useCallback(
-    (message, options = {}) => {
-      return addError(
+    (message, options = {}) => addError(
         { message, isSuccess: true },
         {
           type: ToastType.SUCCESS,
           ...options,
         }
-      );
-    },
+      ),
     [addError]
   );
 
@@ -53,15 +49,13 @@ export const useErrorHandler = () => {
    * Show info message
    */
   const showInfo = useCallback(
-    (message, options = {}) => {
-      return addError(
+    (message, options = {}) => addError(
         { message },
         {
           type: ToastType.INFO,
           ...options,
         }
-      );
-    },
+      ),
     [addError]
   );
 
@@ -69,15 +63,13 @@ export const useErrorHandler = () => {
    * Show warning message
    */
   const showWarning = useCallback(
-    (message, options = {}) => {
-      return addError(
+    (message, options = {}) => addError(
         { message },
         {
           type: ToastType.WARNING,
           ...options,
         }
-      );
-    },
+      ),
     [addError]
   );
 
@@ -85,9 +77,7 @@ export const useErrorHandler = () => {
    * Show error message
    */
   const showError = useCallback(
-    (error, options = {}) => {
-      return handleError(error, options);
-    },
+    (error, options = {}) => handleError(error, options),
     [handleError]
   );
 
@@ -127,9 +117,7 @@ export const useAsyncErrorHandler = (asyncFn, options = {}) => {
   const { executeWithErrorHandling } = useErrorHandler();
 
   return useCallback(
-    async (...args) => {
-      return executeWithErrorHandling(() => asyncFn(...args), options);
-    },
+    async (...args) => executeWithErrorHandling(() => asyncFn(...args), options),
     [asyncFn, executeWithErrorHandling, options]
   );
 };

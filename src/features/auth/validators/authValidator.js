@@ -1,4 +1,4 @@
-import { loginSchema, signupSchema } from '../models/authModel';
+import { loginSchema, signupSchema, forgotPasswordEmailSchema, resetPasswordSchema } from '../models/authModel';
 
 /**
  * Validate login form data against the domain schema.
@@ -21,6 +21,28 @@ export const validateLogin = (data) => {
  */
 export const validateSignup = (data) => {
   const result = signupSchema.safeParse(data);
+  if (result.success) {
+    return { success: true, value: result.data };
+  }
+  return {
+    success: false,
+    errors: result.error.flatten().fieldErrors,
+  };
+};
+
+export const validateForgotPasswordEmail = (data) => {
+  const result = forgotPasswordEmailSchema.safeParse(data);
+  if (result.success) {
+    return { success: true, value: result.data };
+  }
+  return {
+    success: false,
+    errors: result.error.flatten().fieldErrors,
+  };
+};
+
+export const validateResetPassword = (data) => {
+  const result = resetPasswordSchema.safeParse(data);
   if (result.success) {
     return { success: true, value: result.data };
   }

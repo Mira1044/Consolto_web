@@ -5,13 +5,18 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
+    include: ['src/**/*.{test,spec}.{js,jsx}'],
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@/shared': path.resolve(__dirname, './src/shared'),
       '@/features': path.resolve(__dirname, './src/features'),
       '@/pages': path.resolve(__dirname, './src/pages'),
-      '@/auth': path.resolve(__dirname, './src/auth'),
       '@/routes': path.resolve(__dirname, './src/routes'),
       '@/components': path.resolve(__dirname, './src/components'),
       '@/context': path.resolve(__dirname, './src/context'),

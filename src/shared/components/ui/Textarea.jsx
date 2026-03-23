@@ -33,17 +33,17 @@ export const Textarea = forwardRef(
     return (
       <textarea
         ref={ref}
+        className={`${baseClasses} ${stateClasses} ${disabledClasses} ${className}`}
+        disabled={disabled}
         id={id}
+        maxLength={maxLength}
         name={name}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
         placeholder={placeholder}
         required={required}
-        disabled={disabled}
         rows={rows}
-        maxLength={maxLength}
-        className={`${baseClasses} ${stateClasses} ${disabledClasses} ${className}`}
+        value={value}
+        onBlur={onBlur}
+        onChange={onChange}
         {...props}
       />
     );

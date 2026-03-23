@@ -2,6 +2,19 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useBooking } from '../hooks/useBooking';
 import { BookingLayout } from '../components/BookingLayout';
 
+const BookingPageContent = ({ expert, initialDuration, navigate }) => {
+  const booking = useBooking(expert, initialDuration, navigate);
+
+  return (
+    <BookingLayout
+      actions={booking}
+      expert={expert}
+      navigateBack={() => navigate('/experts')}
+      state={booking}
+    />
+  );
+};
+
 /**
  * BookingPage
  * Thin page wrapper: wires routing to feature hook and presentational layout.
@@ -14,16 +27,15 @@ export const BookingPage = () => {
   const expert = state?.expert;
   const initialDuration = state?.duration ?? 15;
 
-  if (!expert) return null;
-
-  const booking = useBooking(expert, initialDuration, navigate);
+  if (!expert) {
+    return null;
+  }
 
   return (
-    <BookingLayout
+    <BookingPageContent
       expert={expert}
-      state={booking}
-      actions={booking}
-      navigateBack={() => navigate('/experts')}
+      initialDuration={initialDuration}
+      navigate={navigate}
     />
   );
 };

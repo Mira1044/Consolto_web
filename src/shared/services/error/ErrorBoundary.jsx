@@ -15,6 +15,13 @@ export class ErrorBoundary extends Component {
       error: null,
       errorInfo: null,
     };
+    this.handleReset = () => {
+      this.setState({
+        hasError: false,
+        error: null,
+        errorInfo: null,
+      });
+    };
   }
 
   static getDerivedStateFromError(error) {
@@ -24,7 +31,7 @@ export class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
 
@@ -36,14 +43,6 @@ export class ErrorBoundary extends Component {
     // You can also log the error to an error reporting service here
     // Example: logErrorToService(error, errorInfo);
   }
-
-  handleReset = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    });
-  };
 
   render() {
     if (this.state.hasError) {
@@ -64,10 +63,10 @@ export class ErrorBoundary extends Component {
 
             <h1 className="mb-4 text-3xl font-bold text-gray-900">Something went wrong</h1>
             <p className="mb-8 text-lg text-gray-600">
-              We're sorry, but something unexpected happened. Please try refreshing the page or return to the home page.
+              We&apos;re sorry, but something unexpected happened. Please try refreshing the page or return to the home page.
             </p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <details className="mb-8 rounded-lg bg-gray-100 p-4 text-left">
                 <summary className="cursor-pointer font-semibold text-gray-700">Error Details (Development Only)</summary>
                 <pre className="mt-2 overflow-auto text-sm text-gray-600">

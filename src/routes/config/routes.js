@@ -148,9 +148,13 @@ export const routeConfig = [
  */
 export const getRouteByPath = (path) => {
   const exact = routeConfig.find((route) => route.path === path);
-  if (exact) return exact;
+  if (exact) {
+return exact;
+}
   return routeConfig.find((route) => {
-    if (!route.path.includes(':')) return false;
+    if (!route.path.includes(':')) {
+return false;
+}
     const pattern = `^${route.path.replace(/:[^/]+/g, '[^/]+')}$`;
     return new RegExp(pattern).test(path);
   });
@@ -159,20 +163,14 @@ export const getRouteByPath = (path) => {
 /**
  * Get all public routes
  */
-export const getPublicRoutes = () => {
-  return routeConfig.filter((route) => !route.requiresAuth && !route.requiresGuest);
-};
+export const getPublicRoutes = () => routeConfig.filter((route) => !route.requiresAuth && !route.requiresGuest);
 
 /**
  * Get all protected routes
  */
-export const getProtectedRoutes = () => {
-  return routeConfig.filter((route) => route.requiresAuth);
-};
+export const getProtectedRoutes = () => routeConfig.filter((route) => route.requiresAuth);
 
 /**
  * Get all auth routes
  */
-export const getAuthRoutes = () => {
-  return routeConfig.filter((route) => route.requiresGuest);
-};
+export const getAuthRoutes = () => routeConfig.filter((route) => route.requiresGuest);

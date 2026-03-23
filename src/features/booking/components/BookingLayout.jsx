@@ -18,7 +18,7 @@ export const BookingLayout = ({
     duration,
     selectedDate,
     selectedSlot,
-    frequency,
+    frequency: _frequency,
     reason,
     message,
     price,
@@ -31,7 +31,7 @@ export const BookingLayout = ({
     setDuration,
     setSelectedDate,
     setSelectedSlot,
-    setFrequency,
+    setFrequency: _setFrequency,
     setReason,
     setMessage,
     confirm,
@@ -56,10 +56,10 @@ export const BookingLayout = ({
             ₹{formatINR(price)} paid
           </p>
           <Button
+            className="rounded-xl px-10 py-4 text-lg !transition-none hover:!shadow-lg"
+            size="lg"
             type="button"
             onClick={navigateBack}
-            size="lg"
-            className="rounded-xl px-10 py-4 text-lg !transition-none hover:!shadow-lg"
           >
             Back to Experts
           </Button>
@@ -74,11 +74,11 @@ export const BookingLayout = ({
         {/* Back + title - desktop */}
         <div className="mb-10">
           <Button
+            className="mb-4 px-0 py-0 h-auto rounded-none shadow-none bg-transparent !transition-none hover:!bg-transparent hover:!text-slate-600"
+            size="sm"
             type="button"
             variant="ghost"
-            size="sm"
             onClick={navigateBack}
-            className="mb-4 px-0 py-0 h-auto rounded-none shadow-none bg-transparent !transition-none hover:!bg-transparent hover:!text-slate-600"
           >
             <span className="inline-flex items-center gap-2 text-base font-medium">
               <ArrowLeft size={22} strokeWidth={2} />
@@ -121,13 +121,15 @@ export const BookingLayout = ({
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <p className="text-base font-semibold text-slate-800 mb-4">Select date</p>
               <Input
+                className="max-w-xs cursor-pointer"
+                min={toInputDateValue(new Date())}
                 type="date"
                 value={toInputDateValue(selectedDate)}
-                min={toInputDateValue(new Date())}
                 onChange={(e) => {
-                  if (e.target.value) setSelectedDate(new Date(e.target.value + 'T00:00:00'));
+                  if (e.target.value) {
+setSelectedDate(new Date(`${e.target.value }T00:00:00`));
+}
                 }}
-                className="max-w-xs cursor-pointer"
               />
               <p className="text-sm text-slate-500 mt-2">
                 Click the field above to open the calendar and pick a date.
@@ -144,15 +146,15 @@ export const BookingLayout = ({
                   return (
                     <Button
                       key={d}
-                      type="button"
-                      onClick={() => setDuration(d)}
-                      variant="ghost"
-                      size="sm"
                       className={`w-full rounded-xl border-2 px-5 sm:px-8 py-4 sm:py-5 text-center !transition-none ${
                         active
                           ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100 hover:!bg-blue-600 hover:!border-blue-600'
                           : 'bg-white border-slate-200 text-slate-700 hover:!bg-white hover:!border-slate-200 hover:!text-slate-700'
                       }`}
+                      size="sm"
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setDuration(d)}
                     >
                       <div>
                         <p className="text-base font-semibold">{d} minutes</p>
@@ -177,60 +179,32 @@ export const BookingLayout = ({
                   return (
                     <Button
                       key={slot.time}
-                      type="button"
-                      onClick={() => setSelectedSlot(slot.time)}
-                      variant="ghost"
-                      size="sm"
                       className={`w-full sm:w-auto sm:min-w-[110px] rounded-xl border-2 px-4 sm:px-5 py-3 text-center !transition-none ${
                         active
                           ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100 hover:!bg-blue-600 hover:!border-blue-600'
                           : 'bg-white border-slate-200 text-slate-700 hover:!bg-white hover:!border-slate-200 hover:!text-slate-700'
                       }`}
+                      size="sm"
+                      type="button"
+                      variant="ghost"
+                      onClick={() => setSelectedSlot(slot.time)}
                     >
                       <p className="text-base font-semibold">{slot.time}</p>
                     </Button>
                   );
                 })}
               </div>
-
-              {/* Frequency (shown after time selection) */}
-              {/* {selectedSlot ? (
-                <div className="mt-5 pt-5 border-t border-slate-100">
-                  <p className="text-sm font-semibold text-slate-700 mb-3">Frequency</p>
-                  <div className="inline-flex w-full sm:w-auto rounded-xl border border-slate-200 bg-slate-50 p-1">
-                    {['Daily', 'Weekly', 'Monthly'].map((f) => {
-                      const active = frequency === f;
-                      return (
-                        <Button
-                          key={f}
-                          type="button"
-                          onClick={() => setFrequency(f)}
-                          variant="ghost"
-                          size="sm"
-                          className={`flex-1 sm:flex-none rounded-lg px-4 sm:px-5 py-2.5 text-sm font-semibold !transition-none ${
-                            active
-                              ? '!bg-slate-900 text-white hover:!bg-slate-900 hover:!text-white'
-                              : '!bg-transparent text-slate-600 hover:!bg-transparent hover:!text-slate-600'
-                          }`}
-                        >
-                          {f}
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : null} */}
             </div>
 
             {/* Reason for visit */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
               <p className="text-base font-semibold text-slate-800 mb-3">Reason for visit</p>
               <textarea
-                value={reason}
-                onChange={(e) => setReason(e.target.value.slice(0, 100))}
+                className="w-full resize-none border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
                 placeholder="Why are you booking this appointment?"
                 rows={4}
-                className="w-full resize-none border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
+                value={reason}
+                onChange={(e) => setReason(e.target.value.slice(0, 100))}
               />
               <p className="text-sm text-slate-400 text-right mt-2">{reason.length}/100</p>
             </div>
@@ -245,11 +219,11 @@ export const BookingLayout = ({
                 Any specific concerns or information you want to share
               </p>
               <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value.slice(0, 100))}
+                className="w-full resize-none border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
                 placeholder="Type your message here..."
                 rows={4}
-                className="w-full resize-none border border-slate-200 rounded-xl px-4 py-3 text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-colors"
+                value={message}
+                onChange={(e) => setMessage(e.target.value.slice(0, 100))}
               />
               <p className="text-sm text-slate-400 text-right mt-2">{message.length}/100</p>
             </div>
@@ -298,14 +272,14 @@ export const BookingLayout = ({
               </div>
 
               <Button
-                type="button"
-                disabled={!canConfirm}
-                onClick={confirm}
-                size="lg"
                 fullWidth
                 className={`rounded-2xl py-5 text-lg !transition-none hover:!shadow-lg ${
                   canConfirm ? 'shadow-lg shadow-blue-200' : 'bg-slate-200 text-slate-400 hover:!bg-slate-200'
                 }`}
+                disabled={!canConfirm}
+                size="lg"
+                type="button"
+                onClick={confirm}
               >
                 Confirm &amp; Pay ₹{formatINR(price)}
               </Button>

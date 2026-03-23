@@ -17,9 +17,9 @@ export const LogLevel = {
  * Error logger configuration
  */
 const loggerConfig = {
-  enabled: process.env.NODE_ENV !== 'test',
-  logToConsole: process.env.NODE_ENV === 'development',
-  logToService: process.env.NODE_ENV === 'production',
+  enabled: import.meta.env.MODE !== 'test',
+  logToConsole: import.meta.env.DEV,
+  logToService: import.meta.env.PROD,
   serviceEndpoint: null, // Can be configured to send logs to external service
 };
 
@@ -52,17 +52,25 @@ const formatError = (error, context = {}) => {
  * Log error to console (development)
  */
 const logToConsole = (errorData) => {
-  if (!loggerConfig.logToConsole) return;
+  if (!loggerConfig.logToConsole) {
+return;
+}
 
   const { message, code, statusCode, context, stack } = errorData;
 
   console.group(`🚨 Error: ${message}`);
-  if (code) console.error('Code:', code);
-  if (statusCode) console.error('Status:', statusCode);
+  if (code) {
+console.error('Code:', code);
+}
+  if (statusCode) {
+console.error('Status:', statusCode);
+}
   if (context && Object.keys(context).length > 0) {
     console.error('Context:', context);
   }
-  if (stack) console.error('Stack:', stack);
+  if (stack) {
+console.error('Stack:', stack);
+}
   console.groupEnd();
 };
 
@@ -70,7 +78,9 @@ const logToConsole = (errorData) => {
  * Log error to external service (production)
  */
 const logToService = async (errorData) => {
-  if (!loggerConfig.logToService || !loggerConfig.serviceEndpoint) return;
+  if (!loggerConfig.logToService || !loggerConfig.serviceEndpoint) {
+return;
+}
 
   try {
     await fetch(loggerConfig.serviceEndpoint, {
@@ -94,7 +104,9 @@ const logToService = async (errorData) => {
  * @param {Object} context - Additional context information
  */
 export const logError = (error, context = {}) => {
-  if (!loggerConfig.enabled) return;
+  if (!loggerConfig.enabled) {
+return;
+}
 
   const errorData = formatError(error, context);
 
@@ -113,7 +125,9 @@ export const logError = (error, context = {}) => {
  * Log warning
  */
 export const logWarning = (message, context = {}) => {
-  if (!loggerConfig.enabled || !loggerConfig.logToConsole) return;
+  if (!loggerConfig.enabled || !loggerConfig.logToConsole) {
+return;
+}
 
   console.warn(`⚠️ Warning: ${message}`, context);
 };
@@ -122,7 +136,9 @@ export const logWarning = (message, context = {}) => {
  * Log info
  */
 export const logInfo = (message, context = {}) => {
-  if (!loggerConfig.enabled || !loggerConfig.logToConsole) return;
+  if (!loggerConfig.enabled || !loggerConfig.logToConsole) {
+return;
+}
 
   console.info(`ℹ️ Info: ${message}`, context);
 };

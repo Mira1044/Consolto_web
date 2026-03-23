@@ -6,17 +6,25 @@ const AUTH_KEY = 'consolto_user';
 
 /** Reject empty / placeholder tokens so we don't skip the login screen by mistake. */
 function isValidAuthToken(token) {
-  if (token == null || typeof token !== 'string') return false;
+  if (token == null || typeof token !== 'string') {
+return false;
+}
   const t = token.trim();
-  if (!t.length) return false;
-  if (t === 'undefined' || t === 'null') return false;
+  if (!t.length) {
+return false;
+}
+  if (t === 'undefined' || t === 'null') {
+return false;
+}
   return true;
 }
 
 function readStoredUser() {
   try {
     const stored = localStorage.getItem(AUTH_KEY);
-    if (!stored) return null;
+    if (!stored) {
+return null;
+}
     const parsed = JSON.parse(stored);
     if (!parsed || !isValidAuthToken(parsed.token)) {
       localStorage.removeItem(AUTH_KEY);
@@ -43,20 +51,28 @@ export function AuthProvider({ children }) {
 
   // Verify persisted session before letting routes decide guest vs authed
   useEffect(() => {
-    if (authReady) return;
+    if (authReady) {
+return;
+}
 
     let cancelled = false;
 
     (async () => {
       try {
         const data = await apiRequest.get('/user/self-identification', { skipErrorHandler: true });
-        if (cancelled) return;
+        if (cancelled) {
+return;
+}
         setUser((prev) => {
-          if (!prev) return null;
+          if (!prev) {
+return null;
+}
           return { ...prev, ...data, token: prev.token };
         });
       } catch (err) {
-        if (cancelled) return;
+        if (cancelled) {
+return;
+}
         const status = err?.response?.status;
         const hasResponse = !!err?.response;
         // Expired / invalid token
@@ -77,7 +93,9 @@ export function AuthProvider({ children }) {
           }
         }
       } finally {
-        if (!cancelled) setAuthReady(true);
+        if (!cancelled) {
+setAuthReady(true);
+}
       }
     })();
 
@@ -143,6 +161,8 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+  if (!ctx) {
+throw new Error('useAuth must be used within AuthProvider');
+}
   return ctx;
 }

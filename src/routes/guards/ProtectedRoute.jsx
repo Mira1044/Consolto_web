@@ -11,8 +11,8 @@ export const ProtectedRoute = ({ children, redirectTo = ROUTES.HOME }) => {
   const { isLoggedIn } = useAuth();
 
   if (!isLoggedIn) {
-    return <Navigate to={redirectTo} replace />;
+    return <Navigate replace to={redirectTo} />;
   }
 
-  return <>{children}</>;
+  return children;
 };

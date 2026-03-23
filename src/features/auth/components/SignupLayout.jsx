@@ -14,15 +14,14 @@ export const SignupLayout = ({
   setField,
   handleSubmit,
   onGoToLogin,
-  onBackToHome,
-}) => {
-  return (
+  onBackToHome: _onBackToHome,
+}) => (
     <div className="flex min-h-screen items-center justify-center px-4 sm:px-6 py-6">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
         className="w-full max-w-md sm:max-w-lg space-y-6 sm:space-y-8"
+        initial={{ opacity: 0, y: 20 }}
+        transition={{ duration: 0.5 }}
       >
         <div className="text-center">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Create your account</h2>
@@ -30,82 +29,82 @@ export const SignupLayout = ({
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <FormField
-              label="Full name"
-              id="name"
-              name="name"
-              type="text"
-              autoComplete="name"
               required
-              value={fields.name}
-              onChange={setField('name')}
-              placeholder="Full name"
-              inputComponent={Input}
+              autoComplete="name"
               error={!!errors.name}
               errorMessage={errors.name?.[0]}
+              id="name"
+              inputComponent={Input}
+              label="Full name"
+              name="name"
+              placeholder="Full name"
+              type="text"
+              value={fields.name}
+              onChange={setField('name')}
             />
 
             <FormField
-              label="Email address"
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
               required
-              value={fields.email}
-              onChange={setField('email')}
-              placeholder="Email"
-              inputComponent={Input}
+              autoComplete="email"
               error={!!errors.email}
               errorMessage={errors.email?.[0]}
+              id="email"
+              inputComponent={Input}
+              label="Email address"
+              name="email"
+              placeholder="Email"
+              type="email"
+              value={fields.email}
+              onChange={setField('email')}
             />
 
             <FormField
-              label="Password"
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
               required
-              minLength={6}
-              value={fields.password}
-              onChange={setField('password')}
-              placeholder="Password"
-              inputComponent={Input}
+              autoComplete="new-password"
               error={!!errors.password}
               errorMessage={errors.password?.[0]}
+              id="password"
+              inputComponent={Input}
+              label="Password"
+              minLength={6}
+              name="password"
+              placeholder="Password"
+              type="password"
+              value={fields.password}
+              onChange={setField('password')}
             />
 
             <FormField
-              label="Confirm password"
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              autoComplete="new-password"
               required
-              minLength={6}
-              value={fields.confirmPassword}
-              onChange={setField('confirmPassword')}
-              placeholder="Confirm password"
-              inputComponent={Input}
+              autoComplete="new-password"
               error={!!errors.confirmPassword || (fields.confirmPassword && !passwordsMatch)}
               errorMessage={
                 errors.confirmPassword?.[0] ||
                 (fields.confirmPassword && !passwordsMatch ? 'Passwords do not match' : '')
               }
+              id="confirmPassword"
+              inputComponent={Input}
+              label="Confirm password"
+              minLength={6}
+              name="confirmPassword"
+              placeholder="Confirm password"
+              type="password"
+              value={fields.confirmPassword}
+              onChange={setField('confirmPassword')}
             />
 
             <Button
-              type="submit"
+              fullWidth
               disabled={isLoading || !passwordsMatch}
               isLoading={isLoading}
-              fullWidth
               size="lg"
+              type="submit"
             >
               {isLoading ? 'Creating account...' : 'Create account'}
             </Button>
@@ -116,9 +115,9 @@ export const SignupLayout = ({
               Already have an account?{' '}
               {onGoToLogin ? (
                 <button
+                  className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
                   type="button"
                   onClick={onGoToLogin}
-                  className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
                 >
                   Sign in
                 </button>
@@ -127,8 +126,7 @@ export const SignupLayout = ({
           </div>
         </motion.div>
 
-        
+
       </motion.div>
     </div>
   );
-};

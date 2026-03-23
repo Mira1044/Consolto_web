@@ -1,11 +1,16 @@
 import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/shared/components/ui';
-import { BookingsSegmentedToggle, UpcomingAppointmentCard } from '../components';
+import {
+  BookingsSegmentedToggle,
+  UpcomingAppointmentCard,
+  BookingDetailsModal,
+  BookingCancelModal,
+  BookingRescheduleModal,
+} from '../components';
 import { useBookingsData } from '../hooks/useBookingsData';
 import { useBookingActions } from '../hooks/useBookingActions';
 import { useInvoiceDownload } from '../hooks/useInvoiceDownload';
-import { toDateOnly } from '../utils/bookingNormalization';
 
 function EmptyState({ tab, filter }) {
   return (
@@ -251,276 +256,41 @@ export const BookingsPage = () => {
       </div>
 
       {/* Modals */}
-      <AnimatePresence>
-        {modal && activeBooking && (
-          <motion.div
-            key="modal-overlay"
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4"
-            exit={{ opacity: 0 }}
-            initial={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={(e) => {
- if (e.target === e.currentTarget) {
-closeModal();
-}
-}}
-          >
-            <motion.div
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
-              exit={{ opacity: 0, y: 16, scale: 0.97 }}
-              initial={{ opacity: 0, y: 24, scale: 0.96 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-            >
-              <div
-                className="h-1 w-full"
-                style={{ background: `linear-gradient(90deg, ${activeBooking.accent}cc, ${activeBooking.accent}33)` }}
-              />
-
-              <div className="p-5 border-b border-slate-100 flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3">
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${activeBooking.color}`}>
-                    {activeBooking.avatar}
-                  </div>
-                  <div>
-                    <p className="text-xs text-slate-400 font-medium">
-                      {modal === 'summary'
-                        ? 'Consultation Summary'
-                        : modal === 'cancel'
-                          ? 'Cancel Appointment'
-                          : modal === 'reschedule'
-                            ? 'Reschedule Appointment'
-                            : 'Booking Details'}
-                    </p>
-                    <p className="font-semibold text-slate-800">{activeBooking.doctor}</p>
-                    <p className="text-sm text-slate-500">{activeBooking.specialty}</p>
-                  </div>
-                </div>
-                <button
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors flex-shrink-0"
-                  type="button"
-                  onClick={closeModal}
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                    <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </div>
-
-              <div className="p-5">
-                {/* Details / Summary modal */}
-                {(modal === 'details' || modal === 'summary') && (
-                  <>
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { label: 'Date', value: activeBooking.date },
-                        { label: 'Time', value: activeBooking.time },
-                        { label: 'Mode', value: activeBooking.mode },
-                        { label: 'Status', value: activeBooking.status.charAt(0).toUpperCase() + activeBooking.status.slice(1) },
-                      ].map((item) => (
-                        <div key={item.label} className="rounded-xl bg-slate-50 p-3">
-                          <p className="text-xs text-slate-400 font-medium mb-0.5">{item.label}</p>
-                          <p className="text-sm font-semibold text-slate-800">{item.value}</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {modal === 'summary' && (
-                      <div className="mt-4 rounded-xl border border-slate-200 p-4">
-                        <p className="text-sm font-semibold text-slate-800 mb-1">Notes</p>
-                        <p className="text-sm text-slate-500 leading-relaxed">
-                          This is a placeholder summary. When backend is ready, we&apos;ll show prescription / advice / follow-up here.
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2 mt-5">
-                      {tab === 'Upcoming' ? (
-                        <>
-                          <motion.button
-                            className="flex-1 h-10 rounded-xl text-sm font-semibold border border-slate-200 hover:border-slate-300 text-slate-700 transition-colors"
-                            type="button"
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => {
- closeModal(); handleReschedule(activeBooking);
-}}
-                          >
-                            Reschedule
-                          </motion.button>
-                          <motion.button
-                            className="flex-1 h-10 rounded-xl text-sm font-semibold border border-red-200 hover:bg-red-50 text-red-600 transition-colors"
-                            type="button"
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => {
- closeModal(); handleCancel(activeBooking);
-}}
-                          >
-                            Cancel
-                          </motion.button>
-                        </>
-                      ) : (
-                        <motion.button
-                          className="flex-1 h-10 rounded-xl text-sm font-semibold bg-slate-900 hover:bg-slate-950 text-white transition-colors"
-                          type="button"
-                          whileTap={{ scale: 0.97 }}
-                          onClick={() => {
- closeModal(); handleBookAgain(activeBooking);
-}}
-                        >
-                          Book Again
-                        </motion.button>
-                      )}
-                    </div>
-                  </>
-                )}
-
-                {/* Cancel modal */}
-                {modal === 'cancel' && (
-                  <div>
-                    <div className="mb-4 rounded-xl bg-red-50 border border-red-100 p-4">
-                      <p className="text-sm font-semibold text-red-700 mb-1">Appointment</p>
-                      <p className="text-sm text-red-800">
-                        {activeBooking.date} at {activeBooking.time}
-                      </p>
-                    </div>
-
-                    <textarea
-                      className="w-full resize-none border border-red-200 rounded-xl px-4 py-3 text-base text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 transition-colors bg-white"
-                      placeholder="Enter cancellation reason..."
-                      rows={4}
-                      value={cancelReason}
-                      onChange={(e) => setCancelReason(e.target.value)}
-                    />
-
-                    <p className={`text-xs mt-2 ${cancelReason.trim().length < 20 ? 'text-red-600' : 'text-slate-500'}`}>
-                      {cancelReason.trim().length} / 20 characters minimum
-                    </p>
-
-                    <div className="flex items-center gap-2 mt-5">
-                      <motion.button
-                        className="flex-1 h-10 rounded-xl text-sm font-semibold border border-slate-200 hover:border-slate-300 text-slate-700 transition-colors"
-                        disabled={cancelLoading}
-                        type="button"
-                        whileTap={{ scale: 0.97 }}
-                        onClick={closeModal}
-                      >
-                        Cancel
-                      </motion.button>
-                      <motion.button
-                        className="flex-1 h-10 rounded-xl text-sm font-semibold bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={cancelLoading || cancelReason.trim().length < 20}
-                        type="button"
-                        whileTap={{ scale: 0.97 }}
-                        onClick={handleConfirmCancel}
-                      >
-                        {cancelLoading ? 'Cancelling...' : 'Confirm Cancellation'}
-                      </motion.button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Reschedule modal */}
-                {modal === 'reschedule' && (
-                  <div>
-                    <div className="mb-4 rounded-xl bg-blue-50 border-l-4 border-blue-500 p-4">
-                      <p className="text-sm text-blue-800 font-medium mb-1">Current Appointment</p>
-                      <p className="text-sm text-blue-700">Date: {activeBooking.date}</p>
-                      <p className="text-sm text-blue-700">Time: {activeBooking.time}</p>
-                      {activeBooking?.raw?.appointment_duration && (
-                        <p className="text-sm text-blue-700">
-                          Duration: {String(activeBooking.raw.appointment_duration).replaceAll('_', ' ')}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="mb-3">
-                      <p className="text-sm text-gray-600 mb-1 font-medium">Select filter date</p>
-                      <input
-                        className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                        min={toDateOnly(activeBooking?.raw?.appointment_booked_date)}
-                        type="date"
-                        value={rescheduleFilterDate}
-                        onChange={(e) => handleRescheduleDateChange(e.target.value)}
-                      />
-                    </div>
-
-                    <div className="mb-2">
-                      <p className="text-sm text-gray-600 mb-1 font-medium">Select new time slot (same duration)</p>
-                    </div>
-
-                    {loadingSlots ? (
-                      <div className="py-8 items-center justify-center">
-                        <p className="text-sm text-slate-600">Loading available slots...</p>
-                      </div>
-                    ) : availableSlots.length === 0 ? (
-                      <div className="py-6 items-center justify-center bg-gray-50 rounded-xl">
-                        <p className="text-sm text-slate-600 text-center">No available slots found.</p>
-                      </div>
-                    ) : (
-                      <div className="max-h-56 overflow-y-auto pr-1">
-                        {availableSlots.map((slot) => {
-                          const isSelected = selectedAvailabilityId === slot._id;
-                          return (
-                            <button
-                              key={slot._id}
-                              className={`w-full text-left p-3 mb-2 rounded-xl border-2 transition-colors ${
-                                isSelected
-                                  ? 'border-yellow-500 bg-yellow-50'
-                                  : 'border-slate-200 bg-white hover:bg-slate-50'
-                              }`}
-                              disabled={rescheduleLoading}
-                              type="button"
-                              onClick={() => setSelectedAvailabilityId(slot._id)}
-                            >
-                              <div className="flex items-center justify-between gap-3">
-                                <div className="min-w-0">
-                                  <p className={`font-semibold ${isSelected ? 'text-yellow-800' : 'text-slate-800'}`}>
-                                    {slot.type === 'SPECIFIC'
-                                      ? new Date(String(slot.available_date || '')).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
-                                      : `${slot.type} Availability`}
-                                  </p>
-                                  <p className={`text-sm ${isSelected ? 'text-yellow-700' : 'text-slate-600'}`}>
-                                    {slot.start_time} - {slot.end_time}
-                                  </p>
-                                </div>
-                                {isSelected && (
-                                  <span className="text-yellow-700 font-semibold">✓</span>
-                                )}
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2 mt-5">
-                      <motion.button
-                        className="flex-1 h-10 rounded-xl text-sm font-semibold border border-slate-200 hover:border-slate-300 text-slate-700 transition-colors"
-                        disabled={rescheduleLoading}
-                        type="button"
-                        whileTap={{ scale: 0.97 }}
-                        onClick={closeModal}
-                      >
-                        Cancel
-                      </motion.button>
-                      <motion.button
-                        className="flex-1 h-10 rounded-xl text-sm font-semibold bg-yellow-500 hover:bg-yellow-600 text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={rescheduleLoading || !selectedAvailabilityId || !rescheduleFilterDate}
-                        type="button"
-                        whileTap={{ scale: 0.97 }}
-                        onClick={handleConfirmReschedule}
-                      >
-                        {rescheduleLoading ? 'Rescheduling...' : 'Reschedule'}
-                      </motion.button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {(modal === 'details' || modal === 'summary') && activeBooking && (
+        <BookingDetailsModal
+          booking={activeBooking}
+          modal={modal}
+          tab={tab}
+          onBookAgain={handleBookAgain}
+          onCancel={handleCancel}
+          onClose={closeModal}
+          onReschedule={handleReschedule}
+        />
+      )}
+      {modal === 'cancel' && activeBooking && (
+        <BookingCancelModal
+          booking={activeBooking}
+          cancelLoading={cancelLoading}
+          cancelReason={cancelReason}
+          onCancelReasonChange={setCancelReason}
+          onClose={closeModal}
+          onConfirmCancel={handleConfirmCancel}
+        />
+      )}
+      {modal === 'reschedule' && activeBooking && (
+        <BookingRescheduleModal
+          availableSlots={availableSlots}
+          booking={activeBooking}
+          loadingSlots={loadingSlots}
+          rescheduleFilterDate={rescheduleFilterDate}
+          rescheduleLoading={rescheduleLoading}
+          selectedAvailabilityId={selectedAvailabilityId}
+          onClose={closeModal}
+          onConfirmReschedule={handleConfirmReschedule}
+          onDateChange={handleRescheduleDateChange}
+          onSelectSlot={setSelectedAvailabilityId}
+        />
+      )}
     </div>
   );
 };

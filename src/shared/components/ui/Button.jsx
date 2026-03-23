@@ -47,14 +47,14 @@ export const Button = forwardRef(
     return (
       <button
         ref={ref}
-        type={type}
-        disabled={disabled || isLoading}
         className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${widthClass} ${className}`}
+        disabled={disabled || isLoading}
+        type={type}
         {...props}
       >
         {isLoading ? (
           <>
-            <ButtonLoader size="sm" color="white" className="mr-2" />
+            <ButtonLoader className="mr-2" color="white" size="sm" />
             <span>Loading...</span>
           </>
         ) : (

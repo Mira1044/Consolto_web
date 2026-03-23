@@ -37,13 +37,23 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
   const chatClientRef = useRef(null);
   const currentModeRef = useRef(mode);
 
-  useEffect(() => { currentModeRef.current = currentMode; }, [currentMode]);
-  useEffect(() => { callRef.current = call; }, [call]);
-  useEffect(() => { streamClientRef.current = streamClient; }, [streamClient]);
-  useEffect(() => { chatClientRef.current = chatClient; }, [chatClient]);
+  useEffect(() => {
+ currentModeRef.current = currentMode;
+}, [currentMode]);
+  useEffect(() => {
+ callRef.current = call;
+}, [call]);
+  useEffect(() => {
+ streamClientRef.current = streamClient;
+}, [streamClient]);
+  useEffect(() => {
+ chatClientRef.current = chatClient;
+}, [chatClient]);
 
   const cleanup = useCallback(async (forceCleanup = false) => {
-    if (isCleaningUp && !forceCleanup) return;
+    if (isCleaningUp && !forceCleanup) {
+return;
+}
     setIsCleaningUp(true);
 
     try {
@@ -79,11 +89,15 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
       }
 
       if (currentStreamClient) {
-        try { await currentStreamClient.disconnectUser(); } catch { /* ok */ }
+        try {
+ await currentStreamClient.disconnectUser();
+} catch { /* ok */ }
       }
 
       if (currentChatClient) {
-        try { await currentChatClient.disconnectUser(); } catch { /* ok */ }
+        try {
+ await currentChatClient.disconnectUser();
+} catch { /* ok */ }
       }
 
       clearActiveSession();
@@ -98,12 +112,16 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
       }
       clearActiveSession();
     } finally {
-      if (isMountedRef.current) setIsCleaningUp(false);
+      if (isMountedRef.current) {
+setIsCleaningUp(false);
+}
     }
   }, [isCleaningUp]);
 
   const initializeServices = useCallback(async () => {
-    if (isInitializingRef.current) return;
+    if (isInitializingRef.current) {
+return;
+}
     isInitializingRef.current = true;
 
     let videoClient = null;
@@ -121,7 +139,9 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
 
       const tokenData = await streamService.getToken();
       const { token, userId, user, apiKey, chatToken } = tokenData;
-      if (!token || !chatToken || !apiKey) throw new Error('Incomplete Stream credentials');
+      if (!token || !chatToken || !apiKey) {
+throw new Error('Incomplete Stream credentials');
+}
 
       // Video client — only for video mode
       if (mode === 'video' || currentModeRef.current === 'video') {
@@ -179,9 +199,15 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
       console.error('Error initializing Stream services:', err);
 
       try {
-        if (callInstance) { await callInstance.leave().catch(() => {}); }
-        if (videoClient) { await videoClient.disconnectUser().catch(() => {}); }
-        if (streamChatClient?.userID) { await streamChatClient.disconnectUser().catch(() => {}); }
+        if (callInstance) {
+ await callInstance.leave().catch(() => {});
+}
+        if (videoClient) {
+ await videoClient.disconnectUser().catch(() => {});
+}
+        if (streamChatClient?.userID) {
+ await streamChatClient.disconnectUser().catch(() => {});
+}
       } catch { /* cleanup partial */ }
 
       if (isMountedRef.current) {
@@ -220,7 +246,9 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
       const callInstance = videoClient.call('default', callId);
       await callInstance.join({ create: true });
 
-      try { await streamService.startCall(appointmentId); } catch { /* ok */ }
+      try {
+ await streamService.startCall(appointmentId);
+} catch { /* ok */ }
 
       if (isMountedRef.current) {
         setStreamClient(videoClient);
@@ -296,7 +324,9 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
 
   // Detect when the other participant ends the call (Stream fires call.ended).
   useEffect(() => {
-    if (!call) return;
+    if (!call) {
+return;
+}
 
     const sub = call.on('call.ended', () => {
       if (isMountedRef.current) {
@@ -310,7 +340,9 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
 
   // Unread count listener
   useEffect(() => {
-    if (!channel || !chatClient?.userID) return;
+    if (!channel || !chatClient?.userID) {
+return;
+}
 
     setUnreadCount(channel.countUnread());
 

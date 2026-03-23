@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   AlertTriangle,
   Banknote,
@@ -70,7 +70,7 @@ export const UpcomingAppointmentCard = ({
     const now = new Date();
 
     const status = String(raw?.appointment_status || '').toUpperCase();
-    
+
     const statusColor = getStatusColor(status);
     // Same as app: `booking.appointment_status.replace('_', ' ')` (first underscore only)
     const statusLabel = String(raw?.appointment_status || '').replace('_', ' ') || '—';
@@ -94,7 +94,9 @@ export const UpcomingAppointmentCard = ({
             const u = raw?.user || {};
             const first = u?.firstName || u?.phoneNumber;
             const last = u?.lastName;
-            if (first && last) return `${first} ${last}`;
+            if (first && last) {
+return `${first} ${last}`;
+}
             return u?.firstName || u?.phoneNumber || 'Unknown Client';
           })()
         : raw?.consultant?.user_name || raw?.consultant?.userName || raw?.consultant?.name || 'Unknown Consultant';
@@ -106,7 +108,9 @@ export const UpcomingAppointmentCard = ({
             const consultantObj =
               raw?.consultant_id && typeof raw.consultant_id === 'object' ? raw.consultant_id : raw?.consultant;
             const spec = consultantObj?.specialization;
-            if (Array.isArray(spec) && spec.length) return spec.map((s) => String(s).trim()).filter(Boolean);
+            if (Array.isArray(spec) && spec.length) {
+return spec.map((s) => String(s).trim()).filter(Boolean);
+}
             return ['Specialist'];
           })()
         : [];
@@ -132,25 +136,27 @@ export const UpcomingAppointmentCard = ({
       isUpcomingByTime;
 
     return {
-      statusColor: statusColor,
-      statusLabel: statusLabel,
-      displayName: displayName,
-      specializationItems: specializationItems,
-      isUpcomingByTime: isUpcomingByTime,
-      chatAvailability: chatAvailability,
-      videoAvailability: videoAvailability,
-      canCancel: canCancel,
-      canReschedule: canReschedule,
-      canComplete: canComplete,
-      amount: amount,
-      paymentStatus: paymentStatus,
-      userJoined: userJoined,
-      consultantJoined: consultantJoined,
-      isFeedback: isFeedback,
+      statusColor,
+      statusLabel,
+      displayName,
+      specializationItems,
+      isUpcomingByTime,
+      chatAvailability,
+      videoAvailability,
+      canCancel,
+      canReschedule,
+      canComplete,
+      amount,
+      paymentStatus,
+      userJoined,
+      consultantJoined,
+      isFeedback,
     };
   }, [raw, userRole]);
 
-  if (!raw) return null;
+  if (!raw) {
+return null;
+}
 
   const appointmentId = raw?._id || booking?.id;
   const durationLabel = raw?.appointment_duration ? String(raw.appointment_duration).replaceAll('_', ' ') : null;
@@ -188,22 +194,22 @@ export const UpcomingAppointmentCard = ({
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 14 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10, scale: 0.98 }}
-      whileHover={{ y: -2 }}
-      transition={{ duration: 0.25 }}
       className="bg-white rounded-2xl p-4 shadow-sm flex flex-col h-full"
+      exit={{ opacity: 0, y: -10, scale: 0.98 }}
+      initial={{ opacity: 0, y: 14 }}
       style={{
         borderLeftWidth: 4,
         borderLeftColor: statusColor,
         borderLeftStyle: 'solid',
       }}
+      transition={{ duration: 0.25 }}
+      whileHover={{ y: -2 }}
     >
       {/* 1) Missed appointment — top of card (same order as app) */}
       <div className={`mb-3 min-h-[40px] ${missedAppointment ? '' : 'opacity-0 pointer-events-none'}`}>
         <div className="p-2 bg-red-100 rounded-lg flex items-center justify-center gap-2">
-          <AlertTriangle size={16} color="#EF4444" />
+          <AlertTriangle color="#EF4444" size={16} />
           <span className="text-red-600 text-sm font-semibold text-center">You have missed this appointment!</span>
         </div>
       </div>
@@ -217,17 +223,17 @@ export const UpcomingAppointmentCard = ({
           {specializationItems.length > 0 && (
             <div className="group relative shrink-0 pt-0.5">
               <button
-                type="button"
-                className="inline-flex rounded-full p-1 text-blue-600 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
-                aria-label="Specializations"
                 aria-describedby={`spec-tip-${appointmentId}`}
+                aria-label="Specializations"
+                className="inline-flex rounded-full p-1 text-blue-600 transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-0"
+                type="button"
               >
-                <Info className="h-[18px] w-[18px]" strokeWidth={2.5} aria-hidden />
+                <Info aria-hidden className="h-[18px] w-[18px]" strokeWidth={2.5} />
               </button>
               <div
+                className="invisible absolute left-0 top-full z-[60] mt-1.5 w-max max-w-[min(18rem,calc(100vw-2rem))] rounded-lg border border-gray-200 bg-white px-3 py-2 text-left text-xs text-gray-700 shadow-lg opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
                 id={`spec-tip-${appointmentId}`}
                 role="tooltip"
-                className="invisible absolute left-0 top-full z-[60] mt-1.5 w-max max-w-[min(18rem,calc(100vw-2rem))] rounded-lg border border-gray-200 bg-white px-3 py-2 text-left text-xs text-gray-700 shadow-lg opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
               >
                 <p className="mb-1.5 font-semibold text-gray-900">Specializations</p>
                 <ul className="max-h-48 list-disc space-y-1 overflow-y-auto pl-4 pr-1">
@@ -257,7 +263,7 @@ export const UpcomingAppointmentCard = ({
 
       {/* 3) Booking ID */}
       <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-        <Ticket size={15} color="#9CA3AF" />
+        <Ticket color="#9CA3AF" size={15} />
         <span>
           Booking ID: <span className="font-medium">{appointmentId || '—'}</span>
         </span>
@@ -265,13 +271,13 @@ export const UpcomingAppointmentCard = ({
 
       {/* 4) Date */}
       <div className="flex items-center gap-2 text-sm text-gray-700 mb-2">
-        <CalendarDays size={15} color="#9CA3AF" />
+        <CalendarDays color="#9CA3AF" size={15} />
         <span className="font-medium">{formatAppointmentDate(raw?.appointment_booked_date)}</span>
       </div>
 
       {/* 5) Time + duration */}
       <div className="flex items-center gap-2 text-sm text-gray-700 mb-2 flex-wrap">
-        <Clock size={15} color="#9CA3AF" />
+        <Clock color="#9CA3AF" size={15} />
         <span className="font-medium">{formatAppointmentTime(raw?.appointment_start_time, raw?.appointment_end_time)}</span>
         {durationLabel && (
           <span className="text-gray-600 text-xs ml-0">
@@ -313,11 +319,11 @@ export const UpcomingAppointmentCard = ({
       {/* 7–8) User / Consultant joined (Past tab; placeholders keep grid aligned on Upcoming) */}
       <div className={`mb-2 min-h-[38px] ${isPast ? '' : 'opacity-0 pointer-events-none'}`}>
         <div className="flex items-center gap-2 text-sm text-gray-700">
-          <User size={15} color="#9CA3AF" />
+          <User color="#9CA3AF" size={15} />
           <span>User Joined: {userJoined ? 'Yes' : 'No'}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-gray-700 mt-1">
-          <User size={15} color="#9CA3AF" />
+          <User color="#9CA3AF" size={15} />
           <span>Consultant Joined: {consultantJoined ? 'Yes' : 'No'}</span>
         </div>
       </div>
@@ -325,7 +331,7 @@ export const UpcomingAppointmentCard = ({
       {/* 9) Payment — banknote icon like app */}
       <div className={`mb-3 min-h-[28px] ${amount > 0 || paymentStatus ? '' : 'opacity-0 pointer-events-none'}`}>
         <div className="flex items-center gap-2 text-sm text-gray-700">
-          <Banknote size={15} color="#9CA3AF" />
+          <Banknote color="#9CA3AF" size={15} />
           <span className="text-gray-800 font-medium">
             ₹{amount || 0}
             {paymentStatus ? <span className="text-gray-500 font-normal"> ({paymentStatus})</span> : null}
@@ -359,15 +365,15 @@ export const UpcomingAppointmentCard = ({
       <div className="mt-auto grid w-full min-w-0 grid-flow-col auto-cols-[minmax(0,1fr)] gap-2 pt-1 max-[380px]:auto-cols-[minmax(5.5rem,1fr)] max-[380px]:overflow-x-auto max-[380px]:pb-0.5 [scrollbar-width:thin]">
         {chatAvailability.available && (
           <Button
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs"
+            disabled={actionLoading}
+            size="sm"
             type="button"
             variant="primary"
-            size="sm"
-            disabled={actionLoading}
             onClick={() => onJoinChat?.(booking)}
-            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs"
           >
             <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
-              <MessageSquare className="shrink-0" size={16} color="#fff" />
+              <MessageSquare className="shrink-0" color="#fff" size={16} />
               <span className="text-center font-semibold">{isUpcomingByTime ? 'Start Chat' : 'Chat History'}</span>
             </span>
           </Button>
@@ -375,14 +381,14 @@ export const UpcomingAppointmentCard = ({
 
         {videoAvailability.available && (
           <Button
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-green-600 !text-white !hover:bg-green-700"
+            disabled={actionLoading}
             type="button"
             variant="secondary"
-            disabled={actionLoading}
             onClick={() => onJoinCall?.(booking)}
-            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-green-600 !text-white !hover:bg-green-700"
           >
             <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
-              <Video className="shrink-0" size={16} color="#fff" />
+              <Video className="shrink-0" color="#fff" size={16} />
               <span className="text-center font-semibold leading-tight">Video Call</span>
             </span>
           </Button>
@@ -390,14 +396,14 @@ export const UpcomingAppointmentCard = ({
 
         {canShowReschedule && (
           <Button
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-yellow-500 !text-white !hover:bg-yellow-600"
+            disabled={rescheduleLoading}
             type="button"
             variant="secondary"
-            disabled={rescheduleLoading}
             onClick={() => onRescheduleBooking?.(booking)}
-            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-yellow-500 !text-white !hover:bg-yellow-600"
           >
             <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
-              <CalendarDays className="shrink-0" size={16} color="#fff" />
+              <CalendarDays className="shrink-0" color="#fff" size={16} />
               <span className="text-center font-semibold">Reschedule</span>
             </span>
           </Button>
@@ -405,11 +411,11 @@ export const UpcomingAppointmentCard = ({
 
         {canShowCancel && (
           <Button
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs"
+            disabled={cancelLoading}
             type="button"
             variant="danger"
-            disabled={cancelLoading}
             onClick={() => onCancelBooking?.(booking)}
-            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs"
           >
             <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
               <span className="text-center font-semibold">Cancel</span>
@@ -419,14 +425,14 @@ export const UpcomingAppointmentCard = ({
 
         {canComplete && (
           <Button
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-green-600 !text-white !hover:bg-green-700"
+            disabled={completeLoading}
             type="button"
             variant="secondary"
-            disabled={completeLoading}
             onClick={() => onCompleteBooking?.(booking)}
-            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-green-600 !text-white !hover:bg-green-700"
           >
             <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
-              <CheckCircle className="shrink-0" size={16} color="#fff" />
+              <CheckCircle className="shrink-0" color="#fff" size={16} />
               <span className="text-center font-semibold">Complete</span>
             </span>
           </Button>
@@ -434,15 +440,15 @@ export const UpcomingAppointmentCard = ({
 
         {canSubmitFeedback && (
           <Button
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-orange-500 !text-white !hover:bg-orange-600"
+            disabled={actionLoading}
+            size="sm"
             type="button"
             variant="secondary"
-            size="sm"
-            disabled={actionLoading}
             onClick={() => onViewSummary?.(booking)}
-            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-orange-500 !text-white !hover:bg-orange-600"
           >
             <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
-              <Star className="shrink-0" size={16} color="#fff" />
+              <Star className="shrink-0" color="#fff" size={16} />
               <span className="text-center font-semibold leading-snug">Feedback</span>
             </span>
           </Button>
@@ -450,12 +456,12 @@ export const UpcomingAppointmentCard = ({
 
         {shouldShowInvoice && (
           <Button
+            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-blue-100 !text-blue-600 !border-transparent hover:!bg-blue-200"
+            disabled={actionLoading || invoiceLoading}
+            size="sm"
             type="button"
             variant="outline"
-            size="sm"
-            disabled={actionLoading || invoiceLoading}
             onClick={() => onDownloadInvoice?.(appointmentId)}
-            className="!h-auto min-h-9 w-full min-w-0 justify-center rounded-xl px-1.5 py-2 text-[11px] leading-tight !transition-none sm:px-2 sm:text-xs !bg-blue-100 !text-blue-600 !border-transparent hover:!bg-blue-200"
           >
             <span className="flex w-full min-w-0 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-1.5">
               <FileText className="shrink-0" size={16} />

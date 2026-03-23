@@ -37,9 +37,11 @@ const setupRequestInterceptor = (client) => {
           const user = JSON.parse(stored);
           const token = user?.[apiConfig.tokenKey];
           if (token) {
+            // eslint-disable-next-line no-param-reassign -- axios request config mutation
             config.headers.Authorization = `Bearer ${token}`;
           } else if (user?.email) {
             // Fallback: use email as token identifier if no token exists
+            // eslint-disable-next-line no-param-reassign -- axios request config mutation
             config.headers['X-User-Email'] = user.email;
           }
         }
@@ -50,15 +52,15 @@ const setupRequestInterceptor = (client) => {
       // Add custom headers from request config
       const customConfig = config;
       if (customConfig.skipAuth) {
+        // eslint-disable-next-line no-param-reassign -- axios request config mutation
         delete config.headers.Authorization;
+        // eslint-disable-next-line no-param-reassign -- axios request config mutation
         delete config.headers['X-User-Email'];
       }
 
       return config;
     },
-    (error) => {
-      return Promise.reject(error);
-    }
+    (error) => Promise.reject(error)
   );
 };
 
@@ -81,7 +83,7 @@ const setupResponseInterceptor = (client) => {
       return response;
     },
     (error) => {
-      const config = error.config;
+      const {config} = error;
 
       // Skip error handler if flag is set
       if (config?.skipErrorHandler) {

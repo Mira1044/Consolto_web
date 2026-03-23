@@ -47,14 +47,20 @@ export const Navbar = () => {
 
   useEffect(() => {
     const onDown = (e) => {
-      if (!profileRef.current) return;
+      if (!profileRef.current) {
+return;
+}
       const dropdownEl = profileDropdownRef.current;
       const clickedInsideTrigger = profileRef.current.contains(e.target);
       const clickedInsideDropdown = dropdownEl ? dropdownEl.contains(e.target) : false;
-      if (!clickedInsideTrigger && !clickedInsideDropdown) setIsProfileOpen(false);
+      if (!clickedInsideTrigger && !clickedInsideDropdown) {
+setIsProfileOpen(false);
+}
     };
     const onEsc = (e) => {
-      if (e.key === 'Escape') setIsProfileOpen(false);
+      if (e.key === 'Escape') {
+setIsProfileOpen(false);
+}
     };
     document.addEventListener('pointerdown', onDown);
     document.addEventListener('keydown', onEsc);
@@ -65,15 +71,25 @@ export const Navbar = () => {
   }, []);
 
   const navHref = (item) => {
-    if ('hash' in item) return location.pathname === ROUTES.HOME ? item.hash : `${item.path}${item.hash}`;
+    if ('hash' in item) {
+return location.pathname === ROUTES.HOME ? item.hash : `${item.path}${item.hash}`;
+}
     return item.path;
   };
 
   useLayoutEffect(() => {
-    if (!isProfileOpen) return;
-    if (!profileRef.current) return;
-    if (!profileDropdownRef.current) return;
-    if (typeof window === 'undefined') return;
+    if (!isProfileOpen) {
+return;
+}
+    if (!profileRef.current) {
+return;
+}
+    if (!profileDropdownRef.current) {
+return;
+}
+    if (typeof window === 'undefined') {
+return;
+}
 
     const triggerRect = profileRef.current.getBoundingClientRect();
 
@@ -98,7 +114,9 @@ export const Navbar = () => {
   }, [isProfileOpen]);
 
   useEffect(() => {
-    if (!isProfileOpen) return;
+    if (!isProfileOpen) {
+return;
+}
     const onUpdate = () => {
       // Re-run measurement logic by toggling state update via layout effect dependency.
       // This keeps it simple without a custom throttle.
@@ -120,16 +138,16 @@ export const Navbar = () => {
 
   return (
     <motion.nav
-      initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`sticky top-0 z-40 w-full transition-all duration-300 ${
         isScrolled ? 'bg-white/90 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}
+      initial={{ y: -100 }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20 gap-3">
-          <motion.div whileHover={{ scale: 1.02 }} className="origin-left">
-            <BrandLogo variant="primary" to={ROUTES.HOME} />
+          <motion.div className="origin-left" whileHover={{ scale: 1.02 }}>
+            <BrandLogo to={ROUTES.HOME} variant="primary" />
           </motion.div>
 
           <div className="hidden md:flex items-center gap-6 lg:gap-8">
@@ -137,8 +155,8 @@ export const Navbar = () => {
               'hash' in link ? (
                 <a
                   key={link.label}
-                  href={navHref(link)}
                   className="text-gray-700 hover:text-blue-600 font-medium transition-colors relative group whitespace-nowrap"
+                  href={navHref(link)}
                 >
                   {link.label}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300" />
@@ -146,8 +164,8 @@ export const Navbar = () => {
               ) : (
                 <Link
                   key={link.label}
-                  to={link.path}
                   className="text-gray-700 hover:text-blue-600 font-medium transition-colors relative group whitespace-nowrap"
+                  to={link.path}
                 >
                   {link.label}
                   <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300" />
@@ -168,35 +186,35 @@ export const Navbar = () => {
                   </MotionButton>
                 </Link> */}
                 <MotionButton
+                  className="rounded-full px-5 lg:px-6 py-2.5 whitespace-nowrap"
+                  size="sm"
                   type="button"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     logout();
                   }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  size="sm"
-                  className="rounded-full px-5 lg:px-6 py-2.5 whitespace-nowrap"
                 >
                   Log out
                 </MotionButton>
 
                 <div ref={profileRef} className="relative z-[10000]">
                   <motion.button
+                    aria-expanded={isProfileOpen}
+                    aria-haspopup="menu"
+                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 px-3 py-2 shadow-sm hover:bg-white transition-colors"
                     type="button"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setIsProfileOpen((v) => !v)}
-                    className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white/70 px-3 py-2 shadow-sm hover:bg-white transition-colors"
-                    aria-haspopup="menu"
-                    aria-expanded={isProfileOpen}
                   >
                     <span className="h-8 w-8 rounded-full bg-blue-50 text-blue-700 flex items-center justify-center flex-shrink-0">
                       <User size={18} />
                     </span>
                     <ChevronDown
-                      size={16}
                       className={`text-gray-500 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`}
+                      size={16}
                     />
                   </motion.button>
 
@@ -215,11 +233,11 @@ export const Navbar = () => {
                         </div>
                         <div className="border-t border-gray-100 p-2">
                           <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
                             fullWidth
                             className="rounded-lg justify-start"
+                            size="sm"
+                            type="button"
+                            variant="ghost"
                             onClick={() => {
                               setIsProfileOpen(false);
                               setIsMobileMenuOpen(false);
@@ -237,23 +255,23 @@ export const Navbar = () => {
             ) : (
               <>
                 <MotionButton
+                  className="rounded-full border border-gray-300 hover:border-blue-500 px-4 lg:px-5 py-2.5 text-gray-700 hover:text-blue-600 shadow-none bg-transparent whitespace-nowrap"
+                  size="sm"
                   type="button"
-                  onClick={handleLogin}
+                  variant="ghost"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-full border border-gray-300 hover:border-blue-500 px-4 lg:px-5 py-2.5 text-gray-700 hover:text-blue-600 shadow-none bg-transparent whitespace-nowrap"
+                  onClick={handleLogin}
                 >
                   Log in
                 </MotionButton>
                 <MotionButton
+                  className="rounded-full px-5 lg:px-6 py-2.5 whitespace-nowrap"
+                  size="sm"
                   type="button"
-                  onClick={handleSignup}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  size="sm"
-                  className="rounded-full px-5 lg:px-6 py-2.5 whitespace-nowrap"
+                  onClick={handleSignup}
                 >
                   Sign up
                 </MotionButton>
@@ -262,10 +280,10 @@ export const Navbar = () => {
           </div>
 
           <button
-            type="button"
-            className="md:hidden text-gray-700"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
+            className="md:hidden text-gray-700"
+            type="button"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -274,18 +292,18 @@ export const Navbar = () => {
 
       {isMobileMenuOpen && (
         <motion.div
-          initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
           className="md:hidden bg-white/95 backdrop-blur-md border-t"
+          exit={{ opacity: 0, height: 0 }}
+          initial={{ opacity: 0, height: 0 }}
         >
           <div className="px-4 py-4 space-y-2">
             {navLinks.map((link) => (
               'hash' in link ? (
                 <a
                   key={link.label}
-                  href={navHref(link)}
                   className="block text-gray-700 hover:text-blue-600 font-medium py-2.5 rounded-lg px-2 hover:bg-blue-50/60 transition-colors"
+                  href={navHref(link)}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
@@ -293,8 +311,8 @@ export const Navbar = () => {
               ) : (
                 <Link
                   key={link.label}
-                  to={link.path}
                   className="block text-gray-700 hover:text-blue-600 font-medium py-2.5 rounded-lg px-2 hover:bg-blue-50/60 transition-colors"
+                  to={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
@@ -308,23 +326,23 @@ export const Navbar = () => {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <Button
-                    variant="ghost"
-                    size="sm"
                     fullWidth
                     className="rounded-full border border-gray-300 hover:border-blue-500 px-6 py-2.5 text-gray-700 hover:text-blue-600 shadow-none bg-transparent"
+                    size="sm"
+                    variant="ghost"
                   >
                     Experts
                   </Button>
                 </Link>
                 <Button
+                  fullWidth
+                  className="rounded-full px-6 py-2.5"
+                  size="sm"
                   type="button"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     logout();
                   }}
-                  fullWidth
-                  size="sm"
-                  className="rounded-full px-6 py-2.5"
                 >
                   Log out
                 </Button>
@@ -332,21 +350,21 @@ export const Navbar = () => {
             ) : (
               <div className="flex flex-col gap-2 pt-2">
                 <Button
-                  type="button"
-                  onClick={handleLogin}
-                  variant="ghost"
-                  size="sm"
                   fullWidth
                   className="rounded-full border border-gray-300 hover:border-blue-500 px-6 py-2.5 text-gray-700 hover:text-blue-600 shadow-none bg-transparent"
+                  size="sm"
+                  type="button"
+                  variant="ghost"
+                  onClick={handleLogin}
                 >
                   Log in
                 </Button>
                 <Button
+                  fullWidth
+                  className="rounded-full px-6 py-2.5"
+                  size="sm"
                   type="button"
                   onClick={handleSignup}
-                  fullWidth
-                  size="sm"
-                  className="rounded-full px-6 py-2.5"
                 >
                   Sign up
                 </Button>

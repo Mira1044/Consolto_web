@@ -14,18 +14,18 @@ export const LoginLayout = ({
   isLoading,
   setField,
   handleSubmit,
-  onForgotPassword,
-  onGoToSignup,
-  onBackToHome,
+  onForgotPassword: _onForgotPassword,
+  onGoToSignup: _onGoToSignup,
+  onBackToHome: _onBackToHome,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <div className="w-full flex items-start md:items-center justify-center px-2 sm:px-4 pt-4 pb-6 sm:pt-6 sm:pb-8">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
         className="w-full max-w-md sm:max-w-lg space-y-5 sm:space-y-7"
+        initial={{ opacity: 0, y: 20 }}
+        transition={{ duration: 0.5 }}
       >
         <div className="text-center">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Welcome back</h2>
@@ -33,62 +33,53 @@ export const LoginLayout = ({
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <form noValidate onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
+          <form noValidate className="space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
             <FormField
+              autoComplete="email"
+              error={!!errors.email}
+              errorMessage={errors.email?.[0]}
+              id="email"
+              inputComponent={Input}
               label={
                 <>
                   Email address <span className="text-red-500">*</span>
                 </>
               }
-              id="email"
               name="email"
+              placeholder="Email"
               type="text"
-              autoComplete="email"
               value={fields.email}
               onChange={setField('email')}
-              placeholder="Email"
-              inputComponent={Input}
-              error={!!errors.email}
-              errorMessage={errors.email?.[0]}
             />
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="password">
                   Password <span className="text-red-500">*</span>
                 </label>
-                {/* {onForgotPassword ? (
-                  <button
-                    type="button"
-                    onClick={onForgotPassword}
-                    className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
-                  >
-                    Forgot password?
-                  </button>
-                ) : null} */}
               </div>
               <div className="relative">
                 <Input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
                   required
-                  value={fields.password}
-                  onChange={setField('password')}
-                  placeholder="••••••••"
+                  autoComplete="current-password"
                   className="pr-12"
                   error={!!errors.password}
+                  id="password"
+                  name="password"
+                  placeholder="••••••••"
+                  type={showPassword ? 'text' : 'password'}
+                  value={fields.password}
+                  onChange={setField('password')}
                 />
                 <button
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -96,28 +87,13 @@ export const LoginLayout = ({
               {errors.password?.[0] ? <p className="mt-1 text-sm text-red-500">{errors.password[0]}</p> : null}
             </div>
 
-            <Button type="submit" disabled={isLoading} isLoading={isLoading} fullWidth size="lg">
+            <Button fullWidth disabled={isLoading} isLoading={isLoading} size="lg" type="submit">
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
-
-          {/* <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Don&apos;t have an account?{' '}
-              {onGoToSignup ? (
-                <button
-                  type="button"
-                  onClick={onGoToSignup}
-                  className="font-medium text-blue-600 hover:text-blue-500 hover:underline"
-                >
-                  Sign up
-                </button>
-              ) : null}
-            </p>
-          </div> */}
         </motion.div>
 
-        
+
       </motion.div>
     </div>
   );

@@ -13,17 +13,17 @@ export const Footer = () => {
   ];
 
   return (
-    <footer id="contact" className="bg-gray-900 text-gray-300">
+    <footer className="bg-gray-900 text-gray-300" id="contact">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-4 gap-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
             transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            whileInView={{ opacity: 1, y: 0 }}
           >
             <div className="mb-4">
-              <BrandLogo variant="onDark" to={ROUTES.HOME} />
+              <BrandLogo to={ROUTES.HOME} variant="onDark" />
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               Connect with verified experts anytime, anywhere. Professional consultation made simple
@@ -33,12 +33,12 @@ export const Footer = () => {
               {socialLinks.map((social, index) => (
                 <motion.a
                   key={index}
-                  href={social.href}
-                  target={social.href.startsWith('http') ? '_blank' : undefined}
-                  rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                   aria-label={social.label}
-                  whileHover={{ scale: 1.1, y: -2 }}
                   className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors"
+                  href={social.href}
+                  rel={social.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  target={social.href.startsWith('http') ? '_blank' : undefined}
+                  whileHover={{ scale: 1.1, y: -2 }}
                 >
                   <social.icon size={18} />
                 </motion.a>
@@ -48,17 +48,17 @@ export const Footer = () => {
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.1 }}
+            viewport={{ once: true }}
+            whileInView={{ opacity: 1, y: 0 }}
           >
             <h4 className="text-white font-bold text-lg mb-4">Quick Links</h4>
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
                 <li key={index}>
                   <a
-                    href={`#${link.toLowerCase().replace(/\s+/g, '-')}`}
                     className="hover:text-blue-400 transition-colors inline-block hover:translate-x-1 transform duration-200"
+                    href={`#${link.toLowerCase().replace(/\s+/g, '-')}`}
                   >
                     {link}
                   </a>
@@ -69,9 +69,9 @@ export const Footer = () => {
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+            whileInView={{ opacity: 1, y: 0 }}
           >
             <h4 className="text-white font-bold text-lg mb-4">Contact Info</h4>
             <ul className="space-y-4">
@@ -95,9 +95,9 @@ export const Footer = () => {
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+            whileInView={{ opacity: 1, y: 0 }}
           >
             <h4 className="text-white font-bold text-lg mb-4">Newsletter</h4>
             <p className="text-gray-400 mb-4">
@@ -105,9 +105,9 @@ export const Footer = () => {
             </p>
             <div className="flex flex-col gap-3">
               <input
-                type="email"
-                placeholder="Enter your email"
                 className="bg-gray-800 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter your email"
+                type="email"
               />
               <button className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
                 Subscribe

@@ -8,7 +8,9 @@
  * Handles: "2:30 PM", "14:30", "14:30:00".
  */
 export function parseAppointmentDateTime(dateStr, timeStr) {
-  if (!dateStr || !timeStr) return null;
+  if (!dateStr || !timeStr) {
+return null;
+}
 
   const dateOnly = String(dateStr).trim().slice(0, 10);
   const t = String(timeStr).trim();
@@ -19,8 +21,12 @@ export function parseAppointmentDateTime(dateStr, timeStr) {
     let h = Number(ampm[1]);
     const m = Number(ampm[2]);
     const p = ampm[3].toUpperCase();
-    if (p === 'PM' && h !== 12) h += 12;
-    if (p === 'AM' && h === 12) h = 0;
+    if (p === 'PM' && h !== 12) {
+h += 12;
+}
+    if (p === 'AM' && h === 12) {
+h = 0;
+}
     const d = new Date(`${dateOnly}T00:00:00`);
     d.setHours(h, m, 0, 0);
     return d;
@@ -48,7 +54,9 @@ export function parseAppointmentDateTime(dateStr, timeStr) {
 export function getTimeWindows(appointmentDate, startTime, endTime) {
   const start = parseAppointmentDateTime(appointmentDate, startTime);
   const end = parseAppointmentDateTime(appointmentDate, endTime);
-  if (!start || !end) return null;
+  if (!start || !end) {
+return null;
+}
 
   const chatWindowStart = new Date(start.getTime() - 15 * 60_000);
   const chatWindowEnd = new Date(end.getTime() + 30 * 24 * 60 * 60_000);
@@ -155,9 +163,15 @@ export const FILE_LIMITS = {
  * Determine file type from MIME type.
  */
 export function getFileType(mimeType) {
-  if (!mimeType) return 'document';
-  if (mimeType.startsWith('image/')) return 'image';
-  if (mimeType.startsWith('video/')) return 'video';
+  if (!mimeType) {
+return 'document';
+}
+  if (mimeType.startsWith('image/')) {
+return 'image';
+}
+  if (mimeType.startsWith('video/')) {
+return 'video';
+}
   return 'document';
 }
 

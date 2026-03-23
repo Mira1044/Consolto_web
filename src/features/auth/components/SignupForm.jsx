@@ -23,91 +23,91 @@ export const SignupForm = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          exit={{ opacity: 0 }}
+          initial={{ opacity: 0 }}
+          onClick={onClose}
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
             exit={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-2xl max-h-[90vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-bold text-gray-900">Sign up</h2>
               <button
+                aria-label="Close"
+                className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
                 type="button"
                 onClick={onClose}
-                className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-                aria-label="Close"
               >
                 <X size={24} />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <FormField
-                label="Name"
+                required
+                error={!!errors.name}
+                errorMessage={errors.name?.[0]}
                 id="signup-name"
+                inputComponent={Input}
+                label="Name"
+                placeholder="Full name"
                 type="text"
                 value={fields.name}
                 onChange={setField('name')}
-                required
-                placeholder="Full name"
-                inputComponent={Input}
-                error={!!errors.name}
-                errorMessage={errors.name?.[0]}
               />
               <FormField
-                label="Email"
+                required
+                error={!!errors.email}
+                errorMessage={errors.email?.[0]}
                 id="signup-email"
+                inputComponent={Input}
+                label="Email"
+                placeholder="Email"
                 type="email"
                 value={fields.email}
                 onChange={setField('email')}
-                required
-                placeholder="Email"
-                inputComponent={Input}
-                error={!!errors.email}
-                errorMessage={errors.email?.[0]}
               />
               <FormField
-                label="Password"
+                required
+                error={!!errors.password}
+                errorMessage={errors.password?.[0]}
                 id="signup-password"
+                inputComponent={Input}
+                label="Password"
+                minLength={6}
+                placeholder="Password"
                 type="password"
                 value={fields.password}
                 onChange={setField('password')}
-                required
-                minLength={6}
-                placeholder="Password"
-                inputComponent={Input}
-                error={!!errors.password}
-                errorMessage={errors.password?.[0]}
               />
               <FormField
-                label="Confirm password"
-                id="signup-confirm"
-                type="password"
-                value={fields.confirmPassword}
-                onChange={setField('confirmPassword')}
                 required
-                minLength={6}
-                placeholder="Confirm password"
-                inputComponent={Input}
                 error={!!errors.confirmPassword || (fields.confirmPassword && !passwordsMatch)}
                 errorMessage={
                   errors.confirmPassword?.[0] ||
                   (fields.confirmPassword && !passwordsMatch ? 'Passwords do not match' : '')
                 }
+                id="signup-confirm"
+                inputComponent={Input}
+                label="Confirm password"
+                minLength={6}
+                placeholder="Confirm password"
+                type="password"
+                value={fields.confirmPassword}
+                onChange={setField('confirmPassword')}
               />
               <Button
-                type="submit"
+                fullWidth
                 disabled={isLoading || !passwordsMatch}
                 isLoading={isLoading}
-                fullWidth
                 size="lg"
+                type="submit"
               >
                 {isLoading ? 'Creating account...' : 'Create account'}
               </Button>

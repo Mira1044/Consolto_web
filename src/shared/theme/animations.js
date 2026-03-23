@@ -3,7 +3,7 @@
  * Framer Motion animation presets and utilities
  */
 
-import { animations, transitions } from './tokens';
+import { transitions } from './tokens';
 
 /**
  * Framer Motion animation variants
@@ -142,11 +142,9 @@ export const tapAnimations = {
 /**
  * Helper function to create custom animation variants
  */
-export const createAnimation = (config) => {
-  return {
+export const createAnimation = (config) => ({
     initial: config.initial || {},
     animate: config.animate || {},
     exit: config.exit || {},
     transition: config.transition || motionTransitions.base,
-  };
-};
+  });

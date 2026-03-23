@@ -10,7 +10,7 @@ export const validateContact = (contact) => {
     return { success: true, value: result.data };
   }
 
-  const fieldErrors = result.error.flatten().fieldErrors;
+  const {fieldErrors} = result.error.flatten();
   return {
     success: false,
     errors: fieldErrors,

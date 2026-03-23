@@ -33,7 +33,9 @@ export const useBooking = (expert, initialDuration = 15, navigate) => {
   );
 
   const confirm = useCallback(() => {
-    if (!canConfirm) return;
+    if (!canConfirm) {
+return;
+}
     setConfirmed(true);
   }, [canConfirm]);
 
@@ -63,7 +65,9 @@ export const useBooking = (expert, initialDuration = 15, navigate) => {
     setSelectedDate,
     setSelectedSlot: (slot) => {
       setSelectedSlot(slot);
-      if (slot) setFrequency((prev) => prev || 'Daily');
+      if (slot) {
+setFrequency((prev) => prev || 'Daily');
+}
     },
     setFrequency,
     setReason,

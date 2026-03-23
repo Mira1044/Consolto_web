@@ -42,18 +42,12 @@ export const ChatPanel = ({
   showMobileClose = false,
   onCloseMobile,
 }) => {
-  if (!chatClient || !channel) {
-    return (
-      <div className="flex h-full min-h-[12rem] items-center justify-center bg-black px-4">
-        <p className="text-center text-sm text-gray-400">Initializing chat…</p>
-      </div>
-    );
-  }
-
   const customRenderAttachments = useCallback(
     (props) => {
       const { attachments } = props;
-      if (!attachments?.length) return null;
+      if (!attachments?.length) {
+        return null;
+      }
       return (
         <div className="flex flex-col gap-2">
           {attachments.map((att, i) => (
@@ -65,10 +59,18 @@ export const ChatPanel = ({
     [],
   );
 
+  if (!chatClient || !channel) {
+    return (
+      <div className="flex h-full min-h-[12rem] items-center justify-center bg-black px-4">
+        <p className="text-center text-sm text-gray-400">Initializing chat…</p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full min-h-0 flex-col bg-black">
       <Chat client={chatClient} theme="str-chat__theme-dark">
-        <Channel channel={channel} Attachment={customRenderAttachments}>
+        <Channel Attachment={customRenderAttachments} channel={channel}>
           <Window>
             <div className="flex min-h-0 flex-1 flex-col">
               {showMobileClose && (
@@ -78,10 +80,10 @@ export const ChatPanel = ({
                     <p className="truncate text-xs text-gray-500">Esc or tap outside to return to video</p>
                   </div>
                   <button
+                    aria-label="Close chat and return to video"
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gray-800 text-gray-200 transition-colors hover:bg-gray-700 lg:hidden"
                     type="button"
                     onClick={onCloseMobile}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gray-800 text-gray-200 transition-colors hover:bg-gray-700 lg:hidden"
-                    aria-label="Close chat and return to video"
                   >
                     <X size={22} strokeWidth={2} />
                   </button>
@@ -95,10 +97,10 @@ export const ChatPanel = ({
               {canSendMessage ? (
                 <div className="session-chat-composer-shell relative z-10 flex flex-shrink-0 flex-col overflow-visible border-t border-gray-800 bg-black">
                   <ChatInput
-                    onUpload={onUpload}
+                    canSend={canSendMessage}
                     uploading={uploading}
                     uploadProgress={uploadProgress}
-                    canSend={canSendMessage}
+                    onUpload={onUpload}
                   >
                     <MessageInput grow />
                   </ChatInput>

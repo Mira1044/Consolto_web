@@ -23,7 +23,9 @@ export const useContact = () => {
       setFields((prev) => ({ ...prev, [key]: e.target.value }));
       // Clear field error on change
       setErrors((prev) => {
-        if (!prev[key]) return prev;
+        if (!prev[key]) {
+return prev;
+}
         const next = { ...prev };
         delete next[key];
         return next;

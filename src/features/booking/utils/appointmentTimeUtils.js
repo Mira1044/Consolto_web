@@ -5,29 +5,41 @@
 
 const extractDateOnly = (dateStr) => {
   const s = String(dateStr || '').trim();
-  if (!s) return '';
+  if (!s) {
+return '';
+}
   // Handles both "YYYY-MM-DD" and ISO timestamps.
   return s.length >= 10 ? s.slice(0, 10) : s;
 };
 
 const parseBookingDateTime = (dateStr, timeStr) => {
-  if (!dateStr || !timeStr) return null;
+  if (!dateStr || !timeStr) {
+return null;
+}
 
   const dateOnly = extractDateOnly(dateStr);
-  if (!dateOnly) return null;
+  if (!dateOnly) {
+return null;
+}
 
   const t = String(timeStr || '').trim();
   // AM/PM format: "2:30 PM"
   if (t.toUpperCase().includes('AM') || t.toUpperCase().includes('PM')) {
     const match = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-    if (!match) return null;
+    if (!match) {
+return null;
+}
 
     let hour = Number(match[1]);
     const minutes = Number(match[2]);
     const period = match[3].toUpperCase();
 
-    if (period === 'PM' && hour !== 12) hour += 12;
-    if (period === 'AM' && hour === 12) hour = 0;
+    if (period === 'PM' && hour !== 12) {
+hour += 12;
+}
+    if (period === 'AM' && hour === 12) {
+hour = 0;
+}
 
     // Local midnight to avoid timezone shifts from `new Date("YYYY-MM-DD")` parsing.
     const d = new Date(`${dateOnly}T00:00:00`);
@@ -37,7 +49,9 @@ const parseBookingDateTime = (dateStr, timeStr) => {
 
   // 24-hour format: "14:30" or "14:30:00"
   const m = t.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
-  if (!m) return null;
+  if (!m) {
+return null;
+}
 
   const hour = Number(m[1]);
   const minutes = Number(m[2]);
@@ -48,27 +62,43 @@ const parseBookingDateTime = (dateStr, timeStr) => {
 };
 
 export const formatTimeTo12Hour = (time) => {
-  if (!time) return '';
+  if (!time) {
+return '';
+}
   const t = String(time).trim();
-  if (t.toUpperCase().includes('AM') || t.toUpperCase().includes('PM')) return t;
+  if (t.toUpperCase().includes('AM') || t.toUpperCase().includes('PM')) {
+return t;
+}
 
   const m = t.match(/^(\d{1,2}):(\d{2})$/);
-  if (!m) return t;
+  if (!m) {
+return t;
+}
 
-  let hour = Number(m[1]);
+  const hour = Number(m[1]);
   const minutes = m[2];
 
-  if (hour === 0) return `12:${minutes} AM`;
-  if (hour < 12) return `${hour}:${minutes} AM`;
-  if (hour === 12) return `12:${minutes} PM`;
+  if (hour === 0) {
+return `12:${minutes} AM`;
+}
+  if (hour < 12) {
+return `${hour}:${minutes} AM`;
+}
+  if (hour === 12) {
+return `12:${minutes} PM`;
+}
   return `${hour - 12}:${minutes} PM`;
 };
 
 export const formatAppointmentDate = (date) => {
   const dateOnly = extractDateOnly(date);
-  if (!dateOnly) return '';
+  if (!dateOnly) {
+return '';
+}
   const d = new Date(`${dateOnly}T00:00:00`);
-  if (Number.isNaN(d.getTime())) return '';
+  if (Number.isNaN(d.getTime())) {
+return '';
+}
 
   return d.toLocaleDateString(undefined, {
     weekday: 'long',
@@ -79,7 +109,9 @@ export const formatAppointmentDate = (date) => {
 };
 
 export const formatAppointmentTime = (startTime, endTime) => {
-  if (!startTime || !endTime) return '';
+  if (!startTime || !endTime) {
+return '';
+}
   return `${formatTimeTo12Hour(startTime)} - ${formatTimeTo12Hour(endTime)}`;
 };
 
@@ -102,10 +134,14 @@ export const getStatusColor = (appointmentStatus) => {
 };
 
 export const isAppointmentUpcoming = (booking, currentTime = new Date()) => {
-  if (!booking?.appointment_booked_date || !booking?.appointment_end_time) return false;
+  if (!booking?.appointment_booked_date || !booking?.appointment_end_time) {
+return false;
+}
 
   const appointmentEndTime = parseBookingDateTime(booking.appointment_booked_date, booking.appointment_end_time);
-  if (!appointmentEndTime) return false;
+  if (!appointmentEndTime) {
+return false;
+}
 
   const status = String(booking?.appointment_status || '').toUpperCase();
   return (
@@ -116,17 +152,27 @@ export const isAppointmentUpcoming = (booking, currentTime = new Date()) => {
 
 const formatCountdown = (minutes) => {
   const m = Number(minutes);
-  if (!Number.isFinite(m)) return '';
-  if (m < 1) return 'less than a minute';
+  if (!Number.isFinite(m)) {
+return '';
+}
+  if (m < 1) {
+return 'less than a minute';
+}
 
   const days = Math.floor(m / (60 * 24));
   const hours = Math.floor((m % (60 * 24)) / 60);
   const mins = Math.floor(m % 60);
 
   const parts = [];
-  if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
-  if (hours > 0) parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
-  if (mins > 0) parts.push(`${mins} minute${mins > 1 ? 's' : ''}`);
+  if (days > 0) {
+parts.push(`${days} day${days > 1 ? 's' : ''}`);
+}
+  if (hours > 0) {
+parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
+}
+  if (mins > 0) {
+parts.push(`${mins} minute${mins > 1 ? 's' : ''}`);
+}
 
   return parts.join(' ');
 };
@@ -194,13 +240,17 @@ export const getVideoAvailability = (booking, currentTime = new Date()) => {
 
 export const canModifyBookingByDate = (booking, currentDate = new Date()) => {
   const appointmentDateOnly = extractDateOnly(booking?.appointment_booked_date);
-  if (!appointmentDateOnly) return false;
+  if (!appointmentDateOnly) {
+return false;
+}
 
   const today = new Date(currentDate);
   today.setHours(0, 0, 0, 0);
 
   const appointmentDate = new Date(`${appointmentDateOnly}T00:00:00`);
-  if (Number.isNaN(appointmentDate.getTime())) return false;
+  if (Number.isNaN(appointmentDate.getTime())) {
+return false;
+}
 
   const lastAllowedModifyDate = new Date(appointmentDate);
   lastAllowedModifyDate.setDate(lastAllowedModifyDate.getDate() - 2);

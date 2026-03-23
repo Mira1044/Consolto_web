@@ -25,71 +25,71 @@ export const LoginForm = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          exit={{ opacity: 0 }}
+          initial={{ opacity: 0 }}
+          onClick={onClose}
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-2xl"
             exit={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-2xl"
           >
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-bold text-gray-900">Log in</h2>
               <button
+                aria-label="Close"
+                className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
                 type="button"
                 onClick={onClose}
-                className="rounded-full p-2 text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-                aria-label="Close"
               >
                 <X size={24} />
               </button>
             </div>
-            <form noValidate onSubmit={handleSubmit} className="space-y-5">
+            <form noValidate className="space-y-5" onSubmit={handleSubmit}>
               <FormField
-                label="Email"
+                error={!!errors.email}
+                errorMessage={errors.email?.[0]}
                 id="login-email"
+                inputComponent={Input}
+                label="Email"
+              placeholder="Email"
                 type="text"
                 value={fields.email}
                 onChange={setField('email')}
-              placeholder="Email"
-                inputComponent={Input}
-                error={!!errors.email}
-                errorMessage={errors.email?.[0]}
               />
               <div>
-                <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="login-password">
                   Password <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <Input
+                    required
+                    className="pr-12"
+                    error={!!errors.password}
                     id="login-password"
                     name="password"
+                    placeholder="Password"
                     type={showPassword ? 'text' : 'password'}
                     value={fields.password}
                     onChange={setField('password')}
-                    required
-                    placeholder="Password"
-                    className="pr-12"
-                    error={!!errors.password}
                   />
                   <button
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
                 {errors.password?.[0] ? <p className="mt-1 text-sm text-red-500">{errors.password[0]}</p> : null}
               </div>
-              <Button type="submit" disabled={isLoading} isLoading={isLoading} fullWidth size="lg">
+              <Button fullWidth disabled={isLoading} isLoading={isLoading} size="lg" type="submit">
                 {isLoading ? 'Logging in...' : 'Log in'}
               </Button>
             </form>

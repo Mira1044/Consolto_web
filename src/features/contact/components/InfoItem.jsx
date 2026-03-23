@@ -7,16 +7,16 @@ import { motion } from 'framer-motion';
  */
 export const InfoItem = ({ icon: Icon, label, value, href, delay }) => (
   <motion.li
-    initial={{ opacity: 0, x: -16 }}
     animate={{ opacity: 1, x: 0 }}
+    className="flex items-start gap-3"
+    initial={{ opacity: 0, x: -16 }}
     transition={{ duration: 0.45, delay }}
     whileHover={{ x: 4 }}
-    className="flex items-start gap-3"
   >
     <motion.div
-      whileHover={{ scale: 1.2, rotate: 8 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 18 }}
       className="mt-0.5"
+      transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+      whileHover={{ scale: 1.2, rotate: 8 }}
     >
       <Icon className="text-blue-600" size={20} />
     </motion.div>

@@ -25,12 +25,16 @@ export const useSessionTimer = ({
   const windows = useRef(null);
 
   useEffect(() => {
-    if (!appointmentDate || !appointmentStartTime || !appointmentEndTime) return;
+    if (!appointmentDate || !appointmentStartTime || !appointmentEndTime) {
+return;
+}
     windows.current = getTimeWindows(appointmentDate, appointmentStartTime, appointmentEndTime);
   }, [appointmentDate, appointmentStartTime, appointmentEndTime]);
 
   const tick = useCallback(() => {
-    if (!windows.current) return;
+    if (!windows.current) {
+return;
+}
     const result = evaluateTimeStatus(windows.current, mode);
 
     setTimeStatus(result.message);
@@ -49,7 +53,9 @@ export const useSessionTimer = ({
   }, [mode, onExpired]);
 
   useEffect(() => {
-    if (!windows.current || isExpired) return;
+    if (!windows.current || isExpired) {
+return;
+}
 
     tick();
     const interval = setInterval(tick, 1000);

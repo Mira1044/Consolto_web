@@ -2,11 +2,12 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from '../hooks/useLogin';
 import { useSignup } from '../hooks/useSignup';
+import { useForgotPassword } from '../hooks/useForgotPassword';
 import { LoginLayout } from '../components/LoginLayout';
 import { SignupLayout } from '../components/SignupLayout';
+import { ForgotPasswordLayout } from '../components/ForgotPasswordLayout';
 import { ROUTES } from '@/routes/config';
 import { Hero } from '@/pages/home';
-import { ForgotPasswordPage } from '@/auth/components/ForgotPasswordPage';
 
 /**
  * LoginPage
@@ -25,6 +26,7 @@ export const LoginPage = () => {
 
   const login = useLogin({ onSuccess: handleSuccess });
   const signup = useSignup({ onSuccess: handleSuccess });
+  const forgotPassword = useForgotPassword({ onBackToLogin: () => setMode('login') });
 
   const goHome = () => navigate(ROUTES.HOME);
 
@@ -33,22 +35,34 @@ export const LoginPage = () => {
       return (
         <SignupLayout
           {...signup}
-          onGoToLogin={() => setMode('login')}
           onBackToHome={goHome}
+          onGoToLogin={() => setMode('login')}
         />
       );
     }
 
     if (mode === 'forgot') {
-      return <ForgotPasswordPage onBackToLogin={() => setMode('login')} />;
+      return (
+        <ForgotPasswordLayout
+          {...forgotPassword}
+          onConfirmPasswordChange={forgotPassword.setConfirmPassword}
+          onEmailChange={forgotPassword.setEmail}
+          onGoToLogin={forgotPassword.goToLogin}
+          onNewPasswordChange={forgotPassword.setNewPassword}
+          onOtpChange={forgotPassword.handleOtpChange}
+          onResetPassword={forgotPassword.handleResetPassword}
+          onSendOtp={forgotPassword.handleSendOtp}
+          onVerifyOtp={forgotPassword.handleVerifyOtp}
+        />
+      );
     }
 
     return (
       <LoginLayout
         {...login}
+        onBackToHome={goHome}
         onForgotPassword={() => setMode('forgot')}
         onGoToSignup={() => setMode('signup')}
-        onBackToHome={goHome}
       />
     );
   };

@@ -12,7 +12,7 @@ import { useDocumentTitle } from './hooks';
 const AuthLayout = ({ children }) => (
   <div className="from-primary/10 via-background to-background min-h-screen bg-gradient-to-br">
     <header className="sticky top-0 z-50 w-full border-b border-blue-100/60 bg-white/85 backdrop-blur-md px-4 py-3 sm:px-6">
-      <BrandLogo variant="primary" to={ROUTES.HOME} />
+      <BrandLogo to={ROUTES.HOME} variant="primary" />
     </header>
     {children}
   </div>
@@ -70,14 +70,14 @@ export const AppRouter = () => {
           return (
             <Route
               key={path}
-              path={path}
               element={<LayoutComponent>{WrappedComponent}</LayoutComponent>}
+              path={path}
             />
           );
         })}
 
         {/* Catch-all route - redirect to 404 */}
-        <Route path="*" element={<Navigate to={ROUTES.NOT_FOUND} replace />} />
+        <Route element={<Navigate replace to={ROUTES.NOT_FOUND} />} path="*" />
       </Routes>
     </Suspense>
   );

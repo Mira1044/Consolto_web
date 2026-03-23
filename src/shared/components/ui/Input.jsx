@@ -35,19 +35,19 @@ export const Input = forwardRef(
     return (
       <input
         ref={ref}
+        autoComplete={autoComplete}
+        className={`${baseClasses} ${stateClasses} ${disabledClasses} ${className}`}
+        disabled={disabled}
         id={id}
+        maxLength={maxLength}
+        minLength={minLength}
         name={name}
-        type={type}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
         placeholder={placeholder}
         required={required}
-        disabled={disabled}
-        autoComplete={autoComplete}
-        minLength={minLength}
-        maxLength={maxLength}
-        className={`${baseClasses} ${stateClasses} ${disabledClasses} ${className}`}
+        type={type}
+        value={value}
+        onBlur={onBlur}
+        onChange={onChange}
         {...props}
       />
     );

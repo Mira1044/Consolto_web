@@ -45,14 +45,10 @@ export const Loader = ({
  * Inline Loader
  * Small inline loading spinner
  */
-export const InlineLoader = ({ size = 'sm', color = 'primary', className = '' }) => {
-  return <Loader size={size} color={color} className={className} />;
-};
+export const InlineLoader = ({ size = 'sm', color = 'primary', className = '' }) => <Loader className={className} color={color} size={size} />;
 
 /**
  * Button Loader
  * Loading spinner for buttons
  */
-export const ButtonLoader = ({ size = 'sm', color = 'white', className = '' }) => {
-  return <Loader size={size} color={color} className={className} />;
-};
+export const ButtonLoader = ({ size = 'sm', color = 'white', className = '' }) => <Loader className={className} color={color} size={size} />;

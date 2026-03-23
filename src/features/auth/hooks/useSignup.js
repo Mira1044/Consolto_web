@@ -30,7 +30,7 @@ export const useSignup = ({ onSuccess } = {}) => {
    */
   const setField = useCallback(
     (key) => (e) => {
-      const value = e.target.value;
+      const {value} = e.target;
       setFields((prev) => {
         const next = { ...prev, [key]: value };
 

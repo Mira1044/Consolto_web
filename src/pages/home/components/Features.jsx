@@ -46,14 +46,14 @@ export const Features = () => {
   };
 
   return (
-    <section id="features" className="py-14 sm:py-16 lg:py-20 bg-white">
+    <section className="py-14 sm:py-16 lg:py-20 bg-white" id="features">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
           className="text-center mb-10 sm:mb-12 lg:mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          whileInView={{ opacity: 1, y: 0 }}
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Why Choose{' '}
@@ -65,14 +65,14 @@ export const Features = () => {
         </motion.div>
 
         <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
           className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8"
+          initial="hidden"
+          variants={containerVariants}
+          viewport={{ once: true }}
+          whileInView="visible"
         >
           {features.map((feature, index) => (
-            <motion.div key={index} variants={itemVariants} whileHover={{ y: -10, transition: { duration: 0.2 } }} className="group">
+            <motion.div key={index} className="group" variants={itemVariants} whileHover={{ y: -10, transition: { duration: 0.2 } }}>
               <div className="bg-gradient-to-br from-blue-50 to-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition-all border border-blue-100 h-full">
                 <div
                   className={`w-16 h-16 bg-gradient-to-br ${feature.gradient} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}

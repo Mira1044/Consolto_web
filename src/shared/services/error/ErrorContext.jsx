@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react';
-import { AppError, ErrorCode } from '../api/errors';
+import { AppError } from '../api/errors';
 
 /**
  * Error Context

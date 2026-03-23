@@ -3,8 +3,6 @@
  * Common layout components and utilities
  */
 
-import { layout, spacing, breakpoints } from './tokens';
-
 /**
  * Container component props
  */

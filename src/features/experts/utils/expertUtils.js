@@ -27,7 +27,9 @@ export const deriveCategoriesFromExperts = (experts) => {
   const labels = new Set();
   for (const e of experts) {
     const tags = Array.isArray(e?.tags) ? e.tags : [];
-    for (const t of tags) labels.add(String(t));
+    for (const t of tags) {
+labels.add(String(t));
+}
   }
   return Array.from(labels)
     .filter(Boolean)
@@ -52,12 +54,10 @@ const CATEGORY_ICON_MAP = {
  * @param {Array} categories - Array of { id, label }
  * @returns {Array} Array of { id, label, icon }
  */
-export const enrichCategoriesWithIcons = (categories) => {
-  return categories.map((cat) => ({
+export const enrichCategoriesWithIcons = (categories) => categories.map((cat) => ({
     ...cat,
     icon: CATEGORY_ICON_MAP[cat.id] || Briefcase,
   }));
-};
 
 /**
  * Filter experts based on search text and active category.
@@ -65,8 +65,7 @@ export const enrichCategoriesWithIcons = (categories) => {
  * @param {Object} filters - { search: string, activeCategory: string|null }
  * @returns {Array} Filtered experts
  */
-export const filterExperts = (experts, { search, activeCategory }) => {
-  return experts.filter((expert) => {
+export const filterExperts = (experts, { search, activeCategory }) => experts.filter((expert) => {
     const term = search?.toLowerCase() ?? '';
 
     const matchSearch =
@@ -82,7 +81,6 @@ export const filterExperts = (experts, { search, activeCategory }) => {
 
     return matchSearch && matchCategory;
   });
-};
 
 /**
  * Slice categories list for "show all / show less" toggle.
@@ -91,6 +89,4 @@ export const filterExperts = (experts, { search, activeCategory }) => {
  * @param {number} defaultCount - Number of categories to show when collapsed
  * @returns {Array} Visible categories
  */
-export const getVisibleCategories = (categories, showAll, defaultCount = 6) => {
-  return showAll ? categories : categories.slice(0, defaultCount);
-};
+export const getVisibleCategories = (categories, showAll, defaultCount = 6) => showAll ? categories : categories.slice(0, defaultCount);
