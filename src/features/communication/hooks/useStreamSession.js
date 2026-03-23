@@ -28,6 +28,7 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
   const [isCleaningUp, setIsCleaningUp] = useState(false);
   const [currentMode, setCurrentMode] = useState(mode);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [callEndedRemotely, setCallEndedRemotely] = useState(false);
 
   const isMountedRef = useRef(true);
   const isInitializingRef = useRef(false);
@@ -152,10 +153,12 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
         chatToken,
       );
 
-      try {
-        await streamService.createChannel(appointmentId, otherUserId);
-      } catch {
-        // channel may already exist
+      if (otherUserId) {
+        try {
+          await streamService.createChannel(appointmentId, otherUserId);
+        } catch {
+          // channel may already exist
+        }
       }
 
       const channelId = getChannelId(appointmentId);
@@ -235,6 +238,18 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
   }, [appointmentId, streamClient, call]);
 
   const endSession = useCallback(async () => {
+    const currentCall = callRef.current;
+    if (currentCall) {
+      try {
+        const state = currentCall.state?.callingState;
+        if (state !== 'left' && state !== 'idle') {
+          await currentCall.endCall();
+        }
+      } catch {
+        // endCall may lack permissions — cleanup's call.leave() will still fire.
+      }
+    }
+
     await cleanup();
     try {
       await streamService.endCall(appointmentId, mode === 'chat' && currentModeRef.current === 'chat');
@@ -279,6 +294,20 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
     }
   }, [appointmentId, initializeServices]);
 
+  // Detect when the other participant ends the call (Stream fires call.ended).
+  useEffect(() => {
+    if (!call) return;
+
+    const sub = call.on('call.ended', () => {
+      if (isMountedRef.current) {
+        setCallEndedRemotely(true);
+        cleanup(true).catch(() => {});
+      }
+    });
+
+    return () => sub.unsubscribe();
+  }, [call, cleanup]);
+
   // Unread count listener
   useEffect(() => {
     if (!channel || !chatClient?.userID) return;
@@ -297,13 +326,9 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
   // Initialize on mount
   useEffect(() => {
     isMountedRef.current = true;
-    if (!appointmentId || !otherUserId) {
+    if (!appointmentId) {
       setLoading(false);
-      setError(
-        !appointmentId
-          ? 'Missing appointment information.'
-          : 'Missing participant — open this session from Bookings.',
-      );
+      setError('Missing appointment information.');
       return () => {
         isMountedRef.current = false;
       };
@@ -316,7 +341,7 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
       cleanup(true).catch(() => {});
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appointmentId, otherUserId]);
+  }, [appointmentId]);
 
   return {
     streamClient,
@@ -333,5 +358,6 @@ export const useStreamSession = ({ appointmentId, otherUserId, mode }) => {
     cleanup,
     endSession,
     switchToVideo,
+    callEndedRemotely,
   };
 };

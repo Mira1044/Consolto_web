@@ -81,7 +81,7 @@ export const streamService = {
     formData.append('category', 'chat');
 
     const { data } = await apiClient.post('/upload-file', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': undefined },
       timeout: 60_000,
       onUploadProgress: (e) => {
         if (onProgress && e.total) {

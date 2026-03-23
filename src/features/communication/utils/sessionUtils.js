@@ -5,19 +5,36 @@
 
 /**
  * Parse an appointment date + time string into a Date object.
- * Handles formats like "2026-03-18" + "11:30 AM".
+ * Handles: "2:30 PM", "14:30", "14:30:00".
  */
 export function parseAppointmentDateTime(dateStr, timeStr) {
-  const [hours, minutesPart] = timeStr.split(':');
-  const [minutes, meridiem] = minutesPart.trim().split(' ');
+  if (!dateStr || !timeStr) return null;
 
-  let h = parseInt(hours, 10);
-  if (meridiem?.toUpperCase() === 'PM' && h !== 12) h += 12;
-  if (meridiem?.toUpperCase() === 'AM' && h === 12) h = 0;
+  const dateOnly = String(dateStr).trim().slice(0, 10);
+  const t = String(timeStr).trim();
 
-  const date = new Date(dateStr);
-  date.setHours(h, parseInt(minutes, 10), 0, 0);
-  return date;
+  // AM/PM format
+  const ampm = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (ampm) {
+    let h = Number(ampm[1]);
+    const m = Number(ampm[2]);
+    const p = ampm[3].toUpperCase();
+    if (p === 'PM' && h !== 12) h += 12;
+    if (p === 'AM' && h === 12) h = 0;
+    const d = new Date(`${dateOnly}T00:00:00`);
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
+
+  // 24-hour format: "14:30" or "14:30:00"
+  const h24 = t.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if (h24) {
+    const d = new Date(`${dateOnly}T00:00:00`);
+    d.setHours(Number(h24[1]), Number(h24[2]), h24[3] ? Number(h24[3]) : 0, 0);
+    return d;
+  }
+
+  return null;
 }
 
 /**
@@ -31,6 +48,7 @@ export function parseAppointmentDateTime(dateStr, timeStr) {
 export function getTimeWindows(appointmentDate, startTime, endTime) {
   const start = parseAppointmentDateTime(appointmentDate, startTime);
   const end = parseAppointmentDateTime(appointmentDate, endTime);
+  if (!start || !end) return null;
 
   const chatWindowStart = new Date(start.getTime() - 15 * 60_000);
   const chatWindowEnd = new Date(end.getTime() + 30 * 24 * 60 * 60_000);
@@ -71,9 +89,9 @@ export function evaluateTimeStatus(windows, mode, now = new Date()) {
       return { status: 'completed', message: 'Appointment completed', canSendMessage, expired: false };
     }
     if (isInVideoWindow) {
-      return { status: 'video_available', message: 'Video call is now available! You can switch to video.', canSendMessage, expired: false };
+      return { status: 'video_available', message: 'Video call is now available! You can switch to video.', canSendMessage, expired: false, showTwoMinWarning };
     }
-    return { status: 'active', message: 'Chat is now available', canSendMessage, expired: false };
+    return { status: 'active', message: 'Chat is now available', canSendMessage, expired: false, showTwoMinWarning };
   }
 
   // Video mode

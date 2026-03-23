@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { Loader2, AlertTriangle } from 'lucide-react';
+import { Loader2, AlertTriangle, Clock, FileWarning } from 'lucide-react';
 import { useMediaQuery } from '@/shared/hooks';
 import { useStreamSession } from '../hooks/useStreamSession';
 import { useSessionTimer } from '../hooks/useSessionTimer';
@@ -95,8 +95,6 @@ export const SessionLayout = () => {
       handleExpired();
       return;
     }
-    // Use the same confirmation modal for both chat and video.
-    // This keeps the "end session" UX consistent with consolto_app.
     setShowEndModal(true);
   }, [timer.isExpired, session, navigate, handleExpired]);
 
@@ -131,7 +129,14 @@ export const SessionLayout = () => {
   const videoChatOverlay =
     !isDesktop && session.currentMode === 'video' && chatSidebarOpen;
 
-  // Lock page scroll while in session (reduces rubber-banding / background scroll on mobile).
+  // When the other participant ends the call, navigate away.
+  useEffect(() => {
+    if (session.callEndedRemotely) {
+      navigate(ROUTES.BOOKINGS, { replace: true });
+    }
+  }, [session.callEndedRemotely, navigate]);
+
+  // Lock page scroll while in session.
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -139,13 +144,6 @@ export const SessionLayout = () => {
       document.body.style.overflow = prev;
     };
   }, []);
-
-  // Dismiss “2 min left” banner automatically (avoid setState during render).
-  useEffect(() => {
-    if (!timer.showTwoMinWarning) return;
-    const id = window.setTimeout(() => timer.dismissTwoMinWarning(), 8000);
-    return () => clearTimeout(id);
-  }, [timer.showTwoMinWarning, timer.dismissTwoMinWarning]);
 
   // Escape closes mobile chat overlay / sheet.
   useEffect(() => {
@@ -171,12 +169,12 @@ export const SessionLayout = () => {
         </div>
         <Loader2 size={40} className="animate-spin text-violet-500" aria-hidden />
         <p className="mt-4 text-center text-base text-white">
-          {initialMode === 'chat' ? 'Connecting to chat…' : 'Connecting to video…'}
+          {initialMode === 'chat' ? 'Connecting to chat...' : 'Connecting to video...'}
         </p>
         <p className="mt-2 max-w-sm text-center text-sm text-gray-500">
           {initialMode === 'video'
             ? 'Allow camera and microphone when your browser asks — you can change this in the address bar.'
-            : 'Securing your session…'}
+            : 'Securing your session...'}
         </p>
       </div>
     );
@@ -214,25 +212,6 @@ export const SessionLayout = () => {
         unreadCount={session.unreadCount}
         initialMode={initialMode}
       />
-
-      {timer.showTwoMinWarning && (
-        <div
-          className="flex flex-shrink-0 flex-wrap items-center justify-center gap-2 border-b border-yellow-500/30 bg-yellow-600/90 px-4 py-2.5 sm:justify-between"
-          role="status"
-          aria-live="polite"
-        >
-          <p className="text-center text-sm font-medium text-white sm:text-left">
-            Session ending in 2 minutes — please wrap up.
-          </p>
-          <button
-            type="button"
-            onClick={timer.dismissTwoMinWarning}
-            className="min-h-9 shrink-0 rounded-lg px-3 text-xs font-semibold text-yellow-950/90 underline decoration-yellow-950/50 underline-offset-2 hover:text-yellow-950"
-          >
-            Dismiss
-          </button>
-        </div>
-      )}
 
       <div className="relative flex min-h-0 flex-1">
         <div
@@ -292,6 +271,68 @@ export const SessionLayout = () => {
           onCancel={() => setShowEndModal(false)}
           onConfirm={confirmEnd}
         />
+      )}
+
+      {fileUpload.uploadError && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
+          role="presentation"
+        >
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="upload-error-title"
+            aria-describedby="upload-error-desc"
+            className="w-full max-w-[400px] rounded-xl border border-red-500/40 bg-gray-800 p-6 text-center shadow-xl"
+          >
+            <FileWarning size={40} className="mx-auto mb-4 text-red-400" aria-hidden />
+            <h3 id="upload-error-title" className="mb-2 text-xl font-bold text-white">
+              Upload Failed
+            </h3>
+            <p id="upload-error-desc" className="mb-6 text-sm leading-relaxed text-gray-300">
+              {fileUpload.uploadError}
+            </p>
+            <button
+              type="button"
+              autoFocus
+              onClick={fileUpload.clearError}
+              className="min-h-11 w-full max-w-[10rem] rounded-lg bg-red-500 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-300"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+
+      {timer.showTwoMinWarning && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]"
+          role="presentation"
+        >
+          <div
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="session-warning-title"
+            aria-describedby="session-warning-desc"
+            className="w-full max-w-[400px] rounded-xl border border-yellow-500/40 bg-gray-800 p-6 text-center shadow-xl"
+          >
+            <Clock size={40} className="mx-auto mb-4 text-yellow-400" aria-hidden />
+            <h3 id="session-warning-title" className="mb-2 text-xl font-bold text-white">
+              Session Ending Soon
+            </h3>
+            <p id="session-warning-desc" className="mb-6 text-sm leading-relaxed text-gray-300">
+              Your session will end in 2 minutes. Please wrap up your discussion.
+            </p>
+            <button
+              type="button"
+              autoFocus
+              onClick={timer.dismissTwoMinWarning}
+              className="min-h-11 w-full max-w-[10rem] rounded-lg bg-yellow-500 px-6 py-2.5 text-sm font-bold text-gray-900 transition-colors hover:bg-yellow-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-300"
+            >
+              OK
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

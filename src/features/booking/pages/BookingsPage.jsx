@@ -554,6 +554,8 @@ import { useAuth } from '@/context/AuthContext';
 import { expertsService } from '@/features/experts/services/expertsService';
 import { apiRequest } from '@/shared/services/api';
 import { BookingsSegmentedToggle, UpcomingAppointmentCard } from '../components';
+import { useConsultantSelf } from '../hooks/useConsultantSelf';
+import { getInitialBookingsRoleTab } from '../utils/bookingsRoleTab';
 
 const upcomingBookings = [
   {
@@ -865,6 +867,7 @@ export const BookingsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { handleApiError } = useErrorHandler();
+  const { data: consultantSelf, isSuccess: hasConsultantSelf } = useConsultantSelf();
   /** Fallback if JWT `role` is set (not all backends set this). */
   const isConsultantByRole =
     String(user?.role || '').toUpperCase() === 'CONSULTANT' || String(user?.role || '').toUpperCase() === 'EXPERT';
@@ -878,7 +881,7 @@ export const BookingsPage = () => {
   // Same mapping as consolto_app `RoleSwitch.TabSwitcher` + bookings initial state:
   // - "Consultant Bookings" => roleTab 'consultant' => GET /appointment/consultant
   // - "Client Bookings"     => roleTab 'user'       => GET /appointment/user
-  const [roleTab, setRoleTab] = useState('user');
+  const [roleTab, setRoleTab] = useState(() => getInitialBookingsRoleTab());
   const userRole = roleTab;
   const roleTabInitRef = useRef(false);
 
@@ -887,6 +890,13 @@ export const BookingsPage = () => {
       roleTabInitRef.current = false;
     }
   }, [user?.token]);
+
+  useEffect(() => {
+    const hasProfile = Boolean(
+      consultantSelf?.raw?._id || consultantSelf?.expert?.id || hasConsultantSelf,
+    );
+    setHasConsultantProfile(hasProfile);
+  }, [consultantSelf, hasConsultantSelf]);
 
   // Default tab: consultants open "Consultant Bookings" once we know they can switch (matches app intent)
   useEffect(() => {
@@ -1385,7 +1395,7 @@ export const BookingsPage = () => {
     setCompleteLoading(true);
     try {
       await bookingService.markAppointmentComplete({ appointmentId });
-      invalidateBookings();
+      setRefreshTick((t) => t + 1);
     } catch (err) {
       handleApiError(err, { context: { feature: 'booking', action: 'markAppointmentComplete' } });
     } finally {
@@ -1471,6 +1481,65 @@ export const BookingsPage = () => {
     } catch (err) {
       handleApiError(err, { context: { feature: 'booking', action: 'bookAgain' } });
     }
+  };
+
+  const buildSessionStateFromBooking = (booking, sessionMode) => {
+    const raw = booking?.raw || {};
+    const appointmentId = raw?._id || booking?.id;
+    const appointmentDate = String(
+      raw?.appointment_booked_date || raw?.appointmentDate || '',
+    ).slice(0, 10);
+    const appointmentStartTime = raw?.appointment_start_time || raw?.appointmentStartTime || '';
+    const appointmentEndTime = raw?.appointment_end_time || raw?.appointmentEndTime || '';
+
+    const otherUserName =
+      userRole === 'consultant'
+        ? raw?.user?.firstName && raw?.user?.lastName
+          ? `${raw.user.firstName} ${raw.user.lastName}`
+          : raw?.user?.firstName || raw?.user?.phoneNumber || 'Client'
+        : raw?.consultant?.user_name || raw?.consultant?.name || 'Consultant';
+
+    const rawOtherUserId =
+      userRole === 'consultant'
+        ? raw?.user?._id ||
+          raw?.user?.id ||
+          (typeof raw?.user === 'string' ? raw.user : null) ||
+          raw?.user_id
+        : raw?.consultant?._id ||
+          raw?.consultant?.id ||
+          (typeof raw?.consultant === 'string' ? raw.consultant : null) ||
+          raw?.consultant_id;
+
+    const otherUserId =
+      rawOtherUserId && typeof rawOtherUserId === 'object'
+        ? rawOtherUserId._id || rawOtherUserId.id || ''
+        : rawOtherUserId || '';
+
+    if (!appointmentId || !appointmentDate) {
+      window.alert('Unable to open this session — missing appointment details.');
+      return null;
+    }
+
+    return {
+      appointmentId,
+      appointmentStartTime,
+      appointmentEndTime,
+      appointmentDate,
+      otherUserName,
+      otherUserId: String(otherUserId),
+      mode: sessionMode,
+      userRole,
+      appointmentStatus: raw?.appointment_status,
+    };
+  };
+
+  const openSessionFromBooking = (booking, sessionMode) => {
+    const sessionState = buildSessionStateFromBooking(booking, sessionMode);
+    if (!sessionState) return;
+    navigate(
+      ROUTES.SESSION.replace(':appointmentId', encodeURIComponent(String(sessionState.appointmentId))),
+      { state: sessionState },
+    );
   };
 
   const pastFilters = ['All', 'Completed', 'Cancelled'];
@@ -1656,76 +1725,8 @@ export const BookingsPage = () => {
                       cancelLoading={cancelLoading && activeBookingId === bookingId}
                       completeLoading={completeLoading && completeBookingId === bookingId}
                       onCompleteBooking={handleCompleteBooking}
-                      onJoinChat={(booking) => {
-                        const raw = booking?.raw || {};
-                        const appointmentId = raw?._id || booking?.id;
-                        const appointmentDate = String(raw?.appointment_booked_date || '').slice(0, 10);
-                        const appointmentStartTime = raw?.appointment_start_time;
-                        const appointmentEndTime = raw?.appointment_end_time;
-
-                        const otherUserName =
-                          userRole === 'consultant'
-                            ? raw?.user?.firstName && raw?.user?.lastName
-                              ? `${raw.user.firstName} ${raw.user.lastName}`
-                              : raw?.user?.firstName || raw?.user?.phoneNumber || 'Client'
-                            : raw?.consultant?.user_name || raw?.consultant?.name || 'Consultant';
-
-                        const otherUserId =
-                          userRole === 'consultant'
-                            ? raw?.user?._id || raw?.user_id
-                            : raw?.consultant?._id || raw?.consultant_id;
-
-                        if (!appointmentId || !appointmentDate || !otherUserId) return;
-
-                        navigate(ROUTES.SESSION, {
-                          state: {
-                            appointmentId,
-                            appointmentStartTime,
-                            appointmentEndTime,
-                            appointmentDate,
-                            otherUserName,
-                            otherUserId,
-                            mode: 'chat',
-                            userRole,
-                            appointmentStatus: raw?.appointment_status,
-                          },
-                        });
-                      }}
-                      onJoinCall={(booking) => {
-                        const raw = booking?.raw || {};
-                        const appointmentId = raw?._id || booking?.id;
-                        const appointmentDate = String(raw?.appointment_booked_date || '').slice(0, 10);
-                        const appointmentStartTime = raw?.appointment_start_time;
-                        const appointmentEndTime = raw?.appointment_end_time;
-
-                        const otherUserName =
-                          userRole === 'consultant'
-                            ? raw?.user?.firstName && raw?.user?.lastName
-                              ? `${raw.user.firstName} ${raw.user.lastName}`
-                              : raw?.user?.firstName || raw?.user?.phoneNumber || 'Client'
-                            : raw?.consultant?.user_name || raw?.consultant?.name || 'Consultant';
-
-                        const otherUserId =
-                          userRole === 'consultant'
-                            ? raw?.user?._id || raw?.user_id
-                            : raw?.consultant?._id || raw?.consultant_id;
-
-                        if (!appointmentId || !appointmentDate || !otherUserId) return;
-
-                        navigate(ROUTES.SESSION, {
-                          state: {
-                            appointmentId,
-                            appointmentStartTime,
-                            appointmentEndTime,
-                            appointmentDate,
-                            otherUserName,
-                            otherUserId,
-                            mode: 'video',
-                            userRole,
-                            appointmentStatus: raw?.appointment_status,
-                          },
-                        });
-                      }}
+                      onJoinChat={(booking) => openSessionFromBooking(booking, 'chat')}
+                      onJoinCall={(booking) => openSessionFromBooking(booking, 'video')}
                       onRescheduleBooking={handleReschedule}
                       onCancelBooking={handleCancel}
                       onViewSummary={openSummary}
@@ -1745,76 +1746,8 @@ export const BookingsPage = () => {
                     cancelLoading={cancelLoading && activeBookingId === bookingId}
                     completeLoading={completeLoading && completeBookingId === bookingId}
                     onCompleteBooking={handleCompleteBooking}
-                    onJoinChat={(booking) => {
-                      const raw = booking?.raw || {};
-                      const appointmentId = raw?._id || booking?.id;
-                      const appointmentDate = String(raw?.appointment_booked_date || '').slice(0, 10);
-                      const appointmentStartTime = raw?.appointment_start_time;
-                      const appointmentEndTime = raw?.appointment_end_time;
-
-                      const otherUserName =
-                        userRole === 'consultant'
-                          ? raw?.user?.firstName && raw?.user?.lastName
-                            ? `${raw.user.firstName} ${raw.user.lastName}`
-                            : raw?.user?.firstName || raw?.user?.phoneNumber || 'Client'
-                          : raw?.consultant?.user_name || raw?.consultant?.name || 'Consultant';
-
-                      const otherUserId =
-                        userRole === 'consultant'
-                          ? raw?.user?._id || raw?.user_id
-                          : raw?.consultant?._id || raw?.consultant_id;
-
-                      if (!appointmentId || !appointmentDate || !otherUserId) return;
-
-                      navigate(ROUTES.SESSION, {
-                        state: {
-                          appointmentId,
-                          appointmentStartTime,
-                          appointmentEndTime,
-                          appointmentDate,
-                          otherUserName,
-                          otherUserId,
-                          mode: 'chat',
-                          userRole,
-                          appointmentStatus: raw?.appointment_status,
-                        },
-                      });
-                    }}
-                    onJoinCall={(booking) => {
-                      const raw = booking?.raw || {};
-                      const appointmentId = raw?._id || booking?.id;
-                      const appointmentDate = String(raw?.appointment_booked_date || '').slice(0, 10);
-                      const appointmentStartTime = raw?.appointment_start_time;
-                      const appointmentEndTime = raw?.appointment_end_time;
-
-                      const otherUserName =
-                        userRole === 'consultant'
-                          ? raw?.user?.firstName && raw?.user?.lastName
-                            ? `${raw.user.firstName} ${raw.user.lastName}`
-                            : raw?.user?.firstName || raw?.user?.phoneNumber || 'Client'
-                          : raw?.consultant?.user_name || raw?.consultant?.name || 'Consultant';
-
-                      const otherUserId =
-                        userRole === 'consultant'
-                          ? raw?.user?._id || raw?.user_id
-                          : raw?.consultant?._id || raw?.consultant_id;
-
-                      if (!appointmentId || !appointmentDate || !otherUserId) return;
-
-                      navigate(ROUTES.SESSION, {
-                        state: {
-                          appointmentId,
-                          appointmentStartTime,
-                          appointmentEndTime,
-                          appointmentDate,
-                          otherUserName,
-                          otherUserId,
-                          mode: 'video',
-                          userRole,
-                          appointmentStatus: raw?.appointment_status,
-                        },
-                      });
-                    }}
+                    onJoinChat={(booking) => openSessionFromBooking(booking, 'chat')}
+                    onJoinCall={(booking) => openSessionFromBooking(booking, 'video')}
                     onRescheduleBooking={handleReschedule}
                     onCancelBooking={handleCancel}
                     onViewSummary={openSummary}

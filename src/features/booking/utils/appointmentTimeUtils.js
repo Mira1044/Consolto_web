@@ -35,14 +35,15 @@ const parseBookingDateTime = (dateStr, timeStr) => {
     return d;
   }
 
-  // 24-hour format: "14:30"
-  const m = t.match(/^(\d{1,2}):(\d{2})$/);
+  // 24-hour format: "14:30" or "14:30:00"
+  const m = t.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
   if (!m) return null;
 
   const hour = Number(m[1]);
   const minutes = Number(m[2]);
+  const seconds = m[3] ? Number(m[3]) : 0;
   const d = new Date(`${dateOnly}T00:00:00`);
-  d.setHours(hour, minutes, 0, 0);
+  d.setHours(hour, minutes, seconds, 0);
   return d;
 };
 
